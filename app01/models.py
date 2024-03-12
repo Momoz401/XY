@@ -121,12 +121,20 @@ class City(models.Model):
     img = models.FileField(verbose_name="Logo", max_length=128, upload_to='city/')
 
 
-class Lot_No(models.Model):
+
+class LotNumber(models.Model):
     """ 批次表 """
     lot_id = models.CharField(verbose_name="批次ID",max_length=32)
     manage_name = models.CharField(verbose_name="责任人", max_length=32)
     plant_date = models.DateField(verbose_name="种植日期")
     area = models.DecimalField(verbose_name="面积", decimal_places=2, max_digits=10)
-    base_id = models.ForeignKey(verbose_name="基地", max_length=32)
+    base_id = models.ForeignKey(to="BasePlace", to_field="base_id", max_length=32, on_delete=models.SET_NULL())  # 至空处理
 
-  
+class BasePlace(models.Model):
+    """基地表"""
+    base_id = models.CharField(verbose_name="基地id", max_length=32, primary_key=True)
+    base_name = models.CharField(verbose_name="基地名称", max_length=32)
+    base_manager = models.CharField(verbose_name="基地经理", max_length=32)
+
+    def __str__(self):
+        return self.base_name
