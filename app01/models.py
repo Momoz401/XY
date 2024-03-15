@@ -1,4 +1,8 @@
+from datetime import timedelta
+
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 
 
 class XX(models.Model):
@@ -121,14 +125,40 @@ class City(models.Model):
     img = models.FileField(verbose_name="Logo", max_length=128, upload_to='city/')
 
 
-
 class LotNumber(models.Model):
     """ 批次表 """
-    lot_id = models.CharField(verbose_name="批次ID",max_length=32)
-    manage_name = models.CharField(verbose_name="责任人", max_length=32)
-    plant_date = models.DateField(verbose_name="种植日期")
-    area = models.DecimalField(verbose_name="面积", decimal_places=2, max_digits=10)
-    base_id = models.ForeignKey(to="BasePlace", to_field="base_id", max_length=32, on_delete=models.SET_NULL())  # 至空处理
+    lot_id = models.CharField(verbose_name="批次ID", max_length=32)
+    lot_area = models.DecimalField(verbose_name="面积", decimal_places=2, max_digits=10)
+    base_id = models.ForeignKey(to="BasePlace", to_field="base_id", max_length=32, on_delete=models.SET_NULL())  # 置空处理
+    destroy_area = models.DecimalField(verbose_name="销毁面积", decimal_places=5, max_digits=2)
+    product_id = models.ForeignKey(verbose_name="产品", to="Products", to_field="product_id",
+                                   on_delete=models.SET_NULL(), null=True)
+    lot_massif = models.CharField(verbose_name="地块", max_length=10, blank=True)
+    lot_number = models.CharField(verbose_name="批次", max_length=10, blank=True)
+    growth_cycle = models.CharField(verbose_name="生长周期", max_length=10, blank=True)
+    recovery_start_date = models.DateField(verbose_name="采摘初期")
+    recovery_end_date = models.DateField(verbose_name="采摘末期")
+    recovered_period = models.DurationField(verbose_name="采摘周期", blank=True, null=True)  # 通过计算得到
+    all_period_date = models.DateField(verbose_name="总周期", blank=True, null=True)
+    all_production = models.DecimalField(verbose_name="总产量", max_digits=5, decimal_places=2, default=0)
+    normal_production = models.DecimalField(verbose_name="总产量", max_digits=5, decimal_places=2, default=0)
+    all_per_mu_production = models.DecimalField(verbose_name="总亩产量", max_digits=5, decimal_places=2, default=0)
+    normal_per_mu_production = models.DecimalField(verbose_name="正常亩量", max_digits=5, decimal_places=2, default=0)
+
+
+'''
+@receiver是Django框架中用于连接信号（Signal）和信号处理器（Signal handler）的装饰器。在Django中，
+信号是一种发布-订阅模式的实现，允许一个组件发送消息并让其他组件在消息发送时做出响应。
+当某个事件发生时，例如保存一个模型实例，Django会触发相应的信号。然后，您可以使用@receiver装饰器将信号连接到一个函数，这个函数会在信号触发时执行。
+'''
+
+
+@receiver(pre_save, sender=LotNumber)
+def calculate_date_difference(sender, instance, **kwargs):
+    if instance.recovery_start_date and instance.recovery_end_date:
+        difference = instance.recovery_end_date - instance.recovery_start_date
+        instance.recovered_period = timedelta(days=difference.days)
+
 
 class BasePlace(models.Model):
     """基地表"""
@@ -138,3 +168,45 @@ class BasePlace(models.Model):
 
     def __str__(self):
         return self.base_name
+
+
+class Plants(models.Model):
+    lot_id = models.CharField(verbose_name="批次ID", max_length=32, primary_key=True)
+    plant_date = models.DateField(verbose_name="种植日期")
+    plant_type = models.CharField(verbose_name="栽种类型", max_length=32)
+
+
+class Products(models.Model):
+    product_id = models.CharField(verbose_name="品类id", max_length=10, primary_key=True)
+    product_category_name = models.CharField(verbose_name="品类名称", max_length=10, null=False)
+    product_brand = models.CharField(verbose_name="品种名称", max_length=10, null=False)
+
+
+class WorkType(models.Model):
+    name = models.CharField(max_length=50, verbose_name='工种名称')
+    parent_work_type = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE,
+                                         related_name='sub_work_types', verbose_name='父工种')
+
+    def __str__(self):
+        return self.get_full_name()
+
+    def get_full_name(self):
+        if self.parent_work_type:
+            return f"{self.parent_work_type.get_full_name()} - {self.name}"
+        return self.name
+
+
+"""
+这里非常重要这里是一个工时单价表
+"""
+
+
+class Task(models.Model):
+    work_type = models.ForeignKey(WorkType, on_delete=models.CASCADE, verbose_name='工种')
+    category = models.CharField(max_length=50, blank=True, null=True, verbose_name='分类')
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='单价')
+    unit = models.CharField(max_length=10, verbose_name='单位')
+    remarks = models.TextField(blank=True, null=True, verbose_name='备注')
+
+    def __str__(self):
+        return f"{self.work_type.get_full_name()} - {self.category if self.category else '无分类'}"
