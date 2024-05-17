@@ -18,7 +18,9 @@ from django.urls import path, re_path
 from django.views.static import serve
 from django.conf import settings
 
-from app01.views import depart, user, pretty, admin, account, task, order, chart, upload,city
+from app01.models import BaseInfoWorkHour, PlanPlantBatch
+from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
+    WorkHour, planplantbatch
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -40,6 +42,22 @@ urlpatterns = [
     path('user/model/form/add/', user.user_model_form_add),
     path('user/<int:nid>/edit/', user.user_edit),
     path('user/<int:nid>/delete/', user.user_delete),
+
+    # 工种管理
+    path('BaseInfoWorkType/list/', worktype.BaseInfoWorkType_list),
+    path('BaseInfoWorkType/add/', worktype.BaseInfoWorkType_add),
+
+    # 基地管理
+    path('BaseInfo/list/', baseinfo.BaseInfo_list),
+    path('BaseInfo/add/', baseinfo.BaseInfo_add),
+
+    # 工价管理
+    path('WorkHour/list/', WorkHour.Hour_list),
+    path('WorkHour/add/', WorkHour.WorkHour_add),
+
+    # 月度计划
+    path('PlanPlantBatch/list/',planplantbatch.planplantbatch_list),
+
 
     # 靓号管理
     path('pretty/list/', pretty.pretty_list),

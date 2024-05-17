@@ -23,27 +23,83 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="#"> 祥云泰兴农业基础数据管理系统 </a>
+            <a class="navbar-brand" href="#"> 祥云泰兴 </a>
         </div>
         <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav">
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">功能管理 <span class="caret"></span></a>
+                       aria-expanded="false">基础信息维护<span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/admin/list/">管理员账户</a></li>
                         <li><a href="/depart/list/">部门管理</a></li>
                         <li><a href="/user/list/">用户管理</a></li>
-                        <li><a href="/pretty/list/">工种管理</a></li>
-                        <li><a href="/task/list/">任务管理</a></li>
+                        <li><a href="/BaseInfoWorkType/list/">工种管理</a></li>
+                        <li><a href="/BaseInfo/list/">基地管理</a></li>
+                        <li><a href="/WorkHour/list/">工价管理</a></li>
                     </ul>
                 </li>
-                <li><a href="/order/list/">订单管理</a></li>
-                <li><a href="/chart/list/">数据统计</a></li>
-                <li><a href="/chart/highcharts/">Highcharts</a></li>
-                <li><a href="/upload/form/">Form上传</a></li>
-                <li><a href="/upload/modal/form/">ModalForm上传</a></li>
-                <li><a href="/city/list/">城市列表（文件）</a></li>
+
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">计划类信息维护<span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/PlanPlantBatch/list/">月度计划</a></li>
+                        <li><a href="/depart/list/">每日计划</a></li>
+                        <li><a href="/user/list/">计划汇总</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">生产类中心维护 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/list/">种植批次表</a></li>
+                        <li><a href="/depart/list/">生产汇总表</a></li>
+
+                    </ul>
+                </li>
+
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">成本中心维护 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/list/">工资表表维护</a></li>
+                        <li><a href="/depart/list/">农资成本维护</a></li>
+                        <li><a href="/user/list/">打药成本维护</a></li>
+                        <li><a href="/pretty/list/">折旧摊销</a></li>
+                        <li><a href="/task/list/">打地成本</a></li>
+                    </ul>
+                </li>
+
+                    <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">销售支持维护 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/order/list/">出库统计</a></li>
+                        <li><a href="/chart/list/">销售明细</a></li>
+                        <li><a href="/chart/highcharts/">销售汇总</a></li>
+
+                    </ul>
+                </li>
+
+
+
+
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">数据统计中心 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/order/list/">订单管理</a></li>
+                        <li><a href="/chart/list/">数据统计</a></li>
+                        <li><a href="/chart/highcharts/">Highcharts</a></li>
+                        <li><a href="/upload/form/">Form上传</a></li>
+                        <li><a href="/upload/modal/form/">ModalForm上传</a></li>
+                        <li><a href="/city/list/">文件上传</a></li>
+                    </ul>
+                </li>
 
 
             </ul>

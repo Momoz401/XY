@@ -64,3 +64,60 @@ class PrettyEditModelForm(BootStrapModelForm):
 
         # 验证通过，用户输入的值返回
         return txt_mobile
+
+class worktypeModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.BaseInfoWorkType
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['工种名称', '父工种','工种级别']
+
+    # 验证：方式2
+    def clean_mobile(self):
+        txt_mobile = self.cleaned_data['工种名称']
+
+        exists = models.BaseInfoWorkType.objects.filter(工种名称=txt_mobile).exists()
+        if exists:
+            raise ValidationError("工种已存在")
+
+        # 验证通过，用户输入的值返回
+        return txt_mobile
+
+
+class baseInfoModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.BaseInfoBase
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['基地ID', '基地位置','基地名称','基地经理']
+
+    # 验证：方式2
+    def clean_mobile(self):
+        txt_mobile = self.cleaned_data['基地名称']
+
+        exists = models.BaseInfo.objects.filter(工种名称=txt_mobile).exists()
+        if exists:
+            raise ValidationError("基地已存在")
+
+        # 验证通过，用户输入的值返回
+        return txt_mobile
+
+
+class workHourModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.BaseInfoWorkHour
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['工种ID', '工种','分类','单价','单位','备注']
+
+    # 验证：方式2
+    def clean_mobile(self):
+        txt_mobile = self.cleaned_data['分类']
+
+        exists = models.BaseInfoWorkHour.objects.filter(工种名称=txt_mobile).exists()
+        if exists:
+            raise ValidationError("分类已存在")
+
+        # 验证通过，用户输入的值返回
+        return txt_mobile
+

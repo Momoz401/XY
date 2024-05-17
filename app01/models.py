@@ -1,8 +1,4 @@
-from datetime import timedelta
-
 from django.db import models
-from django.db.models.signals import pre_save
-from django.dispatch import receiver
 
 
 class XX(models.Model):
@@ -125,88 +121,258 @@ class City(models.Model):
     img = models.FileField(verbose_name="Logo", max_length=128, upload_to='city/')
 
 
-class LotNumber(models.Model):
-    """ 批次表 """
-    lot_id = models.CharField(verbose_name="批次ID", max_length=32)
-    lot_area = models.DecimalField(verbose_name="面积", decimal_places=2, max_digits=10)
-    base_id = models.ForeignKey(to="BasePlace", to_field="base_id", max_length=32, on_delete=models.SET_NULL())  # 置空处理
-    destroy_area = models.DecimalField(verbose_name="销毁面积", decimal_places=5, max_digits=2)
-    product_id = models.ForeignKey(verbose_name="产品", to="Products", to_field="product_id",
-                                   on_delete=models.SET_NULL(), null=True)
-    lot_massif = models.CharField(verbose_name="地块", max_length=10, blank=True)
-    lot_number = models.CharField(verbose_name="批次", max_length=10, blank=True)
-    growth_cycle = models.CharField(verbose_name="生长周期", max_length=10, blank=True)
-    recovery_start_date = models.DateField(verbose_name="采摘初期")
-    recovery_end_date = models.DateField(verbose_name="采摘末期")
-    recovered_period = models.DurationField(verbose_name="采摘周期", blank=True, null=True)  # 通过计算得到
-    all_period_date = models.DateField(verbose_name="总周期", blank=True, null=True)
-    all_production = models.DecimalField(verbose_name="总产量", max_digits=5, decimal_places=2, default=0)
-    normal_production = models.DecimalField(verbose_name="总产量", max_digits=5, decimal_places=2, default=0)
-    all_per_mu_production = models.DecimalField(verbose_name="总亩产量", max_digits=5, decimal_places=2, default=0)
-    normal_per_mu_production = models.DecimalField(verbose_name="正常亩量", max_digits=5, decimal_places=2, default=0)
 
+class BaseInfoBase(models.Model):
+    ID = models.AutoField(primary_key=True)
+    基地ID = models.IntegerField(null=True)
+    基地位置 = models.CharField(max_length=255, unique=True)
+    基地名称 = models.CharField(max_length=255)
+    基地经理 = models.CharField(max_length=255)
 
-'''
-@receiver是Django框架中用于连接信号（Signal）和信号处理器（Signal handler）的装饰器。在Django中，
-信号是一种发布-订阅模式的实现，允许一个组件发送消息并让其他组件在消息发送时做出响应。
-当某个事件发生时，例如保存一个模型实例，Django会触发相应的信号。然后，您可以使用@receiver装饰器将信号连接到一个函数，这个函数会在信号触发时执行。
-'''
+class BaseInfoProduct(models.Model):
+    品类iD = models.AutoField(primary_key=True)
+    品类名称 = models.CharField(max_length=255)
+    品种名称 = models.CharField(max_length=255)
 
-
-@receiver(pre_save, sender=LotNumber)
-def calculate_date_difference(sender, instance, **kwargs):
-    if instance.recovery_start_date and instance.recovery_end_date:
-        difference = instance.recovery_end_date - instance.recovery_start_date
-        instance.recovered_period = timedelta(days=difference.days)
-
-
-class BasePlace(models.Model):
-    """基地表"""
-    base_id = models.CharField(verbose_name="基地id", max_length=32, primary_key=True)
-    base_name = models.CharField(verbose_name="基地名称", max_length=32)
-    base_manager = models.CharField(verbose_name="基地经理", max_length=32)
+class BaseInfoWorkType(models.Model):
+    工种名称 = models.CharField(max_length=255)
+    工种级别 = models.CharField(max_length=2,default='')
+    父工种 = models.CharField(max_length=2,default='')
+    工种ID = models.AutoField(primary_key=True)
 
     def __str__(self):
-        return self.base_name
+        return self.父工种
 
+class BaseInfoWorkHour(models.Model):
+    工种ID = models.AutoField(primary_key=True)
 
-class Plants(models.Model):
-    lot_id = models.CharField(verbose_name="批次ID", max_length=32, primary_key=True)
-    plant_date = models.DateField(verbose_name="种植日期")
-    plant_type = models.CharField(verbose_name="栽种类型", max_length=32)
+    工种 = models.CharField(max_length=255)
+    分类 = models.CharField(max_length=255, null=True)
+    单价 = models.FloatField(null=True)
+    单位 = models.CharField(max_length=255, null=True)
+    备注 = models.CharField(max_length=50, null=True)
 
+class PlanPlantBatch(models.Model):
+    ID = models.AutoField(primary_key=True)
+    批次ID = models.CharField(max_length=10, null=True)
+    移栽日期 = models.DateField(null=True)
+    品种 = models.CharField(max_length=255, null=True)
+    品类 = models.CharField(max_length=255, null=True)
+    面积 = models.FloatField(null=True)
+    基地ID = models.CharField(max_length=11, null=True)
+    移栽数量 = models.FloatField(null=True)
+    移栽板量 = models.FloatField(null=True)
+    点子数量 = models.FloatField(null=True)
+    地块 = models.CharField(max_length=255, null=True)
+    备注 = models.CharField(max_length=255, null=True)
+    生长周期 = models.FloatField(null=True)
+    采收期 = models.CharField(max_length=255, null=True)
+    采收初期 = models.DateField(null=True)
+    采收末期 = models.DateField(null=True)
+    周期批次 = models.CharField(max_length=255, null=True)
+    总周期天数 = models.FloatField(null=True)
+    销毁面积 = models.FloatField(null=True)
+    销毁备注 = models.FloatField(null=True)
+    栽种方式 = models.CharField(max_length=255, null=True)
+    正常产量 = models.FloatField(null=True)
+    正常亩产 = models.FloatField(null=True)
+    总产量 = models.FloatField(null=True)
+    总亩产 = models.FloatField(null=True)
+    下批前一天时间 = models.DateField(null=True)
+    周期 = models.CharField(max_length=255, null=True)
 
-class Products(models.Model):
-    product_id = models.CharField(verbose_name="品类id", max_length=10, primary_key=True)
-    product_category_name = models.CharField(verbose_name="品类名称", max_length=10, null=False)
-    product_brand = models.CharField(verbose_name="品种名称", max_length=10, null=False)
+class ProductionBatch(models.Model):
+    iD = models.AutoField(primary_key=True)
+    批次ID = models.CharField(max_length=255, unique=True)
+    面积 = models.FloatField(null=True)
+    基地ID = models.ForeignKey(BaseInfoBase, on_delete=models.SET_NULL, null=True)
+    销毁面积 = models.FloatField(null=True)
+    产品iD = models.ForeignKey(BaseInfoProduct, on_delete=models.SET_NULL, null=True)
+    地块 = models.CharField(max_length=255, null=True)
+    批次 = models.IntegerField(null=True)
+    生长周期 = models.FloatField(null=True)
+    采收初期 = models.DateField(null=True)
+    采收末期 = models.DateField(null=True)
+    采收周期 = models.DateField(null=True)
+    总周期 = models.FloatField(null=True)
+    实际总产量 = models.FloatField(null=True)
+    正常总产量 = models.FloatField(null=True)
+    总亩产量 = models.FloatField(null=True)
+    正常亩产量 = models.FloatField(null=True)
 
+class CostTotal(models.Model):
+    批次 = models.CharField(max_length=255, null=True)
+    人工费用 = models.FloatField(null=True)
+    农资费用 = models.FloatField(null=True)
+    打药费用 = models.FloatField(null=True)
+    打地费用 = models.FloatField(null=True)
+    折旧费用 = models.FloatField(null=True)
+    出库 = models.FloatField(null=True)
+    销售 = models.FloatField(null=True)
 
-class WorkType(models.Model):
-    name = models.CharField(max_length=50, verbose_name='工种名称')
-    parent_work_type = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE,
-                                         related_name='sub_work_types', verbose_name='父工种')
+class PlanSummary(models.Model):
+    移栽时间 = models.DateField(null=True)
+    批次ID = models.CharField(max_length=255, null=True)
+    计划种植 = models.FloatField(null=True)
+    实际种植 = models.FloatField(null=True)
+    计划达成率 = models.FloatField(null=True)
+    生长周期 = models.FloatField(null=True)
+    踩栽周期 = models.DateField(null=True)
+    踩栽末期 = models.DateField(null=True)
+    下一批前一天 = models.DateField(null=True)
+    损耗 = models.FloatField(null=True)
+    实际采收 = models.FloatField(null=True)
+    计划实际采收率 = models.FloatField(null=True)
+    预估客销售 = models.FloatField(null=True)
+    实际销售 = models.FloatField(null=True)
+    计划销售率 = models.FloatField(null=True)
 
-    def __str__(self):
-        return self.get_full_name()
+class PlanDaily(models.Model):
+    上批批次 = models.CharField(max_length=255, null=True)
+    地块 = models.CharField(max_length=255, null=True)
+    面积 = models.FloatField(null=True)
+    种植日期 = models.DateField(null=True)
+    采收 = models.CharField(max_length=255, null=True)
+    打地 = models.CharField(max_length=255, null=True)
+    SC = models.CharField(max_length=255, null=True)
+    FF = models.CharField(max_length=255, null=True)
+    下一批种植日期 = models.DateField(null=True)
+    种植品种 = models.CharField(max_length=255, null=True)
+    未K = models.CharField(max_length=255, null=True)
+    备注 = models.CharField(max_length=255, null=True)
+    种植规格 = models.CharField(max_length=255, null=True)
 
-    def get_full_name(self):
-        if self.parent_work_type:
-            return f"{self.parent_work_type.get_full_name()} - {self.name}"
-        return self.name
+class ProductionWage(models.Model):
+    日期 = models.DateField(null=True)
+    二级工种 = models.CharField(max_length=255, null=True)
+    单位 = models.CharField(max_length=255, null=True)
+    数量 = models.FloatField(null=True)
+    单价 = models.FloatField(null=True)
+    加班工时 = models.FloatField(null=True)
+    工时 = models.FloatField(null=True)
+    合计工资 = models.FloatField(null=True)
+    批次 = models.CharField(max_length=255, null=True)
+    地块 = models.CharField(max_length=255, null=True)
 
+class CostAgriculture(models.Model):
+    批次 = models.CharField(max_length=255, null=True)
+    地块 = models.FloatField(null=True)
+    单据编号 = models.FloatField(null=True)
+    商品全名 = models.FloatField(null=True)
+    规格 = models.FloatField(null=True)
+    数量 = models.FloatField(null=True)
+    单位 = models.FloatField(null=True)
+    单价 = models.FloatField(null=True)
+    金额 = models.FloatField(null=True)
+    备注 = models.CharField(max_length=255, null=True)
 
-"""
-这里非常重要这里是一个工时单价表
-"""
+class CostPesticide(models.Model):
+    批次 = models.CharField(max_length=255, null=True)
+    地块 = models.FloatField(null=True)
+    面积 = models.FloatField(null=True)
+    实际打药面积 = models.FloatField(null=True)
+    数量 = models.FloatField(null=True)
+    单位 = models.FloatField(null=True)
+    单价 = models.FloatField(null=True)
+    金额 = models.FloatField(null=True)
+    次数 = models.IntegerField(null=True)
+    服务人员 = models.CharField(max_length=255, null=True)
+    申请打药时间 = models.DateField(null=True)
+    预计打药时间 = models.DateField(null=True)
+    实际打药时间 = models.DateField(null=True)
 
+class CostAllocation(models.Model):
+    月度 = models.CharField(max_length=255, null=True)
+    散装工时 = models.FloatField(null=True)
+    农家肥 = models.FloatField(null=True)
+    材料 = models.FloatField(null=True)
+    管理费 = models.FloatField(null=True)
+    生活费 = models.FloatField(null=True)
+    水电费 = models.FloatField(null=True)
+    地租 = models.FloatField(null=True)
+    大棚管架 = models.FloatField(null=True)
+    大棚棚膜 = models.FloatField(null=True)
+    大棚喷灌 = models.FloatField(null=True)
+    其他资产 = models.FloatField(null=True)
+    有机肥 = models.FloatField(null=True)
+    出勤奖 = models.FloatField(null=True)
+    服务费 = models.FloatField(null=True)
+    基地经理 = models.FloatField(null=True)
+    批次 = models.CharField(max_length=255, null=True)
 
-class Task(models.Model):
-    work_type = models.ForeignKey(WorkType, on_delete=models.CASCADE, verbose_name='工种')
-    category = models.CharField(max_length=50, blank=True, null=True, verbose_name='分类')
-    unit_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='单价')
-    unit = models.CharField(max_length=10, verbose_name='单位')
-    remarks = models.TextField(blank=True, null=True, verbose_name='备注')
+class CostLandPreparation(models.Model):
+    月份 = models.CharField(max_length=255, null=True)
+    地块 = models.CharField(max_length=10, null=True)
+    批次 = models.CharField(max_length=255, null=True)
+    面积 = models.FloatField(null=True)
+    实际打药面积 = models.FloatField(null=True)
+    数量 = models.FloatField(null=True)
+    单位 = models.FloatField(null=True)
+    单价 = models.FloatField(null=True)
+    金额 = models.FloatField(null=True)
+    备注 = models.CharField(max_length=255, null=True)
+    打地人姓名 = models.CharField(max_length=255, null=True)
+    申请打地时间 = models.DateField(null=True)
+    预计打地时间 = models.DateField(null=True)
+    实际打地时间 = models.DateField(null=True)
+    工种 = models.CharField(max_length=255, null=True)
 
-    def __str__(self):
-        return f"{self.work_type.get_full_name()} - {self.category if self.category else '无分类'}"
+class SalesOutbound(models.Model):
+    日期 = models.DateField(null=True)
+    车牌 = models.CharField(max_length=255, null=True)
+    公司 = models.CharField(max_length=255, null=True)
+    市场 = models.CharField(max_length=255, null=True)
+    品类 = models.CharField(max_length=255, null=True)
+    规格 = models.CharField(max_length=255, null=True)
+    数量 = models.FloatField(null=True)
+    单位 = models.FloatField(null=True)
+    重量 = models.FloatField(null=True)
+    地块 = models.CharField(max_length=255, null=True)
+    批次 = models.CharField(max_length=255, null=True)
+    盖布 = models.CharField(max_length=255, null=True)
+    备注 = models.CharField(max_length=255, null=True)
+    挑菜 = models.CharField(max_length=255, null=True)
+    客户 = models.CharField(max_length=255, null=True)
+
+class SalesDetail(models.Model):
+    日期 = models.DateField(null=True)
+    车次 = models.CharField(max_length=255, null=True)
+    销售地区 = models.CharField(max_length=255, null=True)
+    品类 = models.CharField(max_length=255, null=True)
+    规格 = models.CharField(max_length=255, null=True)
+    框数 = models.IntegerField(null=True)
+    单价 = models.FloatField(null=True)
+    重量 = models.FloatField(null=True)
+    销售额 = models.FloatField(null=True)
+    批次 = models.CharField(max_length=255, null=True)
+    地块 = models.CharField(max_length=255, null=True)
+    是否正常产量 = models.CharField(max_length=255, null=True)
+
+class SalesSummary(models.Model):
+    出库日期 = models.DateField(null=True)
+    收款日期 = models.DateField(null=True)
+    公司 = models.CharField(max_length=255, null=True)
+    市场 = models.CharField(max_length=255, null=True)
+    车牌 = models.CharField(max_length=255, null=True)
+    销售人员 = models.CharField(max_length=255, null=True)
+    客户 = models.CharField(max_length=255, null=True)
+    类别 = models.CharField(max_length=255, null=True)
+    品种 = models.CharField(max_length=255, null=True)
+    应销框数 = models.IntegerField(null=True)
+    实际框数 = models.IntegerField(null=True)
+    单位 = models.FloatField(null=True)
+    规格 = models.FloatField(null=True)
+    数量 = models.FloatField(null=True)
+    地块 = models.CharField(max_length=255, null=True)
+    批次 = models.CharField(max_length=255, null=True)
+    单价 = models.FloatField(null=True)
+    应收金额 = models.FloatField(null=True)
+    实收金额 = models.FloatField(null=True)
+    应收金额合计 = models.FloatField(null=True)
+    实收金额合计 = models.FloatField(null=True)
+    差额 = models.FloatField(null=True)
+    合计框数 = models.FloatField(null=True)
+    上车拨入框数 = models.FloatField(null=True)
+    本车拨入框数 = models.FloatField(null=True)
+    备注 = models.CharField(max_length=255, null=True)
+    收款方式 = models.CharField(max_length=255, null=True)
