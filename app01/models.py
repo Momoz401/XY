@@ -121,7 +121,6 @@ class City(models.Model):
     img = models.FileField(verbose_name="Logo", max_length=128, upload_to='city/')
 
 
-
 class BaseInfoBase(models.Model):
     ID = models.AutoField(primary_key=True)
     基地ID = models.IntegerField(null=True)
@@ -129,28 +128,36 @@ class BaseInfoBase(models.Model):
     基地名称 = models.CharField(max_length=255)
     基地经理 = models.CharField(max_length=255)
 
+
 class BaseInfoProduct(models.Model):
     品类iD = models.AutoField(primary_key=True)
     品类名称 = models.CharField(max_length=255)
     品种名称 = models.CharField(max_length=255)
 
+
 class BaseInfoWorkType(models.Model):
+    level_choices = (
+        (1, "1级分类"),
+        (2, "2级分类"),
+    )
+
     工种名称 = models.CharField(max_length=255)
-    工种级别 = models.CharField(max_length=2,default='')
-    父工种 = models.CharField(max_length=2,default='')
+    工种级别 = models.IntegerField(choices=level_choices, default=1)
+    父工种 = models.CharField(max_length=255,default='',null=True, blank=True)
     工种ID = models.AutoField(primary_key=True)
 
     def __str__(self):
         return self.父工种
 
+
 class BaseInfoWorkHour(models.Model):
     工种ID = models.AutoField(primary_key=True)
-
     工种 = models.CharField(max_length=255)
     分类 = models.CharField(max_length=255, null=True)
     单价 = models.FloatField(null=True)
     单位 = models.CharField(max_length=255, null=True)
     备注 = models.CharField(max_length=50, null=True)
+
 
 class PlanPlantBatch(models.Model):
     ID = models.AutoField(primary_key=True)
@@ -181,6 +188,7 @@ class PlanPlantBatch(models.Model):
     下批前一天时间 = models.DateField(null=True)
     周期 = models.CharField(max_length=255, null=True)
 
+
 class ProductionBatch(models.Model):
     iD = models.AutoField(primary_key=True)
     批次ID = models.CharField(max_length=255, unique=True)
@@ -200,6 +208,7 @@ class ProductionBatch(models.Model):
     总亩产量 = models.FloatField(null=True)
     正常亩产量 = models.FloatField(null=True)
 
+
 class CostTotal(models.Model):
     批次 = models.CharField(max_length=255, null=True)
     人工费用 = models.FloatField(null=True)
@@ -209,6 +218,7 @@ class CostTotal(models.Model):
     折旧费用 = models.FloatField(null=True)
     出库 = models.FloatField(null=True)
     销售 = models.FloatField(null=True)
+
 
 class PlanSummary(models.Model):
     移栽时间 = models.DateField(null=True)
@@ -227,6 +237,7 @@ class PlanSummary(models.Model):
     实际销售 = models.FloatField(null=True)
     计划销售率 = models.FloatField(null=True)
 
+
 class PlanDaily(models.Model):
     上批批次 = models.CharField(max_length=255, null=True)
     地块 = models.CharField(max_length=255, null=True)
@@ -242,6 +253,7 @@ class PlanDaily(models.Model):
     备注 = models.CharField(max_length=255, null=True)
     种植规格 = models.CharField(max_length=255, null=True)
 
+
 class ProductionWage(models.Model):
     日期 = models.DateField(null=True)
     二级工种 = models.CharField(max_length=255, null=True)
@@ -254,6 +266,7 @@ class ProductionWage(models.Model):
     批次 = models.CharField(max_length=255, null=True)
     地块 = models.CharField(max_length=255, null=True)
 
+
 class CostAgriculture(models.Model):
     批次 = models.CharField(max_length=255, null=True)
     地块 = models.FloatField(null=True)
@@ -265,6 +278,7 @@ class CostAgriculture(models.Model):
     单价 = models.FloatField(null=True)
     金额 = models.FloatField(null=True)
     备注 = models.CharField(max_length=255, null=True)
+
 
 class CostPesticide(models.Model):
     批次 = models.CharField(max_length=255, null=True)
@@ -280,6 +294,7 @@ class CostPesticide(models.Model):
     申请打药时间 = models.DateField(null=True)
     预计打药时间 = models.DateField(null=True)
     实际打药时间 = models.DateField(null=True)
+
 
 class CostAllocation(models.Model):
     月度 = models.CharField(max_length=255, null=True)
@@ -300,6 +315,7 @@ class CostAllocation(models.Model):
     基地经理 = models.FloatField(null=True)
     批次 = models.CharField(max_length=255, null=True)
 
+
 class CostLandPreparation(models.Model):
     月份 = models.CharField(max_length=255, null=True)
     地块 = models.CharField(max_length=10, null=True)
@@ -316,6 +332,7 @@ class CostLandPreparation(models.Model):
     预计打地时间 = models.DateField(null=True)
     实际打地时间 = models.DateField(null=True)
     工种 = models.CharField(max_length=255, null=True)
+
 
 class SalesOutbound(models.Model):
     日期 = models.DateField(null=True)
@@ -334,6 +351,7 @@ class SalesOutbound(models.Model):
     挑菜 = models.CharField(max_length=255, null=True)
     客户 = models.CharField(max_length=255, null=True)
 
+
 class SalesDetail(models.Model):
     日期 = models.DateField(null=True)
     车次 = models.CharField(max_length=255, null=True)
@@ -347,6 +365,7 @@ class SalesDetail(models.Model):
     批次 = models.CharField(max_length=255, null=True)
     地块 = models.CharField(max_length=255, null=True)
     是否正常产量 = models.CharField(max_length=255, null=True)
+
 
 class SalesSummary(models.Model):
     出库日期 = models.DateField(null=True)

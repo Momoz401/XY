@@ -5,7 +5,7 @@ from app01.utils.pagination import Pagination
 from app01.utils.form import UserModelForm, PrettyModelForm, PrettyEditModelForm, worktypeModelForm
 
 
-def BaseInfoWorkType_list(request):
+def work_type_list(request):
     """ 工种列表 """
 
     data_dict = {}
@@ -26,7 +26,7 @@ def BaseInfoWorkType_list(request):
     return render(request, 'work_type.html', context)
 
 
-def BaseInfoWorkType_add(request):
+def work_type_add(request):
     """ 添加工种 """
     if request.method == "GET":
         form = worktypeModelForm()
@@ -38,22 +38,22 @@ def BaseInfoWorkType_add(request):
     return render(request, 'work_type_add.html', {"form": form})
 
 
-def pretty_edit(request, nid):
-    """ 编辑靓号 """
-    row_object = models.PrettyNum.objects.filter(id=nid).first()
+def work_type_edit(request, nid):
+    """ 编辑工种 """
+    row_object = models.BaseInfoWorkType.objects.filter(工种ID=nid).first()
 
     if request.method == "GET":
-        form = PrettyEditModelForm(instance=row_object)
-        return render(request, 'pretty_edit.html', {"form": form})
+        form = worktypeModelForm(instance=row_object)
+        return render(request, 'work_type_edit.html', {"form": form})
 
-    form = PrettyEditModelForm(data=request.POST, instance=row_object)
+    form = worktypeModelForm(data=request.POST, instance=row_object)
     if form.is_valid():
         form.save()
-        return redirect('/pretty/list/')
+        return redirect('/BaseInfoWorkType/list/')
 
-    return render(request, 'pretty_edit.html', {"form": form})
+    return render(request, 'work_type.html', {"form": form})
 
 
-def pretty_delete(request, nid):
-    models.PrettyNum.objects.filter(id=nid).delete()
-    return redirect('/pretty/list/')
+def work_type_delete(request, nid):
+    models.BaseInfoWorkType.objects.filter(工种ID=nid).delete()
+    return redirect('/BaseInfoWorkType/list/')

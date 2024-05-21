@@ -44,8 +44,10 @@ urlpatterns = [
     path('user/<int:nid>/delete/', user.user_delete),
 
     # 工种管理
-    path('BaseInfoWorkType/list/', worktype.BaseInfoWorkType_list),
-    path('BaseInfoWorkType/add/', worktype.BaseInfoWorkType_add),
+    path('BaseInfoWorkType/list/', worktype.work_type_list),
+    path('BaseInfoWorkType/add/', worktype.work_type_add),
+    path('BaseInfoWorkType/<int:nid>/edit/', worktype.work_type_edit),
+    path('BaseInfoWorkType/<int:nid>/delete/', worktype.work_type_delete),
 
     # 基地管理
     path('BaseInfo/list/', baseinfo.BaseInfo_list),

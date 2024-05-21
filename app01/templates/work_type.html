@@ -23,7 +23,7 @@
             </div>
 
         </div>
-        <div class="panel panel-default">
+        <div class="panel panel-default text-center">
             <!-- Default panel contents -->
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
@@ -31,26 +31,26 @@
             </div>
 
             <!-- Table -->
-            <table class="table table-bordered">
+            <table class="table table-bordered text-center">
                 <thead>
-                <tr>
-                    <th>工种ID</th>
-                    <th>工种名称</th>
-                     <th>级别</th>
-                    <th>父工种</th>
-                    <th>操作</th>
+                <tr >
+                    <th class="text-center">工种ID</th>
+                    <th class="text-center">工种名称</th>
+                    <th class="text-center">级别</th>
+                    <th class="text-center">父工种</th>
+                    <th class="text-center">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
-                        <th>{{ obj.工种ID}}</th>
+                        <th class="text-center" >{{ obj.工种ID}}</th>
                         <td>{{ obj.工种名称 }}</td>
                          <td>{{ obj.工种级别 }}</td>
                         <td>{{ obj.父工种 }}</td>
                         <td>
-                            <a class="btn btn-primary btn-xs" href="/pretty/{{ obj.id }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/pretty/{{ obj.id }}/delete/">删除</a>
+                            <a class="btn btn-primary btn-xs" href="/BaseInfoWorkType/{{ obj.工种ID }}/edit/">编辑</a>
+                            <a class="btn btn-danger btn-xs" href="/BaseInfoWorkType/{{ obj.工种ID}}/delete/">删除</a>
                         </td>
                     </tr>
                 {% endfor %}
