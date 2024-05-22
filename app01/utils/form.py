@@ -69,7 +69,7 @@ class PrettyEditModelForm(BootStrapModelForm):
         return txt_mobile
 
 
-class worktypeModelForm(BootStrapModelForm):
+class work_type_ModelForm(BootStrapModelForm):
     class Meta:
         model = models.BaseInfoWorkType
         fields = ['工种名称', '父工种', '工种级别']
@@ -79,10 +79,11 @@ class worktypeModelForm(BootStrapModelForm):
         # 获取所有工种级别为1的工种，构建成选择框的选项
         level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种ID', '工种名称')
         # 添加一个空的选项，表示可以为空
-        choices = [('', '------------------------------------------------------')] + list(level_one_choices)
+        choices = [('', '')] + list(level_one_choices)
         self.fields['父工种'].choices = choices
         # 重新设置字段
-        self.fields['父工种'] = forms.ChoiceField(choices=choices, required=False)
+        self.fields['父工种'] = forms.ChoiceField(choices=choices, required=False,widget=forms.Select(attrs={'class': 'form-control'}))
+
 
     def clean(self):
         cleaned_data = super().clean()
@@ -125,15 +126,18 @@ class workHourModelForm(BootStrapModelForm):
         model = models.BaseInfoWorkHour
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['工种ID', '工种', '分类', '单价', '单位', '备注']
+        fields = ['工种ID', '工种', '一级分类', '二级分类',  '单价', '单位', '备注']
 
-    # 验证：方式2
-    def clean_mobile(self):
-        txt_mobile = self.cleaned_data['分类']
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 获取所有工种级别为1的工种，构建成选择框的选项
+        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种ID', '工种名称')
+        # 添加一个空的选项，表示可以为空
+        choices = list(level_one_choices)
+        self.fields['一级分类'].choices = choices
+        # 重新设置字段
+        self.fields['一级分类'] = forms.ChoiceField(choices=choices, required=True,widget=forms.Select(attrs={'class': 'form-control'}))
+        self.fields['二级分类'].choices = []
 
-        exists = models.BaseInfoWorkHour.objects.filter(工种名称=txt_mobile).exists()
-        if exists:
-            raise ValidationError("分类已存在")
+        self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
 
-        # 验证通过，用户输入的值返回
-        return txt_mobile

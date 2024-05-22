@@ -1,5 +1,7 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from app01 import models
+from app01.models import BaseInfoWorkHour, BaseInfoWorkType
 
 from app01.utils.pagination import Pagination
 from app01.utils.form import PrettyEditModelForm, workHourModelForm
@@ -31,10 +33,24 @@ def WorkHour_add(request):
         form = workHourModelForm()
         return render(request, 'workhour_add.html', {"form": form})
     form = workHourModelForm(data=request.POST)
+    # 限制一级工种只能从规定的类别列选择
     if form.is_valid():
         form.save()
         return redirect('/WorkHour/list/')
     return render(request, 'workhour_add.html', {"form": form})
+def get_second_level_categories(request):
+    if request.method == 'GET' :
+        # 解码参数
+        level_one_id = request.GET.get('id', None)
+        # 根据一级分类 ID 获取相应的二级分类数据
+        if level_one_id is not None:
+            second_level_categories = BaseInfoWorkType.objects.filter(父工种=level_one_id).values_list('工种ID', '工种名称')
+            print(JsonResponse(dict(second_level_categories)))
+            return JsonResponse(dict(second_level_categories))
+        else:
+            return JsonResponse({'error': '一级分类_id 参数缺失'}, status=400)
+    else:
+        return JsonResponse({'error': '无效请求'}, status=400)
 
 
 def pretty_edit(request, nid):

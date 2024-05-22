@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from app01 import models
 
 from app01.utils.pagination import Pagination
-from app01.utils.form import UserModelForm, PrettyModelForm, PrettyEditModelForm, worktypeModelForm, baseInfoModelForm
+from app01.utils.form import UserModelForm, PrettyModelForm, PrettyEditModelForm, work_type_ModelForm, baseInfoModelForm
 
 
 def BaseInfo_list(request):

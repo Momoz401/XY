@@ -153,10 +153,11 @@ class BaseInfoWorkType(models.Model):
 class BaseInfoWorkHour(models.Model):
     工种ID = models.AutoField(primary_key=True)
     工种 = models.CharField(max_length=255)
-    分类 = models.CharField(max_length=255, null=True)
     单价 = models.FloatField(null=True)
     单位 = models.CharField(max_length=255, null=True)
     备注 = models.CharField(max_length=50, null=True)
+    一级分类 = models.CharField(max_length=255, null=True)
+    二级分类 = models.CharField(max_length=255, null=True)
 
 
 class PlanPlantBatch(models.Model):
