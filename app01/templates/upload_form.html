@@ -9,13 +9,19 @@
                 <h3 class="panel-title"> {{ title }} </h3>
             </div>
             <div class="panel-body">
-                <form method="post" enctype="multipart/form-data" novalidate >
+                <form method="post" enctype="multipart/form-data" novalidate>
                     {% csrf_token %}
 
                     {% for field in form %}
                         <div class="form-group">
                             <label>{{ field.label }}</label>
-                            {{ field }}
+                            {% if field.name == '上传人' %}
+                                <!-- 在模板中检查会话值，并将其作为字段的初始值传递给模板 -->
+                                <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}"
+                                       value="{{ request.session.your_session_value }}">
+                            {% else %}
+                                {{ field }}
+                            {% endif %}
                             <span style="color: red;">{{ field.errors.0 }}</span>
                         </div>
                     {% endfor %}

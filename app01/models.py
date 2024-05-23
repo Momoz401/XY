@@ -114,11 +114,11 @@ class Boss(models.Model):
 
 class City(models.Model):
     """ 城市 """
-    name = models.CharField(verbose_name="名称", max_length=32)
-    count = models.IntegerField(verbose_name="人口")
+    update_date = models.DateField(verbose_name="上传时间",auto_now=True)
+    update_user = models.CharField(verbose_name="上传人" , max_length=100,default="admin")
 
     # 本质上数据库也是CharField，自动保存数据。
-    img = models.FileField(verbose_name="Logo", max_length=128, upload_to='city/')
+    excel_file = models.FileField(verbose_name="excel_file", max_length=128, upload_to='city/',default='')
 
 
 class BaseInfoBase(models.Model):

@@ -78,7 +78,7 @@ class UpModelForm(BootStrapModelForm):
 
 def upload_modal_form(request):
     """ 上传文件和数据（modelForm）"""
-    title = "ModelForm上传文件"
+    title = "批量上传价格文件"
     if request.method == "GET":
         form = UpModelForm()
         return render(request, 'upload_form.html', {"form": form, 'title': title})
