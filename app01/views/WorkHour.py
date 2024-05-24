@@ -4,7 +4,8 @@ from app01 import models
 from app01.models import BaseInfoWorkHour, BaseInfoWorkType
 
 from app01.utils.pagination import Pagination
-from app01.utils.form import PrettyEditModelForm, workHourModelForm
+from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm
+
 
 def Hour_list(request):
     """ 工时列表 """
@@ -53,22 +54,22 @@ def get_second_level_categories(request):
         return JsonResponse({'error': '无效请求'}, status=400)
 
 
-def pretty_edit(request, nid):
-    """ 编辑靓号 """
-    row_object = models.PrettyNum.objects.filter(id=nid).first()
+def work_hour_edit(request, nid):
+    """ 编辑工时 """
+    row_object = models.BaseInfoWorkHour.objects.filter(工种ID=nid).first()
 
     if request.method == "GET":
-        form = PrettyEditModelForm(instance=row_object)
-        return render(request, 'pretty_edit.html', {"form": form})
+        form = workHour_Edit_ModelForm(instance=row_object)
+        return render(request, 'work_type_edit.html', {"form": form})
 
-    form = PrettyEditModelForm(data=request.POST, instance=row_object)
+    form = workHour_Edit_ModelForm(data=request.POST, instance=row_object)
     if form.is_valid():
         form.save()
-        return redirect('/pretty/list/')
+        return redirect('/WorkHour/list/')
 
     return render(request, 'pretty_edit.html', {"form": form})
 
 
-def pretty_delete(request, nid):
-    models.PrettyNum.objects.filter(id=nid).delete()
-    return redirect('/pretty/list/')
+def work_hour_delete(request, nid):
+    models.BaseInfoWorkHour.objects.filter(工种ID=nid).delete()
+    return redirect('/WorkHour/list/')

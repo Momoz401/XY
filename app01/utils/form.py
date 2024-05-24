@@ -141,3 +141,11 @@ class workHourModelForm(BootStrapModelForm):
 
         self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
 
+class workHour_Edit_ModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.BaseInfoWorkHour
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['工种ID', '工种', '一级分类', '二级分类',  '单价', '单位', '备注']
+
+

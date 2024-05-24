@@ -1,7 +1,11 @@
 import os
 from django.conf import settings
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import render, HttpResponse, redirect
 from app01 import models
+import pandas as pd
+import openpyxl
+
+from app01.utils.database import data_to_db
 
 
 def upload_list(request):
@@ -26,7 +30,7 @@ def upload_list(request):
 
 from django import forms
 from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
-
+from app01.models import BaseInfoWorkHour
 
 class UpForm(BootStrapForm):
     bootstrap_exclude_fields = ['img']
@@ -87,7 +91,21 @@ def upload_modal_form(request):
     if form.is_valid():
         # 对于文件：自动保存；
         # 字段 + 上传路径写入到数据库
-        form.save()
+        # print(form.cleaned_data)
+        df = pd.read_excel(form.cleaned_data['excel_file'])
+        print(df)
+        #data_to_db(df, 'tpx_hxb_province')
+        records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
+        for record in records:
+            obj, created = BaseInfoWorkHour.objects.update_or_create(
+                工种=record['工种'],
+                一级分类=record['一级分类'],
+                二级分类=record['二级分类'],
+                单位=record['单位'],
+                单价=record['单价'],
+                备注=record['备注'],
+                # 假设 'name' 是唯一标识相同记录的字段
 
-        return HttpResponse("成功")
+            )
+        return redirect('/WorkHour/list/')
     return render(request, 'upload_form.html', {"form": form, 'title': title})

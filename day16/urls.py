@@ -48,7 +48,7 @@ urlpatterns = [
     path('BaseInfoWorkType/add/', worktype.work_type_add),
     path('BaseInfoWorkType/<int:nid>/edit/', worktype.work_type_edit),
     path('BaseInfoWorkType/<int:nid>/delete/', worktype.work_type_delete),
-    path('BaseInfoWorkType/<int:nid>/delete/', worktype.work_type_delete),
+
 
     # 基地管理
     path('BaseInfo/list/', baseinfo.BaseInfo_list),
@@ -57,6 +57,8 @@ urlpatterns = [
     # 工价管理
     path('WorkHour/list/', WorkHour.Hour_list),
     path('WorkHour/add/', WorkHour.WorkHour_add),
+    path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),
+    path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),
     path('get_second_level_categories/', WorkHour.get_second_level_categories),
     path('upload/WorkHour/', upload.upload_modal_form),  # 工价批量上传
 
