@@ -4,7 +4,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django import forms
 
-from app01.models import BaseInfoWorkType
+from app01.models import BaseInfoWorkType, BaseInfoWorkHour
 from app01.utils.bootstrap import BootStrapModelForm
 
 
@@ -84,7 +84,6 @@ class work_type_ModelForm(BootStrapModelForm):
         # 重新设置字段
         self.fields['父工种'] = forms.ChoiceField(choices=choices, required=False,widget=forms.Select(attrs={'class': 'form-control'}))
 
-
     def clean(self):
         cleaned_data = super().clean()
         level = cleaned_data.get('工种级别')
@@ -138,8 +137,8 @@ class workHourModelForm(BootStrapModelForm):
         # 重新设置字段
         self.fields['一级分类'] = forms.ChoiceField(choices=choices, required=True,widget=forms.Select(attrs={'class': 'form-control'}))
         self.fields['二级分类'].choices = []
-
         self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
+
 
 class workHour_Edit_ModelForm(BootStrapModelForm):
     class Meta:
@@ -149,3 +148,55 @@ class workHour_Edit_ModelForm(BootStrapModelForm):
         fields = ['工种ID', '工种', '一级分类', '二级分类',  '单价', '单位', '备注']
 
 
+
+class production_wage_ModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.ProductionWage
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['日期', '工人', '批次', '一级分类', '二级分类',  '工种', '工价', '工时', '地块']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 获取所有工种级别为1的工种，构建成选择框的选项
+        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种ID', '工种名称')
+
+        # 添加一个空的选项，表示可以为空
+        choices = list(level_one_choices)
+        self.fields['一级分类'].choices = choices
+        # 重新设置字段
+        self.fields['一级分类'] = forms.ChoiceField(choices=choices, required=True,widget=forms.Select(attrs={'class': 'form-control'}))
+        self.fields['二级分类'].choices = []
+
+        self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
+        # 设置日期字段为日期控件
+        self.fields['日期'].widget = forms.DateInput(attrs={'type': 'date', 'class': 'form-control'})
+        self.fields['工种'].choices = []
+        self.fields['工种'].widget = forms.Select(attrs={'class': 'form-control'})
+        self.fields['工价'].widget = forms.Select(attrs={'class': 'form-control'})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        selected_work_type = cleaned_data.get('工种')
+        print(selected_work_type)
+        # 获取工种选项的文本值
+        if selected_work_type:
+            corresponding_object = BaseInfoWorkHour.objects.filter(工种ID=selected_work_type).first()
+            #print(corresponding_object.工种)
+
+            if corresponding_object:
+                # 保存选项的文本值
+                cleaned_data['工种'] = corresponding_object.工种
+                cleaned_data['一级分类'] = corresponding_object.一级分类
+                cleaned_data['二级分类'] = corresponding_object.二级分类
+                print(cleaned_data)
+        return cleaned_data
+
+
+
+class production_wage_Edit_ModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.ProductionWage
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['日期', '工人', '批次', '一级分类', '二级分类',  '工种', '工价', '工时', '地块']

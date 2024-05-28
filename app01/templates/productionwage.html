@@ -4,11 +4,11 @@
 {% block content %}
     <div class="container">
         <div style="margin-bottom: 10px" class="clearfix">
-            <a class="btn btn-success" href="/WorkHour/add/">
+            <a class="btn btn-success" href="/productionwate/add/">
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 新建工价
             </a>
-             <a class="btn btn-success" href="/upload/WorkHour/">
+             <a class="btn btn-success" href="/upload/productionwate/">
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 新建工价批量导入
             </a>
@@ -39,26 +39,30 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>工种ID</th>
-                    <th>工种</th>
+                    <th>日期</th>
+                    <th>员工</th>
                     <th>一级分类</th>
                     <th>二级分类</th>
-                    <th>单价</th>
-                    <th>单位</th>
-                    <th>备注</th>
+                    <th>工种</th>
+                    <th>工价</th>
+                    <th>工时</th>
+                    <th>批次</th>
+                    <th>地块</th>
                     <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
-                        <th>{{ obj.工种ID }}</th>
-                        <td>{{ obj.工种 }}</td>
+                        <th>{{ obj.日期 }}</th>
+                        <td>{{ obj.工人 }}</td>
                         <td>{{ obj.一级分类 }}</td>
                         <td>{{ obj.二级分类 }}</td>
-                        <td>{{ obj.单价 }}</td>
-                        <td>{{ obj.单位 }}</td>
-                        <td>{{ obj.备注 }}</td>
+                        <td>{{ obj.工种 }}</td>
+                        <td>{{ obj.工价 }}</td>
+                        <td>{{ obj.工时 }}</td>
+                        <td>{{ obj.批次 }}</td>
+                        <td>{{ obj.地块 }}</td>
                         <td>
                             <a class="btn btn-primary btn-xs" href="/WorkHour/{{ obj.工种ID }}/edit/">编辑</a>
                             <a class="btn btn-danger btn-xs" href="/WorkHour/{{ obj.工种ID }}/delete/">删除</a>

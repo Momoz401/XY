@@ -13,7 +13,7 @@ def Hour_list(request):
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["分类"] = search_data
+        data_dict["工种__contains"] = search_data
 
     queryset = models.BaseInfoWorkHour.objects.filter(**data_dict).order_by("-工种ID")
 
@@ -39,6 +39,8 @@ def WorkHour_add(request):
         form.save()
         return redirect('/WorkHour/list/')
     return render(request, 'workhour_add.html', {"form": form})
+
+
 def get_second_level_categories(request):
     if request.method == 'GET' :
         # 解码参数

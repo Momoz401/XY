@@ -257,12 +257,13 @@ class PlanDaily(models.Model):
 
 class ProductionWage(models.Model):
     日期 = models.DateField(null=True)
-    二级工种 = models.CharField(max_length=255, null=True)
-    单位 = models.CharField(max_length=255, null=True)
-    数量 = models.FloatField(null=True)
-    单价 = models.FloatField(null=True)
-    加班工时 = models.FloatField(null=True)
+    工人 = models.CharField(max_length=255, null=True)
+    工种 = models.CharField(max_length=255, null=True)
+    一级分类 = models.CharField(max_length=255, null=True)
+    二级分类 = models.CharField(max_length=255, null=True)
     工时 = models.FloatField(null=True)
+    工价 = models.FloatField(null=True)
+    累计工时 = models.FloatField(null=True)
     合计工资 = models.FloatField(null=True)
     批次 = models.CharField(max_length=255, null=True)
     地块 = models.CharField(max_length=255, null=True)

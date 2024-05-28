@@ -20,7 +20,7 @@ from django.conf import settings
 
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
-    WorkHour, planplantbatch
+    WorkHour, planplantbatch, productionwage
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -54,12 +54,22 @@ urlpatterns = [
     path('BaseInfo/list/', baseinfo.BaseInfo_list),
     path('BaseInfo/add/', baseinfo.BaseInfo_add),
 
+    # 工时管理
+    path('production_wage_list/list/', productionwage.production_wage_list),
+    path('productionwate/add/', productionwage.production_wage_add),
+
+
+    path('get_productionwate/', productionwage.get_productionwate), #ajax获得价格和类型
+    path('get_productionwate_price/', productionwage.get_productionwate_price),  # ajax获得价格和类型
+    path('get_second_level_categories/', WorkHour.get_second_level_categories),#ajax二级类型和类型
+
+
     # 工价管理
     path('WorkHour/list/', WorkHour.Hour_list),
     path('WorkHour/add/', WorkHour.WorkHour_add),
     path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),
     path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),
-    path('get_second_level_categories/', WorkHour.get_second_level_categories),
+
     path('upload/WorkHour/', upload.upload_modal_form),  # 工价批量上传
 
     # 月度计划
