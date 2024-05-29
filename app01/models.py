@@ -112,7 +112,7 @@ class Boss(models.Model):
     img = models.CharField(verbose_name="头像", max_length=128)
 
 
-class City(models.Model):
+class uploader(models.Model):
     """ 城市 """
     update_date = models.DateField(verbose_name="上传时间",auto_now=True)
     update_user = models.CharField(verbose_name="上传人" , max_length=100,default="admin")

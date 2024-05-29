@@ -4,7 +4,7 @@ from app01.utils.bootstrap import BootStrapModelForm
 
 
 def city_list(request):
-    queryset = models.City.objects.all()
+    queryset = models.uploader.objects.all()
     return render(request, 'city_list.html', {'queryset': queryset})
 
 
@@ -12,7 +12,7 @@ class UpModelForm(BootStrapModelForm):
     bootstrap_exclude_fields = ['img']
 
     class Meta:
-        model = models.City
+        model = models.uploader
         fields = "__all__"
 
 

@@ -96,6 +96,6 @@ def work_hour_edit(request, nid):
     return render(request, 'pretty_edit.html', {"form": form})
 
 
-def work_hour_delete(request, nid):
-    models.BaseInfoWorkHour.objects.filter(工种ID=nid).delete()
-    return redirect('/WorkHour/list/')
+def production_wage_delete(request, nid):
+    models.Production_Wage.objects.filter(ID=nid).delete()
+    return redirect('/production_wage_list/list')

@@ -57,7 +57,8 @@ urlpatterns = [
     # 工时管理
     path('production_wage_list/list/', productionwage.production_wage_list),
     path('productionwate/add/', productionwage.production_wage_add),
-
+    path('productionwate/<int:nid>/delete/', productionwage.production_wage_delete),
+    path('upload/productionwate/', upload.upload_productionwate_modal_form),  # 工时批量上传
 
     path('get_productionwate/', productionwage.get_productionwate), #ajax获得价格和类型
     path('get_productionwate_price/', productionwage.get_productionwate_price),  # ajax获得价格和类型
@@ -70,7 +71,7 @@ urlpatterns = [
     path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),
     path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),
 
-    path('upload/WorkHour/', upload.upload_modal_form),  # 工价批量上传
+    path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工价批量上传
 
     # 月度计划
     path('PlanPlantBatch/list/',planplantbatch.planplantbatch_list),
@@ -116,7 +117,7 @@ urlpatterns = [
     # 上传文件
     path('upload/list/', upload.upload_list),
     path('upload/form/', upload.upload_form),
-    path('upload/modal/form/', upload.upload_modal_form),
+    #path('upload/modal/form/', upload.upload_modal_form),
 
     # 城市列表
     path('city/list/', city.city_list),

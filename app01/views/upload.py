@@ -30,7 +30,8 @@ def upload_list(request):
 
 from django import forms
 from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
-from app01.models import BaseInfoWorkHour
+from app01.models import BaseInfoWorkHour, ProductionWage
+
 
 class UpForm(BootStrapForm):
     bootstrap_exclude_fields = ['img']
@@ -76,11 +77,11 @@ class UpModelForm(BootStrapModelForm):
     bootstrap_exclude_fields = ['img']
 
     class Meta:
-        model = models.City
+        model = models.uploader
         fields = "__all__"
 
 
-def upload_modal_form(request):
+def upload_workhour_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批量上传价格文件"
     if request.method == "GET":
@@ -98,7 +99,7 @@ def upload_modal_form(request):
         records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
         for record in records:
             obj, created = BaseInfoWorkHour.objects.update_or_create(
-                工种=record['工种'],
+                工人=record['工人'],
                 一级分类=record['一级分类'],
                 二级分类=record['二级分类'],
                 单位=record['单位'],
@@ -108,4 +109,36 @@ def upload_modal_form(request):
 
             )
         return redirect('/WorkHour/list/')
+    return render(request, 'upload_form.html', {"form": form, 'title': title})
+
+def upload_productionwate_modal_form(request):
+    """ 上传文件和数据（modelForm）"""
+    title = "批量上传工价文件"
+    if request.method == "GET":
+        form = UpModelForm()
+        return render(request, 'upload_form.html', {"form": form, 'title': title})
+
+    form = UpModelForm(data=request.POST, files=request.FILES)
+    if form.is_valid():
+        # 对于文件：自动保存；
+        # 字段 + 上传路径写入到数据库
+        # print(form.cleaned_data)
+        df = pd.read_excel(form.cleaned_data['excel_file'])
+        # print(df)
+        #data_to_db(df, 'tpx_hxb_province')
+        records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
+        for record in records:
+            obj, created = ProductionWage.objects.update_or_create(
+                工人=record['工人'],
+                一级分类=record['一级分类'],
+                二级分类=record['二级分类'],
+                工种=record['工种'],
+                工价=record['工价'],
+                工时=record['工时'],
+                日期=record['日期'],
+                批次=record['批次'],
+                地块=record['地块'],
+
+            )
+        return redirect('/production_wage_list/list/')
     return render(request, 'upload_form.html', {"form": form, 'title': title})
