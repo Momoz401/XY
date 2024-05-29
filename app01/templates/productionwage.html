@@ -39,6 +39,7 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
+                    <th>序号</th>
                     <th>日期</th>
                     <th>员工</th>
                     <th>一级分类</th>
@@ -54,6 +55,7 @@
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
+                        <th>{{ obj.id }}</th>
                         <th>{{ obj.日期 }}</th>
                         <td>{{ obj.工人 }}</td>
                         <td>{{ obj.一级分类 }}</td>
@@ -64,8 +66,8 @@
                         <td>{{ obj.批次 }}</td>
                         <td>{{ obj.地块 }}</td>
                         <td>
-                            <a class="btn btn-primary btn-xs" href="/WorkHour/{{ obj.工种ID }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/WorkHour/{{ obj.工种ID }}/delete/">删除</a>
+                            <a class="btn btn-primary btn-xs" href="/productionwate/{{ obj.id }}/edit/">编辑</a>
+                            <a class="btn btn-danger btn-xs" href="/productionwate/{{ obj.id }}/delete/">删除</a>
                         </td>
                     </tr>
                 {% endfor %}

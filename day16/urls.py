@@ -58,6 +58,7 @@ urlpatterns = [
     path('production_wage_list/list/', productionwage.production_wage_list),
     path('productionwate/add/', productionwage.production_wage_add),
     path('productionwate/<int:nid>/delete/', productionwage.production_wage_delete),
+    path('productionwate/<int:nid>/edit/', productionwage.productionwate_edit),
     path('upload/productionwate/', upload.upload_productionwate_modal_form),  # 工时批量上传
 
     path('get_productionwate/', productionwage.get_productionwate), #ajax获得价格和类型

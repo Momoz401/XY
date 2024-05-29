@@ -4,7 +4,8 @@ from app01 import models
 from app01.models import BaseInfoWorkHour, BaseInfoWorkType,ProductionWage
 
 from app01.utils.pagination import Pagination
-from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm, production_wage_ModelForm
+from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm, production_wage_ModelForm, \
+    production_wage_Edit_ModelForm
 
 
 def production_wage_list(request):
@@ -80,22 +81,22 @@ def get_productionwate_price(request):
 
 
 
-def work_hour_edit(request, nid):
+def productionwate_edit(request, nid):
     """ 编辑工时 """
-    row_object = models.BaseInfoWorkHour.objects.filter(工种ID=nid).first()
+    row_object = models.ProductionWage.objects.filter(id=nid).first()
 
     if request.method == "GET":
-        form = workHour_Edit_ModelForm(instance=row_object)
+        form = production_wage_Edit_ModelForm(instance=row_object)
         return render(request, 'work_type_edit.html', {"form": form})
 
-    form = workHour_Edit_ModelForm(data=request.POST, instance=row_object)
+    form = production_wage_Edit_ModelForm(data=request.POST, instance=row_object)
     if form.is_valid():
         form.save()
-        return redirect('/WorkHour/list/')
+        return redirect('/production_wage_list/list')
 
     return render(request, 'pretty_edit.html', {"form": form})
 
 
 def production_wage_delete(request, nid):
-    models.Production_Wage.objects.filter(ID=nid).delete()
+    models.ProductionWage.objects.filter(id=nid).delete()
     return redirect('/production_wage_list/list')
