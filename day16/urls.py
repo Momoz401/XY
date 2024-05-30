@@ -20,7 +20,7 @@ from django.conf import settings
 
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
-    WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch
+    WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -86,6 +86,8 @@ urlpatterns = [
     path('Plant_batch/<int:nid>/edit/', Plant_batch.Plant_batch_edit),
     path('Plant_batch/<int:nid>/delete/', Plant_batch.Plant_batch_delete),
     path('upload/Plant_batch/', upload.upload_Plant_batch_modal_form),  # 工价批量上传
+    # 实现自动补全功能
+    path('autocomplete/', views.autocomplete, name='autocomplete'),
 
 
 

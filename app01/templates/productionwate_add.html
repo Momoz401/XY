@@ -112,8 +112,10 @@
                     }
                 });
             });
-
-
+            $("#id_批次").autocomplete({
+                source: "{% url 'autocomplete' %}",
+                minLength: 2
+            });
         });
     </script>
 
