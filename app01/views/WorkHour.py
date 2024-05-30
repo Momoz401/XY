@@ -69,7 +69,7 @@ def work_hour_edit(request, nid):
         form.save()
         return redirect('/WorkHour/list/')
 
-    return render(request, 'pretty_edit.html', {"form": form})
+    return render(request, 'workhour.html', {"form": form})
 
 
 def work_hour_delete(request, nid):

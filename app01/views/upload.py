@@ -30,7 +30,7 @@ def upload_list(request):
 
 from django import forms
 from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
-from app01.models import BaseInfoWorkHour, ProductionWage
+from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost
 
 
 class UpForm(BootStrapForm):
@@ -141,4 +141,35 @@ def upload_productionwate_modal_form(request):
 
             )
         return redirect('/production_wage_list/list/')
+    return render(request, 'upload_form.html', {"form": form, 'title': title})
+def upload_agriculturecost_modal_form(request):
+    """ 上传文件和数据（modelForm）"""
+    title = "批量农资成本文件"
+    if request.method == "GET":
+        form = UpModelForm()
+        return render(request, 'upload_form.html', {"form": form, 'title': title})
+
+    form = UpModelForm(data=request.POST, files=request.FILES)
+    if form.is_valid():
+        # 对于文件：自动保存；
+        # 字段 + 上传路径写入到数据库
+        # print(form.cleaned_data)
+        df = pd.read_excel(form.cleaned_data['excel_file'])
+        # print(df)
+        #data_to_db(df, 'tpx_hxb_province')
+        records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
+        for record in records:
+            obj, created = Agriculture_cost.objects.update_or_create(
+                日期=record['日期'],
+                工种=record['工种'],
+                数量=record['数量'],
+                农资种类=record['农资种类'],
+                名称=record['名称'],
+                单价=record['单价'],
+                金额=record['金额'],
+                批次=record['批次'],
+                地块=record['地块'],
+
+            )
+        return redirect('/Agricureture/list/')
     return render(request, 'upload_form.html', {"form": form, 'title': title})

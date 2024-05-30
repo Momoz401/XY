@@ -256,12 +256,14 @@ class PlanDaily(models.Model):
 
 
 class ProductionWage(models.Model):
+    基地 = models.CharField(max_length=255, null=True)
     日期 = models.DateField(null=True)
     工人 = models.CharField(max_length=255, null=True)
     工种 = models.CharField(max_length=255, null=True)
     一级分类 = models.CharField(max_length=255, null=True)
     二级分类 = models.CharField(max_length=255, null=True)
     工时 = models.FloatField(null=True)
+    数量 = models.FloatField(null=True)
     工价 = models.FloatField(null=True)
     累计工时 = models.FloatField(null=True)
     合计工资 = models.FloatField(null=True)
@@ -397,3 +399,17 @@ class SalesSummary(models.Model):
     本车拨入框数 = models.FloatField(null=True)
     备注 = models.CharField(max_length=255, null=True)
     收款方式 = models.CharField(max_length=255, null=True)
+
+
+class Agriculture_cost(models.Model):
+    ID = models.AutoField(primary_key=True)
+    日期 = models.DateField(null=True,blank=True)
+    工种 = models.CharField(max_length=255, null=True)
+    数量 = models.FloatField(null=True,blank=True)
+    农资种类 = models.CharField(max_length=255, null=True)
+    名称 = models.CharField(max_length=255, null=True)
+    单价 = models.FloatField(null=True)
+    金额 = models.FloatField(null=True)
+    批次 = models.CharField(max_length=255, null=True)
+    地块 = models.CharField(max_length=255, null=True)
+

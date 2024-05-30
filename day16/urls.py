@@ -20,7 +20,7 @@ from django.conf import settings
 
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
-    WorkHour, planplantbatch, productionwage
+    WorkHour, planplantbatch, productionwage, agriculturecost
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -71,8 +71,18 @@ urlpatterns = [
     path('WorkHour/add/', WorkHour.WorkHour_add),
     path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),
     path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),
-
     path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工价批量上传
+
+    # 农资管理
+    path('Agricureture/list/', agriculturecost.agriculture_cost_list),
+    path('Agricureture/add/', agriculturecost.agriculture_cost_add),
+    path('Agricureture/<int:nid>/edit/', agriculturecost.agriculture_cost_edit),
+    path('Agricureture/<int:nid>/delete/', agriculturecost.agriculture_cost_delete),
+    path('upload/agriculturecost/', upload.upload_agriculturecost_modal_form),  # 工价批量上传
+
+
+
+
 
     # 月度计划
     path('PlanPlantBatch/list/',planplantbatch.planplantbatch_list),

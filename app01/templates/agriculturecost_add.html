@@ -1,10 +1,12 @@
 {% extends 'layout.html' %}
 
+
 {% block content %}
+
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title"> 编辑 </h3>
+                <h3 class="panel-title"> 新建农资成本</h3>
             </div>
             <div class="panel-body">
                 <form method="post" novalidate>
@@ -17,10 +19,24 @@
                             <span style="color: red;">{{ field.errors.0 }}</span>
                         </div>
                     {% endfor %}
-
+                    {% if form.errors %}
+                        <div class="alert alert-danger">
+                            <strong>Validation Error(s):</strong>
+                            <ul>
+                                {% for field, error_list in form.errors.items %}
+                                    {% for error in error_list %}
+                                        <li>{{ error }}</li>
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
                     <button type="submit" class="btn btn-primary">提 交</button>
                 </form>
             </div>
         </div>
     </div>
+
+
+
 {% endblock %}

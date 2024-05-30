@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.forms import CharField
 from app01 import models
 from django.core.validators import RegexValidator
@@ -82,7 +84,8 @@ class work_type_ModelForm(BootStrapModelForm):
         choices = [('', '')] + list(level_one_choices)
         self.fields['父工种'].choices = choices
         # 重新设置字段
-        self.fields['父工种'] = forms.ChoiceField(choices=choices, required=False,widget=forms.Select(attrs={'class': 'form-control'}))
+        self.fields['父工种'] = forms.ChoiceField(choices=choices, required=False,
+                                                  widget=forms.Select(attrs={'class': 'form-control'}))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -125,7 +128,7 @@ class workHourModelForm(BootStrapModelForm):
         model = models.BaseInfoWorkHour
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['工种ID', '工种', '一级分类', '二级分类',  '单价', '单位', '备注']
+        fields = ['工种ID', '工种', '一级分类', '二级分类', '单价', '单位', '备注']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -135,7 +138,8 @@ class workHourModelForm(BootStrapModelForm):
         choices = list(level_one_choices)
         self.fields['一级分类'].choices = choices
         # 重新设置字段
-        self.fields['一级分类'] = forms.ChoiceField(choices=choices, required=True,widget=forms.Select(attrs={'class': 'form-control'}))
+        self.fields['一级分类'] = forms.ChoiceField(choices=choices, required=True,
+                                                    widget=forms.Select(attrs={'class': 'form-control'}))
         self.fields['二级分类'].choices = []
         self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
 
@@ -145,8 +149,7 @@ class workHour_Edit_ModelForm(BootStrapModelForm):
         model = models.BaseInfoWorkHour
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['工种ID', '工种', '一级分类', '二级分类',  '单价', '单位', '备注']
-
+        fields = ['工种ID', '工种', '一级分类', '二级分类', '单价', '单位', '备注']
 
 
 class production_wage_ModelForm(BootStrapModelForm):
@@ -154,7 +157,7 @@ class production_wage_ModelForm(BootStrapModelForm):
         model = models.ProductionWage
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['日期', '工人', '批次', '一级分类', '二级分类',  '工种', '工价', '工时', '地块']
+        fields = ['日期', '工人', '批次', '一级分类', '二级分类', '工种', '工价', '工时', '地块']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -165,7 +168,8 @@ class production_wage_ModelForm(BootStrapModelForm):
         choices = list(level_one_choices)
         self.fields['一级分类'].choices = choices
         # 重新设置字段
-        self.fields['一级分类'] = forms.ChoiceField(choices=choices, required=True,widget=forms.Select(attrs={'class': 'form-control'}))
+        self.fields['一级分类'] = forms.ChoiceField(choices=choices, required=True,
+                                                    widget=forms.Select(attrs={'class': 'form-control'}))
         self.fields['二级分类'].choices = []
 
         self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
@@ -182,7 +186,7 @@ class production_wage_ModelForm(BootStrapModelForm):
         # 获取工种选项的文本值
         if selected_work_type:
             corresponding_object = BaseInfoWorkHour.objects.filter(工种ID=selected_work_type).first()
-            #print(corresponding_object.工种)
+            # print(corresponding_object.工种)
 
             if corresponding_object:
                 # 保存选项的文本值
@@ -193,10 +197,37 @@ class production_wage_ModelForm(BootStrapModelForm):
         return cleaned_data
 
 
-
 class production_wage_Edit_ModelForm(BootStrapModelForm):
     class Meta:
         model = models.ProductionWage
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['日期', '工人', '批次', '一级分类', '二级分类',  '工种', '工价', '工时', '地块']
+        fields = ['日期', '工人', '批次', '一级分类', '二级分类', '工种', '工价', '工时', '地块']
+
+
+
+
+
+class agriculture_cost_ModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.Agriculture_cost
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['日期', '工种', '数量', '农资种类', '名称', '单价', '金额', '批次', '地块']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        today = datetime.now().date()
+        self.fields['日期'].initial = today
+        self.fields['日期'].widget = forms.DateInput(attrs={
+            'type': 'date',
+            'class': 'form-control'
+        })
+
+
+class agriculture_cost_Edit_ModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.Agriculture_cost
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['日期', '工种', '数量', '农资种类', '名称', '单价', '金额', '批次', '地块']
