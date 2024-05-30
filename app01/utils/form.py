@@ -231,3 +231,21 @@ class agriculture_cost_Edit_ModelForm(BootStrapModelForm):
         # fields = "__all__"
         # exclude = ['level']
         fields = ['日期', '工种', '数量', '农资种类', '名称', '单价', '金额', '批次', '地块']
+
+
+
+class Plant_batch_ModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.Plant_batch
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['批次ID', '品种', '品类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期','用籽量', '备注']
+
+
+class Plant_batch_Edit_ModelForm(BootStrapModelForm):
+    class Meta:
+        model = models.Plant_batch
+        # fields = "__all__"
+        # exclude = ['level']
+        fields = ['批次ID', '品种', '品类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期', '用籽量', '备注']
+

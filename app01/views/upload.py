@@ -30,7 +30,7 @@ def upload_list(request):
 
 from django import forms
 from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
-from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost
+from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch
 
 
 class UpForm(BootStrapForm):
@@ -173,3 +173,49 @@ def upload_agriculturecost_modal_form(request):
             )
         return redirect('/Agricureture/list/')
     return render(request, 'upload_form.html', {"form": form, 'title': title})
+
+def upload_Plant_batch_modal_form(request):
+    """ 上传文件和数据（modelForm）"""
+    title = "批量农资成本文件"
+    if request.method == "GET":
+        form = UpModelForm()
+        return render(request, 'upload_form.html', {"form": form, 'title': title})
+
+    form = UpModelForm(data=request.POST, files=request.FILES)
+    if form.is_valid():
+        # 对于文件：自动保存；
+        # 字段 + 上传路径写入到数据库
+        # print(form.cleaned_data)
+        df = pd.read_excel(form.cleaned_data['excel_file'])
+        # 将日期时间列转换为 pandas 的 datetime 类型，同时处理错误
+        date_columns = ['移栽日期', '点籽日期']
+        for column in date_columns:
+            df[column] = pd.to_datetime(df[column], errors='coerce')
+
+            # 填充 NaT 值（用一个默认值），然后转换时区
+            df[column] = df[column].fillna(pd.Timestamp('1970-01-01'))
+            df[column] = df[column].dt.tz_localize('UTC').dt.tz_convert('Asia/Shanghai')
+
+        # print(df)
+        #data_to_db(df, 'tpx_hxb_province')
+        records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
+        for record in records:
+            obj, created = Plant_batch.objects.update_or_create(
+                批次ID=record['批次ID'],
+                品种=record['品种'],
+                品类=record['品类'],
+                地块=record['地块'],
+                面积=record['面积'],
+                基地经理=record['基地经理'],
+                移栽日期=record['移栽日期'],
+                移栽板量=record['移栽板量'],
+                移栽数量=record['移栽数量'],
+                点籽日期=record['点籽日期'],
+                用籽量=record['用籽量'],
+                备注=record['备注'],
+
+
+            )
+        return redirect('/Plant_batch/list/')
+    return render(request, 'Plant_batch.html', {"form": form, 'title': title})
+

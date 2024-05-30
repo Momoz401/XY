@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from django.db import models
 
 
@@ -413,3 +415,17 @@ class Agriculture_cost(models.Model):
     批次 = models.CharField(max_length=255, null=True)
     地块 = models.CharField(max_length=255, null=True)
 
+class Plant_batch(models.Model):
+    ID = models.AutoField(primary_key=True)
+    批次ID = models.CharField(max_length=10, null=True)
+    品种 = models.CharField(max_length=255, null=True)
+    品类 = models.CharField(max_length=255, null=True)
+    地块 = models.CharField(max_length=255, null=True)
+    面积 = models.FloatField(null=True)
+    基地经理 = models.CharField(max_length=255, null=True, blank=True)
+    移栽日期 = models.DateField(null=True, blank=True, default=timezone.now)
+    移栽板量 = models.FloatField(null=True, blank=True)
+    移栽数量 = models.FloatField(null=True, blank=True)
+    点籽日期 = models.DateField(null=True, blank=True,default=timezone.now)
+    用籽量 = models.FloatField(null=True, blank=True)
+    备注 = models.CharField(max_length=255, null=True)
