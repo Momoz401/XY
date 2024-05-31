@@ -1,125 +1,150 @@
 {% extends 'layout.html' %}
 
-
 {% block content %}
-
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title"> 新建工价</h3>
+                <h3 class="panel-title">新建工价</h3>
             </div>
             <div class="panel-body">
-                <form method="post" novalidate>
+                <form method="post" id="dynamic_form" action="">
                     {% csrf_token %}
-
-                    {% for field in form %}
-                        <div class="form-group">
-                            <label>{{ field.label }}</label>
-                            {{ field }}
-                            <span style="color: red;">{{ field.errors.0 }}</span>
-                        </div>
-                    {% endfor %}
-                    {% if form.errors %}
-                        <div class="alert alert-danger">
-                            <strong>Validation Error(s):</strong>
-                            <ul>
-                                {% for field, error_list in form.errors.items %}
-                                    {% for error in error_list %}
-                                        <li>{{ error }}</li>
-                                    {% endfor %}
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                    <button type="submit" class="btn btn-primary">提 交</button>
+                    {{ fixed_form.as_p }}
+                    {{ formset.management_form }}
+                    <div id="formset_container" class="row">
+                        {% for form in formset %}
+                            <div class="col-md-3 formset_item">
+                                {{ form.as_p }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <button type="button" id="add_more" class="btn btn-primary">添加更多</button>
+                    <button type="submit" class="btn btn-success">提交</button>
+                    <button type="button" id="test" class="btn btn-success">提交</button>
                 </form>
             </div>
         </div>
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
-            $('#id_一级分类').change(function () {
-                var selectedValue = $('#id_一级分类').val();
-                //alert(selectedValue)
-                $.ajax({
-                    url: '/get_second_level_categories/',
-                    type: 'GET',
-                    data: {
-                        'id': selectedValue
-                    },
-                    success: function (data) {
-
-                        $('#id_二级分类').empty();
-                        $.each(data, function (key, value) {
-                            $('#id_二级分类').append($('<option></option>').attr('value', key).text(value));
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.log("Ajax请求失败:", error);
-                    }
+            function bindEvents(prefix) {
+                $('#' + prefix + '-一级分类').change(function () {
+                    var selectedValue = $(this).val();
+                    $.ajax({
+                        url: '/get_second_level_categories/',
+                        type: 'GET',
+                        data: {
+                            'id': selectedValue
+                        },
+                        success: function (data) {
+                            $('#' + prefix + '-二级分类').empty();
+                            $.each(data, function (key, value) {
+                                $('#' + prefix + '-二级分类').append($('<option></option>').attr('value', key).text(value));
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Ajax请求失败:", error);
+                        }
+                    });
                 });
-            });
-            $('#id_二级分类').change(function () {
-                var selectedValue_one = $('#id_一级分类 option:selected').text();
-                var selectedValue_tow = $('#id_二级分类 option:selected').text();
-                //alert(selectedValue_one)
-                //alert(selectedValue)
-                $.ajax({
-                    url: '/get_productionwate/',
-                    type: 'GET',
-                    data: {
-                        'one': selectedValue_one,
-                        'tow': selectedValue_tow,
 
-                    },
-                    success: function (data) {
-
-                        $('#id_工种').empty();
-                        $.each(data, function (key, value) {
-                            $('#id_工种').append($('<option></option>').attr('value', key).text(value));
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.log("Ajax请求失败:", error);
-                    }
+                $('#' + prefix + '-二级分类').change(function () {
+                    var selectedValue_one = $('#' + prefix + '-一级分类 option:selected').text();
+                    var selectedValue_tow = $('#' + prefix + '-二级分类 option:selected').text();
+                    $.ajax({
+                        url: '/get_productionwate/',
+                        type: 'GET',
+                        data: {
+                            'one': selectedValue_one,
+                            'tow': selectedValue_tow
+                        },
+                        success: function (data) {
+                            $('#' + prefix + '-工种').empty();
+                            $.each(data, function (key, value) {
+                                $('#' + prefix + '-工种').append($('<option></option>').attr('value', key).text(value));
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Ajax请求失败:", error);
+                        }
+                    });
                 });
-            });
-            $('#id_工种').change(function () {
-                var selectedValue_one = $('#id_一级分类 option:selected').text();
-                var selectedValue_tow = $('#id_二级分类 option:selected').text();
-                var selectedValue_three = $('#id_工种 option:selected').text();
-                //alert(selectedValue_one)
-                //alert(selectedValue)
-                $.ajax({
-                    url: '/get_productionwate_price/',
-                    type: 'GET',
-                    data: {
-                        'one': selectedValue_one,
-                        'tow': selectedValue_tow,
-                        'three': selectedValue_three,
 
-                    },
-                    success: function (data) {
-
-                        $('#id_工价').empty();
-                        $('#id_工价').empty();
-                        $.each(data, function (key, value) {
-                            $('#id_工价').append($('<option></option>').attr('value', key).text(value));
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.log("Ajax请求失败:", error);
-                    }
+                $('#' + prefix + '-工种').change(function () {
+                    var selectedValue_one = $('#' + prefix + '-一级分类 option:selected').text();
+                    var selectedValue_tow = $('#' + prefix + '-二级分类 option:selected').text();
+                    var selectedValue_three = $('#' + prefix + '-工种 option:selected').text();
+                    $.ajax({
+                        url: '/get_productionwate_price/',
+                        type: 'GET',
+                        data: {
+                            'one': selectedValue_one,
+                            'tow': selectedValue_tow,
+                            'three': selectedValue_three
+                        },
+                        success: function (data) {
+                            $('#' + prefix + '-工价').empty();
+                            $.each(data, function (key, value) {
+                                $('#' + prefix + '-工价').append($('<option></option>').attr('value', key).text(value));
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Ajax请求失败:", error);
+                        }
+                    });
                 });
-            });
+            }
+
+            // 初始绑定事件
+            bindEvents('id_form-0');
+
             $("#id_批次").autocomplete({
                 source: "{% url 'autocomplete' %}",
                 minLength: 2
             });
+
+            var form_idx = {{ formset.total_form_count }};
+            $('#add_more').click(function () {
+                var newForm = $('.formset_item:first').clone(false);
+                var form_idx = $('#formset_container .formset_item').length; // 获取表单项的数量
+
+                newForm.find(':input').each(function () {
+                    var name = $(this).attr('name').replace(/-0-/g, '-' + form_idx + '-'); // 更新名称
+                    var id = 'id_' + name;
+                    $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked').removeAttr('selected');
+                });
+
+                newForm.find('label').each(function () {
+                    var newFor = $(this).attr('for').replace(/-0-/g, '-' + form_idx + '-'); // 更新 label 的 for 属性
+                    $(this).attr('for', newFor);
+                });
+
+                $('#formset_container').append(newForm);
+
+                // 绑定新表单项的事件
+                bindEvents('id_form-' + form_idx);
+            });
+
+            $('#test').click(function () {
+                var form = $('#dynamic_form');
+                var formData = form.serializeArray();
+                console.log(formData); // 在控制台打印表单数据
+
+                $.ajax({
+                    url: '', // 使用表单的action属性作为URL
+                    type: 'post',
+                    data: formData,
+                    success: function (response) {
+                        console.log(formData);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+
+
+
+            });
         });
     </script>
-
-
-
-
 {% endblock %}

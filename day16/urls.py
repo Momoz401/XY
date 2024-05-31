@@ -88,7 +88,7 @@ urlpatterns = [
     path('upload/Plant_batch/', upload.upload_Plant_batch_modal_form),  # 工价批量上传
     # 实现自动补全功能
     path('autocomplete/', views.autocomplete, name='autocomplete'),
-
+    path('test/',views.add_multiple_work_hours),
 
 
     # 月度计划

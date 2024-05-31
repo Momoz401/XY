@@ -5,7 +5,7 @@ from app01.models import BaseInfoWorkHour, BaseInfoWorkType,ProductionWage
 
 from app01.utils.pagination import Pagination
 from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm, production_wage_ModelForm, \
-    production_wage_Edit_ModelForm
+    production_wage_Edit_ModelForm, FixedFieldsForm, DynamicFieldsFormSet
 
 
 def production_wage_list(request):
@@ -30,17 +30,26 @@ def production_wage_list(request):
 
 
 def production_wage_add(request):
-    """ 添加工价 """
-    if request.method == "GET":
-        form = production_wage_ModelForm()
-        return render(request, 'productionwate_add.html', {"form": form})
-    form = production_wage_ModelForm(data=request.POST)
-    # 限制一级工种只能从规定的类别列选择
-    if form.is_valid():
-        form.save()
-        return redirect('/production_wage_list/list/')
-    return render(request, 'productionwage.html', {"form": form})
+    if request.method == 'POST':
+        fixed_form = FixedFieldsForm(request.POST)
+        print(request.POST)
+        formset = DynamicFieldsFormSet(request.POST, queryset=ProductionWage.objects.none())
+        if fixed_form.is_valid() and formset.is_valid():
+            fixed_instance = fixed_form.save(commit=False)
+            instances = formset.save(commit=False)  # 获取所有实例，但不保存到数据库中
 
+            for instance in instances:
+                instance.日期 = fixed_instance.日期
+                instance.工人 = fixed_instance.工人
+                instance.批次 = fixed_instance.批次
+                instance.save()  # 保存每个实例
+
+            formset.save_m2m()  # 保存多对多关系，如果有的话
+            return redirect('/production_wage_list/list')
+    else:
+        fixed_form = FixedFieldsForm()
+        formset = DynamicFieldsFormSet(queryset=ProductionWage.objects.none())
+    return render(request, 'productionwate_add.html', {'fixed_form': fixed_form, 'formset': formset})
 
 
 def get_productionwate(request):

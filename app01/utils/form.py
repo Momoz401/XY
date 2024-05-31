@@ -6,7 +6,7 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django import forms
 
-from app01.models import BaseInfoWorkType, BaseInfoWorkHour
+from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage
 from app01.utils.bootstrap import BootStrapModelForm
 
 
@@ -179,6 +179,10 @@ class production_wage_ModelForm(BootStrapModelForm):
         self.fields['工种'].widget = forms.Select(attrs={'class': 'form-control'})
         self.fields['工价'].widget = forms.Select(attrs={'class': 'form-control'})
 
+
+
+
+
     def clean(self):
         cleaned_data = super().clean()
         selected_work_type = cleaned_data.get('工种')
@@ -249,3 +253,61 @@ class Plant_batch_Edit_ModelForm(BootStrapModelForm):
         # exclude = ['level']
         fields = ['批次ID', '品种', '品类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期', '用籽量', '备注']
 
+from django import forms
+from django.forms import modelformset_factory
+
+
+class WorkHourModelForm(forms.ModelForm):
+    class Meta:
+        model = BaseInfoWorkHour
+        fields = ['工种ID', '工种', '一级分类', '二级分类', '单价', '单位', '备注']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种ID', '工种名称')
+        choices = list(level_one_choices)
+        self.fields['一级分类'].choices = choices
+        self.fields['一级分类'] = forms.ChoiceField(
+            choices=choices, required=True,
+            widget=forms.Select(attrs={'class': 'form-control'})
+        )
+        self.fields['二级分类'].choices = []
+        self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
+
+WorkHourFormSet = modelformset_factory(BaseInfoWorkHour, form=WorkHourModelForm, extra=1)
+
+
+
+class FixedFieldsForm(forms.ModelForm): # 静态字段
+    class Meta:
+        model = ProductionWage
+        fields = ['日期', '工人', '批次']
+
+
+
+class DynamicFieldsForm(forms.ModelForm):
+    class Meta:
+        model = ProductionWage
+        fields = ['一级分类', '二级分类', '工种', '工价', '工时', '地块']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种ID', '工种名称')
+        choices = list(level_one_choices)
+        self.fields['一级分类'].choices = choices
+        self.fields['一级分类'] = forms.ChoiceField(
+            choices=choices, required=True,
+            widget=forms.Select(attrs={'class': 'form-control'})
+        )
+        self.fields['二级分类'].choices = []
+        self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
+        self.fields['工种'].choices = []
+        self.fields['工种'].widget = forms.Select(attrs={'class': 'form-control'})
+        self.fields['工价'].widget = forms.Select(attrs={'class': 'form-control'})
+        self.fields['工时'].widget = forms.NumberInput(attrs={'class': 'form-control'})
+        self.fields['地块'].widget = forms.TextInput(attrs={'class': 'form-control'})
+
+
+from django.forms import modelformset_factory
+
+DynamicFieldsFormSet = modelformset_factory(ProductionWage, form=DynamicFieldsForm, extra=1)

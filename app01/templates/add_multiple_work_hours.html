@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+
+{% block content %}
+<body>
+    <div class="container">
+        <h2>添加多个工作小时记录</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <div id="formset_container">
+                {% for form in formset %}
+                    <div class="formset_item">
+                        {{ form.as_p }}
+                    </div>
+                {% endfor %}
+            </div>
+            <button type="button" id="add_more" class="btn btn-primary">添加更多</button>
+            <button type="submit" class="btn btn-success">提交</button>
+        </form>
+    </div>
+    <script>
+        $(document).ready(function() {
+            var form_idx = {{ formset.total_form_count }};
+            $('#add_more').click(function() {
+                var form_template = $('.formset_item:first').clone(true).html().replace(/__prefix__/g, form_idx);
+                $('#formset_container').append('<div class="formset_item">' + form_template + '</div>');
+                form_idx++;
+            });
+        });
+    </script>
+
+{% endblock %}
