@@ -1,7 +1,7 @@
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import render, redirect
 from app01 import models
-from app01.models import BaseInfoWorkHour, BaseInfoWorkType,ProductionWage
+from app01.models import BaseInfoWorkHour, BaseInfoWorkType, ProductionWage, Plant_batch
 
 from app01.utils.pagination import Pagination
 from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm, production_wage_ModelForm, \
@@ -57,9 +57,9 @@ def production_wage_add(request):
         # 如果是GET请求，创建空的固定表单和表单集
         fixed_form = FixedFieldsForm()
         formset = DynamicFieldsFormSet(queryset=ProductionWage.objects.none())
-
+    {}
     # 渲染模板并将固定表单和表单集传递给模板
-    return render(request, 'productionwate_add.html', {'fixed_form': fixed_form, 'formset': formset})
+    return render(request, 'productionwate_add.html', {'fixed_form': fixed_form, 'formset': formset,'redirect': '/production_wage_list/list'})
 
 def get_productionwate(request):
     if request.method == 'GET' :
@@ -94,6 +94,21 @@ def get_productionwate_price(request):
     else:
         return JsonResponse({'error': '无效请求'}, status=400)
 
+
+def get_Plant_batch_dk(request):
+    if request.method == 'GET' :
+        # 解码参数
+        level_one_id = request.GET.get('one', None)
+
+        # 根据一级分类和二级分类活动工种和价格
+        if level_one_id is not None:
+            dikuai = Plant_batch.objects.filter(批次ID=level_one_id ).values_list('ID', '地块')
+            # print(work_type)
+            return JsonResponse(dict(dikuai))
+        else:
+            return JsonResponse({'error': '一级分类_id 参数缺失'}, status=400)
+    else:
+        return JsonResponse({'error': '无效请求'}, status=400)
 
 
 

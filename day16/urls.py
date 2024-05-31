@@ -56,13 +56,17 @@ urlpatterns = [
 
     # 工时管理
     path('production_wage_list/list/', productionwage.production_wage_list),
+    path('productionwate/add/undefined/', productionwage.production_wage_list),
     path('productionwate/add/', productionwage.production_wage_add),
     path('productionwate/<int:nid>/delete/', productionwage.production_wage_delete),
     path('productionwate/<int:nid>/edit/', productionwage.productionwate_edit),
     path('upload/productionwate/', upload.upload_productionwate_modal_form),  # 工时批量上传
 
+
     path('get_productionwate/', productionwage.get_productionwate), #ajax获得价格和类型
     path('get_productionwate_price/', productionwage.get_productionwate_price),  # ajax获得价格和类型
+    path('get_Plant_batch_dk/', productionwage.get_Plant_batch_dk),  # ajax获得地块
+
     path('get_second_level_categories/', WorkHour.get_second_level_categories),#ajax二级类型和类型
 
 

@@ -281,7 +281,7 @@ WorkHourFormSet = modelformset_factory(BaseInfoWorkHour, form=WorkHourModelForm,
 class FixedFieldsForm(BootStrapModelForm): # 静态字段
     class Meta:
         model = ProductionWage
-        fields = ['日期', '基地','工人', '批次']
+        fields = ['日期', '基地', '批次','工人']
 
 
 
@@ -308,7 +308,8 @@ class DynamicFieldsForm(forms.ModelForm):
         self.fields['工价'].widget = forms.Select(attrs={'class': 'form-control'})
         self.fields['数量'].widget = forms.NumberInput(attrs={'class': 'form-control'})
         self.fields['工时'].widget = forms.NumberInput(attrs={'class': 'form-control'})
-        self.fields['地块'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['地块'].choices = []
+        self.fields['地块'].widget = forms.Select(attrs={'class': 'form-control'})
 
 
 from django.forms import modelformset_factory

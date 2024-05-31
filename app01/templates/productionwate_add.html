@@ -93,6 +93,28 @@
                         }
                     });
                 });
+
+                $('#id_工人').change(function () {
+                    var pc = $('#id_批次').val();
+                    //alert(pc);
+
+                    $.ajax({
+                        url: '/get_Plant_batch_dk/',
+                        type: 'GET',
+                        data: {
+                            'one': pc,
+                        },
+                        success: function (data) {
+                            $('#' + prefix + '-地块').empty();
+                            $.each(data, function (key, value) {
+                                $('#' + prefix + '-地块').append($('<option></option>').attr('value', key).text(value));
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Ajax请求失败:", error);
+                        }
+                    });
+                });  //获得地块
             }
 
             // 初始绑定事件
@@ -142,7 +164,7 @@
                     type: 'post',
                     data: formData,
                     success: function (response) {
-                        console.log(formData);
+                          window.location.href = response.redirect;  // 使用指定的 URL 进行重定向
                     },
                     error: function (xhr, status, error) {
                         console.error(xhr.responseText);
