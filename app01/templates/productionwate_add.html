@@ -121,8 +121,15 @@
 
                 $('#formset_container').append(newForm);
 
+                form_idx++;
+                // 更新 TOTAL_FORMS 的值
+                $('#id_form-TOTAL_FORMS').val(form_idx);  // 假设这是你的 TOTAL_FORMS 字段的 ID        });
                 // 绑定新表单项的事件
-                bindEvents('id_form-' + form_idx);
+                  // 绑定现有表单事件
+                var form_idx = $('#formset_container .formset_item').length;
+                for (var i = 0; i < form_idx; i++) {
+                    bindEvents('id_form-' + i);
+                }
             });
 
             $('#test').click(function () {
@@ -141,7 +148,6 @@
                         console.error(xhr.responseText);
                     }
                 });
-
 
 
             });

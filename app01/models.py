@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.utils import timezone
 
 from django.db import models
@@ -259,7 +261,7 @@ class PlanDaily(models.Model):
 
 class ProductionWage(models.Model):
     基地 = models.CharField(max_length=255, null=True)
-    日期 = models.DateField(null=True)
+    日期 = models.DateField(null=True,default=timezone.now)
     工人 = models.CharField(max_length=255, null=True)
     工种 = models.CharField(max_length=255, null=True)
     一级分类 = models.CharField(max_length=255, null=True)

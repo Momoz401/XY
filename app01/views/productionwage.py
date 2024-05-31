@@ -1,11 +1,11 @@
-from django.http import JsonResponse
+from django.http import JsonResponse, QueryDict
 from django.shortcuts import render, redirect
 from app01 import models
 from app01.models import BaseInfoWorkHour, BaseInfoWorkType,ProductionWage
 
 from app01.utils.pagination import Pagination
 from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm, production_wage_ModelForm, \
-    production_wage_Edit_ModelForm, FixedFieldsForm, DynamicFieldsFormSet
+    production_wage_Edit_ModelForm, FixedFieldsForm, DynamicFieldsFormSet, DynamicFieldsForm
 
 
 def production_wage_list(request):
@@ -16,7 +16,7 @@ def production_wage_list(request):
     if search_data:
         data_dict["工种__contains"] = search_data
 
-    queryset = models.ProductionWage.objects.filter(**data_dict).order_by("-日期")
+    queryset = models.ProductionWage.objects.filter(**data_dict).order_by("-id")
 
     page_object = Pagination(request, queryset)
 
@@ -31,26 +31,35 @@ def production_wage_list(request):
 
 def production_wage_add(request):
     if request.method == 'POST':
+        # 将POST数据传递给固定表单和表单集
         fixed_form = FixedFieldsForm(request.POST)
-        print(request.POST)
-        formset = DynamicFieldsFormSet(request.POST, queryset=ProductionWage.objects.none())
+        formset = DynamicFieldsFormSet(request.POST)
+        # 如果固定表单和表单集都有效，则保存数据并重定向
         if fixed_form.is_valid() and formset.is_valid():
             fixed_instance = fixed_form.save(commit=False)
-            instances = formset.save(commit=False)  # 获取所有实例，但不保存到数据库中
-
+            # fixed_instance.save()  # 首先保存固定实例
+            instances = formset.save(commit=False)
             for instance in instances:
                 instance.日期 = fixed_instance.日期
                 instance.工人 = fixed_instance.工人
                 instance.批次 = fixed_instance.批次
-                instance.save()  # 保存每个实例
-
-            formset.save_m2m()  # 保存多对多关系，如果有的话
+                instance.基地 = fixed_instance.基地
+                instance.save()
+            formset.save_m2m()
             return redirect('/production_wage_list/list')
+        else:
+            # 如果有验证错误，打印错误信息以便调试
+            print(fixed_form.errors)  # 打印固定表单的错误
+            print(formset.errors)  # 打印表单集的错误
+            # 在这里可以进一步处理验证错误
+
     else:
+        # 如果是GET请求，创建空的固定表单和表单集
         fixed_form = FixedFieldsForm()
         formset = DynamicFieldsFormSet(queryset=ProductionWage.objects.none())
-    return render(request, 'productionwate_add.html', {'fixed_form': fixed_form, 'formset': formset})
 
+    # 渲染模板并将固定表单和表单集传递给模板
+    return render(request, 'productionwate_add.html', {'fixed_form': fixed_form, 'formset': formset})
 
 def get_productionwate(request):
     if request.method == 'GET' :
