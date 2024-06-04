@@ -53,6 +53,10 @@ urlpatterns = [
     # 基地管理
     path('BaseInfo/list/', baseinfo.BaseInfo_list),
     path('BaseInfo/add/', baseinfo.BaseInfo_add),
+    path('BaseInfo/<int:nid>/edit/',baseinfo.BaseInfo_edit),
+    path('BaseInfo/<int:nid>/delete/', baseinfo.BaseInfo_delete),
+
+
 
     # 工时管理
     path('production_wage_list/list/', productionwage.production_wage_list),
@@ -91,7 +95,8 @@ urlpatterns = [
     path('Plant_batch/<int:nid>/delete/', Plant_batch.Plant_batch_delete),
     path('upload/Plant_batch/', upload.upload_Plant_batch_modal_form),  # 工价批量上传
     # 实现自动补全功能
-    path('autocomplete/', views.autocomplete, name='autocomplete'),
+    path('autocomplete', views.autocomplete, name='autocomplete'),
+    path('autocomplete_baseinfo/', views.autocomplete_baseinfo, name='autocomplete_baseinfo'),
     path('test/',views.add_multiple_work_hours),
 
 

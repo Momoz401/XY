@@ -34,6 +34,7 @@ def production_wage_add(request):
         # 将POST数据传递给固定表单和表单集
         fixed_form = FixedFieldsForm(request.POST)
         formset = DynamicFieldsFormSet(request.POST)
+        print(formset)
         # 如果固定表单和表单集都有效，则保存数据并重定向
         if fixed_form.is_valid() and formset.is_valid():
             fixed_instance = fixed_form.save(commit=False)
@@ -42,8 +43,8 @@ def production_wage_add(request):
             for instance in instances:
                 instance.日期 = fixed_instance.日期
                 instance.工人 = fixed_instance.工人
-                instance.批次 = fixed_instance.批次
-                instance.基地 = fixed_instance.基地
+                #instance.批次 = fixed_instance.批次
+                #instance.基地 = fixed_instance.基地
                 instance.save()
             formset.save_m2m()
             return redirect('/production_wage_list/list')

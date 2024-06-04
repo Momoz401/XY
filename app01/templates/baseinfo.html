@@ -34,22 +34,27 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>基地ID</th>
-                    <th>基地位置</th>
-                     <th>基地名称</th>
+                    <th>ID</th>
+
+                    <th>基地</th>
+                         <th>代号</th>
                     <th>基地经理</th>
+                    <th>面积</th>
+                    <th>操作</th>
+
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
-                        <th>{{ obj.基地ID}}</th>
-                        <td>{{ obj.基地位置 }}</td>
-                         <td>{{ obj.基地名称 }}</td>
+                        <th>{{ obj.ID}}</th>
+                        <td>{{ obj.基地 }}</td>
+                         <td>{{ obj.代号 }}</td>
                         <td>{{ obj.基地经理 }}</td>
+                          <td>{{ obj.面积 }}</td>
                         <td>
-                            <a class="btn btn-primary btn-xs" href="/pretty/{{ obj.id }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/pretty/{{ obj.id }}/delete/">删除</a>
+                            <a class="btn btn-primary btn-xs" href="/BaseInfo/{{ obj.ID}}/edit/">编辑</a>
+                            <a class="btn btn-danger btn-xs" href="/BaseInfo/{{ obj.ID }}/delete/">删除</a>
                         </td>
                     </tr>
                 {% endfor %}

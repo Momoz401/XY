@@ -38,22 +38,24 @@ def BaseInfo_add(request):
     return render(request, 'baseinfo_add.html', {"form": form})
 
 
-def pretty_edit(request, nid):
-    """ 编辑靓号 """
-    row_object = models.PrettyNum.objects.filter(id=nid).first()
+
+
+def BaseInfo_edit(request, nid):
+    """ 编辑基地 """
+    row_object = models.BaseInfoBase.objects.filter(ID=nid).first()
 
     if request.method == "GET":
-        form = PrettyEditModelForm(instance=row_object)
+        form = baseInfoModelForm(instance=row_object)
         return render(request, 'pretty_edit.html', {"form": form})
 
-    form = PrettyEditModelForm(data=request.POST, instance=row_object)
+    form = baseInfoModelForm(data=request.POST, instance=row_object)
     if form.is_valid():
         form.save()
-        return redirect('/pretty/list/')
+        return redirect('/BaseInfo/list/')
 
     return render(request, 'pretty_edit.html', {"form": form})
 
 
-def pretty_delete(request, nid):
-    models.PrettyNum.objects.filter(id=nid).delete()
-    return redirect('/pretty/list/')
+def BaseInfo_delete(request, nid):
+    models.BaseInfoBase.objects.filter(基地ID=nid).delete()
+    return redirect('/BaseInfo/list/')

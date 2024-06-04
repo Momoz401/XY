@@ -128,9 +128,10 @@ class uploader(models.Model):
 class BaseInfoBase(models.Model):
     ID = models.AutoField(primary_key=True)
     基地ID = models.IntegerField(null=True)
-    基地位置 = models.CharField(max_length=255, unique=True)
-    基地名称 = models.CharField(max_length=255)
+    基地 = models.CharField(max_length=255)
+    代号 = models.CharField(max_length=255)
     基地经理 = models.CharField(max_length=255)
+    面积 = models.FloatField(null=True,blank=True)
 
 
 class BaseInfoProduct(models.Model):

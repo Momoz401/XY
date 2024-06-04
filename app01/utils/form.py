@@ -110,14 +110,15 @@ class baseInfoModelForm(BootStrapModelForm):
         model = models.BaseInfoBase
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['基地ID', '基地位置', '基地名称', '基地经理']
+        # exclude = ['level']
+        fields = ['基地', '代号', '基地经理', '面积']
 
     # 验证：方式2
     def clean_mobile(self):
-        txt_mobile = self.cleaned_data['基地名称']
-        exists = models.BaseInfo.objects.filter(工种名称=txt_mobile).exists()
+        txt_mobile = self.cleaned_data['代号']
+        exists = models.BaseInfoBase.objects.filter(代号=txt_mobile).exists()
         if exists:
-            raise ValidationError("基地已存在")
+            raise ValidationError("代号")
 
         # 验证通过，用户输入的值返回
         return txt_mobile
@@ -157,7 +158,7 @@ class production_wage_ModelForm(BootStrapModelForm):
         model = models.ProductionWage
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['日期', '工人', '批次', '一级分类', '二级分类', '工种', '工价', '工时', '地块']
+        fields = ['日期', '工人', '批次', '一级分类', '二级分类', '工种', '工价', '合计工资', '工时', '地块']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -178,10 +179,6 @@ class production_wage_ModelForm(BootStrapModelForm):
         self.fields['工种'].choices = []
         self.fields['工种'].widget = forms.Select(attrs={'class': 'form-control'})
         self.fields['工价'].widget = forms.Select(attrs={'class': 'form-control'})
-
-
-
-
 
     def clean(self):
         cleaned_data = super().clean()
@@ -206,10 +203,7 @@ class production_wage_Edit_ModelForm(BootStrapModelForm):
         model = models.ProductionWage
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['日期', '工人', '批次', '一级分类', '二级分类', '工种', '工价', '工时', '地块']
-
-
-
+        fields = ['日期', '工人', '批次', '一级分类', '二级分类', '工种', '工价', '合计工资', '工时', '地块']
 
 
 class agriculture_cost_ModelForm(BootStrapModelForm):
@@ -237,13 +231,13 @@ class agriculture_cost_Edit_ModelForm(BootStrapModelForm):
         fields = ['日期', '工种', '数量', '农资种类', '名称', '单价', '金额', '批次', '地块']
 
 
-
 class Plant_batch_ModelForm(BootStrapModelForm):
     class Meta:
         model = models.Plant_batch
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['批次ID', '品种', '品类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期','用籽量', '备注']
+        fields = ['批次ID', '品种', '品类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期',
+                  '用籽量', '备注']
 
 
 class Plant_batch_Edit_ModelForm(BootStrapModelForm):
@@ -251,7 +245,9 @@ class Plant_batch_Edit_ModelForm(BootStrapModelForm):
         model = models.Plant_batch
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['批次ID', '品种', '品类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期', '用籽量', '备注']
+        fields = ['批次ID', '品种', '品类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期',
+                  '用籽量', '备注']
+
 
 from django import forms
 from django.forms import modelformset_factory
@@ -274,23 +270,20 @@ class WorkHourModelForm(forms.ModelForm):
         self.fields['二级分类'].choices = []
         self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
 
+
 WorkHourFormSet = modelformset_factory(BaseInfoWorkHour, form=WorkHourModelForm, extra=1)
 
 
-
-class FixedFieldsForm(BootStrapModelForm): # 静态字段
+class FixedFieldsForm(BootStrapModelForm):  # 静态字段
     class Meta:
         model = ProductionWage
-        fields = ['日期', '基地', '批次','工人']
-
-
-
+        fields = ['日期', '工人']
 
 
 class DynamicFieldsForm(forms.ModelForm):
     class Meta:
         model = ProductionWage
-        fields = ['一级分类', '二级分类', '工种', '工价', '工时','数量','地块']
+        fields = ['基地', '批次', '一级分类', '二级分类', '工种', '工价', '数量', '合计工资', '工时', '地块']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -308,6 +301,9 @@ class DynamicFieldsForm(forms.ModelForm):
         self.fields['工价'].widget = forms.Select(attrs={'class': 'form-control'})
         self.fields['数量'].widget = forms.NumberInput(attrs={'class': 'form-control'})
         self.fields['工时'].widget = forms.NumberInput(attrs={'class': 'form-control'})
+        self.fields['合计工资'].widget = forms.NumberInput(attrs={'class': 'form-control'})
+        self.fields['基地'].widget = forms.TextInput(attrs={'class': 'form-control'})
+        self.fields['批次'].widget = forms.TextInput(attrs={'class': 'form-control'})
         self.fields['地块'].choices = []
         self.fields['地块'].widget = forms.Select(attrs={'class': 'form-control'})
 

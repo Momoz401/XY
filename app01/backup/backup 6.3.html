@@ -4,7 +4,7 @@
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">新建</h3>
+                <h3 class="panel-title">新建工价</h3>
             </div>
             <div class="panel-body">
                 <form method="post" id="dynamic_form" action="">
@@ -15,40 +15,18 @@
                         {% for form in formset %}
                             <div class="col-md-3 formset_item">
                                 {{ form.as_p }}
-                                <button type="button" class="btn btn-danger remove-form">删除</button>
                             </div>
                         {% endfor %}
                     </div>
-
-                    <hr> <!-- 添加一条横线 -->
                     <button type="button" id="add_more" class="btn btn-primary">添加更多</button>
-
-                    <button type="button" id="test" class="btn btn-success">保存提交</button>
+                    <button type="submit" class="btn btn-success">提交</button>
+                    <button type="button" id="test" class="btn btn-success">提交</button>
                 </form>
             </div>
         </div>
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
-
-            // 计算工资函数
-            function calculateSalary(prefix) {
-                var quantity = $('#' + prefix + '-数量').val();
-                var wage = $('#' + prefix + '-工价 option:selected').text();
-
-                // 检查输入是否为数字
-                if ($.isNumeric(quantity) && $.isNumeric(wage)) {
-                    var salary = parseFloat(quantity) * parseFloat(wage);
-                    //alert(salary)
-                    // 将结果赋值给工资输入框
-                    $('#' + prefix + '-合计工资').val(salary);
-                } else {
-                    // 如果输入不是数字，则清空工资输入框
-                    $('#' + prefix + '-合计工资').val('');
-                }
-            }
-
-
             function bindEvents(prefix) {
                 $('#' + prefix + '-一级分类').change(function () {
                     var selectedValue = $(this).val();
@@ -60,7 +38,6 @@
                         },
                         success: function (data) {
                             $('#' + prefix + '-二级分类').empty();
-                            $('#' + prefix + '-二级分类').empty().append($('<option></option>').attr('value', '').text('请选择'));
                             $.each(data, function (key, value) {
                                 $('#' + prefix + '-二级分类').append($('<option></option>').attr('value', key).text(value));
                             });
@@ -83,7 +60,6 @@
                         },
                         success: function (data) {
                             $('#' + prefix + '-工种').empty();
-                            $('#' + prefix + '-工种').empty().append($('<option></option>').attr('value', '').text('请选择'));
                             $.each(data, function (key, value) {
                                 $('#' + prefix + '-工种').append($('<option></option>').attr('value', key).text(value));
                             });
@@ -118,8 +94,7 @@
                     });
                 });
 
-                $('#' + prefix + '-数量').change(function () {
-                    calculateSalary(prefix);
+                $('#' + prefix + '-工人').change(function () {
                     var pc = $('#' + prefix + '-批次').val();
                     //alert(pc);
 
@@ -144,7 +119,7 @@
                 $('#' + prefix + '-批次').autocomplete({
                     source: function (request, response) {
                         var baseId = $('#' + prefix + '-基地').val();  // 动态获取 base_id 值
-                        // alert(baseId);
+                        //alert(baseId);
                         var url = "{% url 'autocomplete'  %}";
 
                         $.ajax({
@@ -175,43 +150,35 @@
             // 初始绑定事件
             bindEvents('id_form-0');
 
-            // 添加更多表单项的点击事件
+            var form_idx = {{ formset.total_form_count }};
             $('#add_more').click(function () {
-                var newForm = $('.formset_item:first').clone(false); // 克隆第一个表单项以保留事件绑定
-                var form_idx = $('#formset_container .formset_item').length;
+                var newForm = $('.formset_item:first').clone(false);
+                var form_idx = $('#formset_container .formset_item').length; // 获取表单项的数量
 
                 newForm.find(':input').each(function () {
-                    var name = $(this).attr('name');
-                    if (name) {
-                        var newName = name.replace(/\d+/, form_idx); // 替换表单项名称中的数字
-                        $(this).attr('name', newName);
-                    }
-
-                    var id = $(this).attr('id');
-                    if (id) {
-                        var newId = id.replace(/\d+/, form_idx); // 替换表单项ID中的数字
-                        $(this).attr('id', newId);
-                    }
-
-                    $(this).val('').removeAttr('checked').removeAttr('selected');
+                    var name = $(this).attr('name').replace(/-0-/g, '-' + form_idx + '-'); // 更新名称
+                    var id = 'id_' + name;
+                    $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked').removeAttr('selected');
                 });
 
-                $('#formset_container').append(newForm); // 将新表单项添加到页面
+                newForm.find('label').each(function () {
+                    var newFor = $(this).attr('for').replace(/-0-/g, '-' + form_idx + '-'); // 更新 label 的 for 属性
+                    $(this).attr('for', newFor);
+                });
 
-                // 为新表单项绑定事件
-                bindEvents('id_form-' + form_idx);
+                $('#formset_container').append(newForm);
 
-                form_idx++; // 更新索引
-                 updateTotalForms();
-
+                form_idx++;
+                // 更新 TOTAL_FORMS 的值
+                $('#id_form-TOTAL_FORMS').val(form_idx);  // 假设这是你的 TOTAL_FORMS 字段的 ID        });
+                // 绑定新表单项的事件
+                // 绑定现有表单事件
+                var form_idx = $('#formset_container .formset_item').length;
+                for (var i = 0; i < form_idx; i++) {
+                    bindEvents('id_form-' + i);
+                }
             });
 
-            $(document).on('click', '.remove-form', function () {
-                $(this).closest('.formset_item').remove();
-                updateTotalForms();
-            });
-
-            // 测试提交的点击事件  
             $('#test').click(function () {
                 var form = $('#dynamic_form');
                 var formData = form.serializeArray();
@@ -231,12 +198,6 @@
 
 
             });
-
-            // 更新表单项数量  
-            function updateTotalForms() {
-                var totalForms = $('#formset_container .formset_item').length;
-                $('#id_form-TOTAL_FORMS').val(totalForms);
-            }
         });
     </script>
 {% endblock %}
