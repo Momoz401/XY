@@ -43,7 +43,7 @@ def production_wage_add(request):
             for instance in instances:
                 instance.日期 = fixed_instance.日期
                 instance.工人 = fixed_instance.工人
-                #instance.批次 = fixed_instance.批次
+                instance.负责人 = fixed_instance.负责人
                 #instance.基地 = fixed_instance.基地
                 instance.save()
             formset.save_m2m()

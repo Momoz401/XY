@@ -277,7 +277,7 @@ WorkHourFormSet = modelformset_factory(BaseInfoWorkHour, form=WorkHourModelForm,
 class FixedFieldsForm(BootStrapModelForm):  # 静态字段
     class Meta:
         model = ProductionWage
-        fields = ['日期', '工人']
+        fields = ['日期', '工人', '负责人']
 
 
 class DynamicFieldsForm(forms.ModelForm):
@@ -322,8 +322,6 @@ class DynamicFieldsForm(forms.ModelForm):
                 cleaned_data['二级分类'] = corresponding_object.二级分类
                 # print(cleaned_data)
         return cleaned_data
-
-
 
 
 from django.forms import modelformset_factory

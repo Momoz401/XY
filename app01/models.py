@@ -274,6 +274,7 @@ class ProductionWage(models.Model):
     合计工资 = models.FloatField(null=True)
     批次 = models.CharField(max_length=255, null=True)
     地块 = models.CharField(max_length=255, null=True)
+    负责人 = models.CharField(max_length=255, null=True)
 
 
 class CostAgriculture(models.Model):
