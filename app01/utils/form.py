@@ -79,7 +79,7 @@ class work_type_ModelForm(BootStrapModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # 获取所有工种级别为1的工种，构建成选择框的选项
-        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种ID', '工种名称')
+        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种名称', '工种名称')
         # 添加一个空的选项，表示可以为空
         choices = [('', '')] + list(level_one_choices)
         self.fields['父工种'].choices = choices
@@ -134,7 +134,7 @@ class workHourModelForm(BootStrapModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # 获取所有工种级别为1的工种，构建成选择框的选项
-        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种ID', '工种名称')
+        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种名称', '工种名称')
         # 添加一个空的选项，表示可以为空
         choices = list(level_one_choices)
         self.fields['一级分类'].choices = choices
@@ -183,7 +183,7 @@ class production_wage_ModelForm(BootStrapModelForm):
     def clean(self):
         cleaned_data = super().clean()
         selected_work_type = cleaned_data.get('工种')
-        print(selected_work_type)
+        # print(selected_work_type)
         # 获取工种选项的文本值
         if selected_work_type:
             corresponding_object = BaseInfoWorkHour.objects.filter(工种ID=selected_work_type).first()
@@ -194,7 +194,7 @@ class production_wage_ModelForm(BootStrapModelForm):
                 cleaned_data['工种'] = corresponding_object.工种
                 cleaned_data['一级分类'] = corresponding_object.一级分类
                 cleaned_data['二级分类'] = corresponding_object.二级分类
-                print(cleaned_data)
+                # print(cleaned_data)
         return cleaned_data
 
 
@@ -260,7 +260,7 @@ class WorkHourModelForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种ID', '工种名称')
+        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('工种名称', '工种名称')
         choices = list(level_one_choices)
         self.fields['一级分类'].choices = choices
         self.fields['一级分类'] = forms.ChoiceField(
@@ -306,6 +306,24 @@ class DynamicFieldsForm(forms.ModelForm):
         self.fields['批次'].widget = forms.TextInput(attrs={'class': 'form-control'})
         self.fields['地块'].choices = []
         self.fields['地块'].widget = forms.Select(attrs={'class': 'form-control'})
+
+    def clean(self):
+        cleaned_data = super().clean()
+        selected_work_type = cleaned_data.get('工种')
+        # 获取工种选项的文本值 ,这里非常重要
+        if selected_work_type:
+            corresponding_object = BaseInfoWorkHour.objects.filter(工种ID=selected_work_type).first()
+            # print(corresponding_object.工种)
+
+            if corresponding_object:
+                # 保存选项的文本值
+                cleaned_data['工种'] = corresponding_object.工种
+                cleaned_data['一级分类'] = corresponding_object.一级分类
+                cleaned_data['二级分类'] = corresponding_object.二级分类
+                # print(cleaned_data)
+        return cleaned_data
+
+
 
 
 from django.forms import modelformset_factory
