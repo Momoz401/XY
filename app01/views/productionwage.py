@@ -34,7 +34,7 @@ def production_wage_add(request):
         # 将POST数据传递给固定表单和表单集
         fixed_form = FixedFieldsForm(request.POST)
         formset = DynamicFieldsFormSet(request.POST)
-        print(formset)
+        # print(formset)
         # 如果固定表单和表单集都有效，则保存数据并重定向
         if fixed_form.is_valid() and formset.is_valid():
             fixed_instance = fixed_form.save(commit=False)
@@ -103,7 +103,7 @@ def get_Plant_batch_dk(request):
 
         # 根据一级分类和二级分类活动工种和价格
         if level_one_id is not None:
-            dikuai = Plant_batch.objects.filter(批次ID=level_one_id ).values_list('ID', '地块')
+            dikuai = Plant_batch.objects.filter(批次ID=level_one_id ).values_list('地块', '地块')
             # print(work_type)
             return JsonResponse(dict(dikuai))
         else:

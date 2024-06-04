@@ -144,6 +144,22 @@ class workHourModelForm(BootStrapModelForm):
         self.fields['二级分类'].choices = []
         self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
 
+    def clean(self):
+        cleaned_data = super().clean()
+        selected_work_type = cleaned_data.get('二级分类')
+
+        # print(selected_work_type)
+        # 获取工种选项的文本值
+        if selected_work_type:
+            corresponding_object = BaseInfoWorkType.objects.filter(工种级别=2, 工种ID=selected_work_type).first()
+            # print(corresponding_object.一级分类)
+            if corresponding_object:
+                # 保存选项的文本值
+                cleaned_data['二级分类'] = corresponding_object.工种名称
+                cleaned_data['一级分类'] = corresponding_object.父工种
+                # print(cleaned_data)
+        return cleaned_data
+
 
 class workHour_Edit_ModelForm(BootStrapModelForm):
     class Meta:
@@ -183,6 +199,7 @@ class production_wage_ModelForm(BootStrapModelForm):
     def clean(self):
         cleaned_data = super().clean()
         selected_work_type = cleaned_data.get('工种')
+        selected_base_id = cleaned_data.get('地块')
         # print(selected_work_type)
         # 获取工种选项的文本值
         if selected_work_type:
@@ -320,6 +337,7 @@ class DynamicFieldsForm(forms.ModelForm):
                 cleaned_data['工种'] = corresponding_object.工种
                 cleaned_data['一级分类'] = corresponding_object.一级分类
                 cleaned_data['二级分类'] = corresponding_object.二级分类
+                cleaned_data['工价'] = corresponding_object.单价
                 # print(cleaned_data)
         return cleaned_data
 

@@ -40,6 +40,7 @@
                 if ($.isNumeric(quantity) && $.isNumeric(wage)) {
                     var salary = parseFloat(quantity) * parseFloat(wage);
                     //alert(salary)
+                    salary=salary.toFixed(2);
                     // 将结果赋值给工资输入框
                     $('#' + prefix + '-合计工资').val(salary);
                 } else {
