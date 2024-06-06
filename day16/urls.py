@@ -20,7 +20,8 @@ from django.conf import settings
 
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
-    WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views
+    WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report
+
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -126,6 +127,13 @@ urlpatterns = [
     path('task/list/', task.task_list),
     path('task/ajax/', task.task_ajax),  # 学习Ajax
     path('task/add/', task.task_add),
+
+
+    # 报表管理
+
+    path('report/list/', report.report_list),
+    path('report/get_tables_date/', report.data_table_view, name="data_table_view"),
+
 
     # 订单管理
     path('order/list/', order.order_list),
