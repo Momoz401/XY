@@ -52,6 +52,7 @@
                     <th>工时</th>
                     <th>批次</th>
                     <th>地块</th>
+                    <th>备注</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -71,6 +72,7 @@
                         <td>{{ obj.工时 }}</td>
                         <td>{{ obj.批次 }}</td>
                         <td>{{ obj.地块 }}</td>
+                        <td>{{ obj.备注 }}</td>
                         <td>
                             <a class="btn btn-primary btn-xs" href="/productionwate/{{ obj.id }}/edit/">编辑</a>
                             <a class="btn btn-danger btn-xs" href="/productionwate/{{ obj.id }}/delete/">删除</a>

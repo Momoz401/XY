@@ -131,9 +131,10 @@ urlpatterns = [
 
     # 报表管理
 
-    path('report/list/', report.report_list),
+    path('report/list/', report.report_list),  # 工资明细表
     path('report/get_tables_date/', report.data_table_view, name="data_table_view"),
-
+    path('report_salary_by_plople/list/', report.report_salary_by_plople),
+    path('report_salary_by_plople/get_tables_date/', report.report_salary_by_plople_data_table_view, name="report_salary_by_plople"),
 
     # 订单管理
     path('order/list/', order.order_list),

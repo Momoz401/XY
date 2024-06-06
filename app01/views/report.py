@@ -8,7 +8,7 @@ from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from app01 import models
-from app01.models import ProductionWage
+from app01.models import ProductionWage, Salary_by_plople
 from app01.utils.bootstrap import BootStrapModelForm
 from app01.utils.pagination import Pagination
 
@@ -31,6 +31,24 @@ def report_list(request):
     }
 
     return render(request, 'report_list.html', context)
+
+
+def report_salary_by_plople(request):
+    # 按月份进行分组和计数
+    months = Salary_by_plople.objects.values('日期').annotate(count=Count('id')).order_by('日期')
+
+    # 生成月份选项
+    month_options = [
+        {"value": month['日期'], "label": f"{month['日期'][:4]}年{month['日期'][4:]}月"}
+        for month in months
+    ]
+    print(month_options)
+    # 将月份选项传递给模板
+    context = {
+        'months': month_options
+    }
+
+    return render(request, 'report_salary_by_plople.html', context)
 
 
 def data_table_view(request):
@@ -60,6 +78,48 @@ def data_table_view(request):
         "hours": obj.工时,
         "batch": obj.批次,
         "plot": obj.地块
+    } for obj in queryset]
+
+    return JsonResponse({"data": data})
+
+
+# 工资花名册
+def report_salary_by_plople_data_table_view(request):
+    month_str = request.GET.get('month', '')
+    queryset = Salary_by_plople.objects.all()  # 全部数据
+    if month_str:
+        try:
+            queryset = queryset.filter(日期=month_str)  # 假设日期字段为 `日期`
+        except ValueError:
+            pass  # 处理错误的月份格
+    data = [{
+        "company": obj.公司,
+        "owner": obj.归属业主,
+        "name": obj.姓名,
+        "ri_qi": obj.日期,
+        "clean_shed": obj.清棚,
+        "seed_sowing": obj.点籽,
+        "transplant": obj.移栽,
+        "weeding": obj.锄草,
+        "inter_vegetable": obj.间菜,
+        "pull_weeds": obj.拔草,
+        "pesticide": obj.打药,
+        "fertilize": obj.施肥,
+        "blow_lettuce": obj.吹生菜,
+        "tie_bamboo": obj.插竹竿绑线,
+        "harvest": obj.收菜,
+        "clean_waste": obj.清废菜,
+        "tie_line": obj.绑线,
+        "scattered_work": obj.散工,
+        "prune": obj.修枝,
+        "tie_branch": obj.绑枝,
+        "insert_bamboo": obj.插竹竿,
+        "other": obj.其它,
+        "ditch_grass": obj.铲沟草,
+        "weed_removal": obj.锄拔草,
+        "total_hours": obj.合计工时,
+        "total_wage": obj.合计工资,
+        "average_wage": obj.平均工资
     } for obj in queryset]
 
     return JsonResponse({"data": data})

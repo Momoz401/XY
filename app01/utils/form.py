@@ -300,7 +300,7 @@ class FixedFieldsForm(BootStrapModelForm):  # 静态字段
 class DynamicFieldsForm(forms.ModelForm):
     class Meta:
         model = ProductionWage
-        fields = ['基地', '批次', '一级分类', '二级分类', '工种', '工价', '数量', '合计工资', '工时', '地块']
+        fields = ['基地', '批次', '一级分类', '二级分类', '工种', '工价', '数量', '合计工资', '工时', '地块','备注']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -323,6 +323,7 @@ class DynamicFieldsForm(forms.ModelForm):
         self.fields['批次'].widget = forms.TextInput(attrs={'class': 'form-control'})
         self.fields['地块'].choices = []
         self.fields['地块'].widget = forms.Select(attrs={'class': 'form-control'})
+        self.fields['备注'].widget = forms.TextInput(attrs={'class': 'form-control'})
 
     def clean(self):
         cleaned_data = super().clean()
