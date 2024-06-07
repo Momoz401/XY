@@ -8,7 +8,7 @@ from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from app01 import models
-from app01.models import ProductionWage, Salary_by_plople
+from app01.models import ProductionWage, Salary_by_plople, Salary_by_daily, Workhour_by_daily
 from app01.utils.bootstrap import BootStrapModelForm
 from app01.utils.pagination import Pagination
 
@@ -49,6 +49,41 @@ def report_salary_by_plople(request):
     }
 
     return render(request, 'report_salary_by_plople.html', context)
+
+def report_salary_by_daily(request):
+    # 按月份进行分组和计数
+    months = Salary_by_daily.objects.values('月份').annotate(count=Count('id')).order_by('月份')
+
+    # 生成月份选项
+    month_options = [
+        {"value": month['月份'], "label": f"{month['月份'][:4]}年{month['月份'][4:]}月"}
+        for month in months
+    ]
+    print(month_options)
+    # 将月份选项传递给模板
+    context = {
+        'months': month_options
+    }
+
+    return render(request, 'report_salary_by_daily.html', context)
+
+def report_workhour_by_daily(request):
+    # 按月份进行分组和计数
+    months = Workhour_by_daily.objects.values('月份').annotate(count=Count('id')).order_by('月份')
+
+    # 生成月份选项
+    month_options = [
+        {"value": month['月份'], "label": f"{month['月份'][:4]}年{month['月份'][4:]}月"}
+        for month in months
+    ]
+    print(month_options)
+    # 将月份选项传递给模板
+    context = {
+        'months': month_options
+    }
+
+    return render(request, 'report_salary_by_hour.html', context)
+
 
 
 def data_table_view(request):
@@ -123,6 +158,108 @@ def report_salary_by_plople_data_table_view(request):
     } for obj in queryset]
 
     return JsonResponse({"data": data})
+
+def report_salary_by_daily_data_table_view(request):
+    month_str = request.GET.get('month', '')
+    queryset = Salary_by_daily.objects.all()  # 全部数据
+    if month_str:
+        try:
+            queryset = queryset.filter(月份=month_str)  # 假设月份字段为 `month`
+        except ValueError:
+            pass  # 处理错误的月份格式
+
+    data = [{
+        "worker": obj.工人,
+        "base": obj.基地,
+        "supervisor": obj.负责人,
+        "month": obj.月份,
+        "day_1": obj.day_1,
+        "day_2": obj.day_2,
+        "day_3": obj.day_3,
+        "day_4": obj.day_4,
+        "day_5": obj.day_5,
+        "day_6": obj.day_6,
+        "day_7": obj.day_7,
+        "day_8": obj.day_8,
+        "day_9": obj.day_9,
+        "day_10": obj.day_10,
+        "day_11": obj.day_11,
+        "day_12": obj.day_12,
+        "day_13": obj.day_13,
+        "day_14": obj.day_14,
+        "day_15": obj.day_15,
+        "day_16": obj.day_16,
+        "day_17": obj.day_17,
+        "day_18": obj.day_18,
+        "day_19": obj.day_19,
+        "day_20": obj.day_20,
+        "day_21": obj.day_21,
+        "day_22": obj.day_22,
+        "day_23": obj.day_23,
+        "day_24": obj.day_24,
+        "day_25": obj.day_25,
+        "day_26": obj.day_26,
+        "day_27": obj.day_27,
+        "day_28": obj.day_28,
+        "day_29": obj.day_29,
+        "day_30": obj.day_30,
+        "day_31": obj.day_31,
+        "total": obj.合计
+    } for obj in queryset]
+
+    return JsonResponse({"data": data})
+
+def report_workhour_by_daily_data_table_view(request):
+    month_str = request.GET.get('month', '')
+    queryset = Workhour_by_daily.objects.all()  # 全部数据
+    if month_str:
+        try:
+            queryset = queryset.filter(月份=month_str)  # 假设月份字段为 `month`
+        except ValueError:
+            pass  # 处理错误的月份格式
+
+    data = [{
+        "worker": obj.工人,
+        "base": obj.基地,
+        "supervisor": obj.负责人,
+        "month": obj.月份,
+        "day_1": obj.day_1,
+        "day_2": obj.day_2,
+        "day_3": obj.day_3,
+        "day_4": obj.day_4,
+        "day_5": obj.day_5,
+        "day_6": obj.day_6,
+        "day_7": obj.day_7,
+        "day_8": obj.day_8,
+        "day_9": obj.day_9,
+        "day_10": obj.day_10,
+        "day_11": obj.day_11,
+        "day_12": obj.day_12,
+        "day_13": obj.day_13,
+        "day_14": obj.day_14,
+        "day_15": obj.day_15,
+        "day_16": obj.day_16,
+        "day_17": obj.day_17,
+        "day_18": obj.day_18,
+        "day_19": obj.day_19,
+        "day_20": obj.day_20,
+        "day_21": obj.day_21,
+        "day_22": obj.day_22,
+        "day_23": obj.day_23,
+        "day_24": obj.day_24,
+        "day_25": obj.day_25,
+        "day_26": obj.day_26,
+        "day_27": obj.day_27,
+        "day_28": obj.day_28,
+        "day_29": obj.day_29,
+        "day_30": obj.day_30,
+        "day_31": obj.day_31,
+        "total": obj.合计工时,
+        "total_1": obj.累积工时
+    } for obj in queryset]
+
+    return JsonResponse({"data": data})
+
 
 
 @csrf_exempt

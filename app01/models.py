@@ -474,3 +474,101 @@ class Salary_by_plople(models.Model):
 
     def __str__(self):
         return self.姓名
+
+class Salary_by_daily(models.Model):
+    id = models.AutoField(primary_key=True)  # 添加ID字段
+    工人 = models.CharField(max_length=100)
+    基地 = models.CharField(max_length=100)
+    负责人 = models.CharField(max_length=100)
+    月份 = models.CharField(max_length=6)  # 假设月份字段已经是 "YYYYMM" 格式
+    day_1 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_2 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_3 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_4 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_5 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_6 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_7 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_8 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_9 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_10 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_11 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_12 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_13 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_14 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_15 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_16 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_17 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_18 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_19 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_20 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_21 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_22 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_23 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_24 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_25 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_26 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_27 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_28 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_29 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_30 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_31 = models.DecimalField(max_digits=10, decimal_places=2)
+    合计 = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        db_table = 'views_每日工资表'
+        managed = False  # 不让 Django 管理表的创建和删除
+        verbose_name = '每日工资表'
+        verbose_name_plural = '每日工资表'
+
+    def __str__(self):
+        return self.姓名
+
+
+class Workhour_by_daily(models.Model):
+    id = models.AutoField(primary_key=True)  # 添加ID字段
+    工人 = models.CharField(max_length=100)
+    基地 = models.CharField(max_length=100)
+    负责人 = models.CharField(max_length=100)
+    月份 = models.CharField(max_length=6)  # 假设月份字段已经是 "YYYYMM" 格式
+    day_1 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_2 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_3 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_4 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_5 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_6 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_7 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_8 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_9 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_10 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_11 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_12 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_13 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_14 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_15 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_16 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_17 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_18 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_19 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_20 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_21 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_22 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_23 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_24 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_25 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_26 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_27 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_28 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_29 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_30 = models.DecimalField(max_digits=10, decimal_places=2)
+    day_31 = models.DecimalField(max_digits=10, decimal_places=2)
+    合计工时 = models.DecimalField(max_digits=10, decimal_places=2)
+    累积工时 = models.DecimalField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        db_table = 'views_每月工时表'
+        managed = False  # 不让 Django 管理表的创建和删除
+        verbose_name = '每月工时表'
+        verbose_name_plural = '每月工时表'
+
+    def __str__(self):
+        return self.姓名
