@@ -33,6 +33,22 @@ def report_list(request):
     return render(request, 'report_list.html', context)
 
 
+def report_salary_temp_by_daily(request):
+    months = ProductionWage.objects.annotate(month=TruncMonth('日期')).values('month').annotate(count=Count('id')).order_by('month')
+    month_options = [{"value": month['month'].strftime('%Y%m'), "label": month['month'].strftime('%Y年%m月')} for month
+                     in months]
+    context = {
+        'months': month_options  # 月份选项
+    }
+
+    return render(request, 'report_salary_temp_by_daily.html', context)
+
+
+
+
+
+
+
 def report_salary_by_plople(request):
     # 按月份进行分组和计数
     months = Salary_by_plople.objects.values('日期').annotate(count=Count('id')).order_by('日期')
@@ -85,7 +101,7 @@ def report_workhour_by_daily(request):
     return render(request, 'report_salary_by_hour.html', context)
 
 
-
+# 工资明细表
 def data_table_view(request):
     query = request.GET.get('q', '')
     month_str = request.GET.get('month', '')
@@ -102,6 +118,7 @@ def data_table_view(request):
     data = [{
         "id": obj.id,
         "base": obj.基地,
+        "manager": obj.负责人,
         "date": obj.日期,
         "worker": obj.工人,
         "category1": obj.一级分类,
@@ -116,6 +133,44 @@ def data_table_view(request):
     } for obj in queryset]
 
     return JsonResponse({"data": data})
+
+
+
+
+
+# 散工明细表
+def report_salary_temp_by_daily_data_table_view(request):
+    query = request.GET.get('q', '')
+    month_str = request.GET.get('month', '')
+
+    queryset = ProductionWage.objects.filter(一级分类='散工')
+
+    if month_str:
+        try:
+            year = int(month_str[:4])
+            month = int(month_str[4:])
+            queryset = queryset.filter(日期__year=year, 日期__month=month)  # 假设日期字段为 `日期`
+        except ValueError:
+            pass  # 处理错误的月份格
+    data = [{
+        "id": obj.id,
+        "base": obj.基地,
+        "manager": obj.负责人,
+        "date": obj.日期,
+        "worker": obj.工人,
+        "category1": obj.一级分类,
+        "category2": obj.二级分类,
+        "job": obj.工种,
+        "wage": obj.工价,
+        "quantity": obj.数量,
+        "total_wage": obj.合计工资,
+        "hours": obj.工时,
+        "batch": obj.批次,
+        "plot": obj.地块
+    } for obj in queryset]
+
+    return JsonResponse({"data": data})
+
 
 
 # 工资花名册

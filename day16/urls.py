@@ -130,13 +130,19 @@ urlpatterns = [
 
 
     # 报表管理
-
+    # 工资明细表
     path('report/list/', report.report_list),  # 工资明细表
     path('report/get_tables_date/', report.data_table_view, name="data_table_view"),
-    path('report_salary_by_plople/list/', report.report_salary_by_plople), # 工资花名册
+    # 散工工资
+    path('report_salary_temp_by_daily/list', report.report_salary_temp_by_daily),  # 工资明细表
+    path('report_salary_temp_by_daily/get_tables_date/', report.report_salary_temp_by_daily_data_table_view, name="report_salary_temp_by_daily"),
+    # 工资花名册
+    path('report_salary_by_plople/list/', report.report_salary_by_plople),
     path('report_salary_by_plople/get_tables_date/', report.report_salary_by_plople_data_table_view, name="report_salary_by_plople"), # 获取工资花名册
+    # 每日工资表
     path('report_salary_by_daily/list/', report.report_salary_by_daily),# 每日工资表
     path('report_salary_by_daily/get_tables_date/', report.report_salary_by_daily_data_table_view,name="report_salary_by_daily"),
+    # 每日工时
     path('report_workhour_by_daily/list/', report.report_workhour_by_daily),  # 每日工时
     path('report_workhour_by_daily/get_tables_date/', report.report_workhour_by_daily_data_table_view,
          name="report_workhour_by_daily"),

@@ -76,7 +76,7 @@
                 "scrollX": true,
 
                 "ajax": {
-                    "url": "{% url 'data_table_view' %}",
+                    "url": "{% url 'report_salary_temp_by_daily' %}",
                     "data": function (d) {
                         d.q = $('#search-query').val();
                         d.month = $('#search-month').val();
