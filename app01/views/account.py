@@ -51,8 +51,8 @@ def login(request):
             return render(request, 'login.html', {'form': form})
 
         # 去数据库校验用户名和密码是否正确，获取用户对象、None
-        admin_object =True
-        # admin_object = models.Admin.objects.filter(**form.cleaned_data).first()
+        #admin_object =True
+        admin_object = models.Admin.objects.filter(**form.cleaned_data).first()
         if not admin_object:
             form.add_error("password", "用户名或密码错误")
             # form.add_error("username", "用户名或密码错误")
@@ -60,7 +60,7 @@ def login(request):
 
         # 用户名和密码正确
         # 网站生成随机字符串; 写到用户浏览器的cookie中；在写入到session中；
-        request.session["info"] = {'id': 1, 'name': 123}
+        request.session["info"] = {'id': 1, 'name':admin_object.username}
         # session可以保存7天
         request.session.set_expiry(60 * 60 * 24 * 7)
 

@@ -323,7 +323,7 @@ def order_add(request):
     form = OrderModelForm(data=request.POST)
     if form.is_valid():
         # 订单号：额外增加一些不是用户输入的值（自己计算出来）
-        form.instance.oid = datetime.now().strftime("%Y%m%d%H%M%S") + str(random.randint(1000, 9999))
+        form.instance.oid = datetime.now().strftime("%Y%m%d")
 
         # 固定设置管理员ID，去哪里获取？
         form.instance.admin_id = request.session["info"]["id"]

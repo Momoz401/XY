@@ -129,6 +129,7 @@ urlpatterns = [
     path('task/add/', task.task_add),
 
 
+
     # 报表管理
     # 工资明细表
     path('report/list/', report.report_list),  # 工资明细表
@@ -147,7 +148,7 @@ urlpatterns = [
     path('report_workhour_by_daily/get_tables_date/', report.report_workhour_by_daily_data_table_view,
          name="report_workhour_by_daily"),
 
-    # 订单管理
+    # 对照管理
     path('order/list/', order.order_list),
     path('order/add/', order.order_add),
     path('order/delete/', order.order_delete),
