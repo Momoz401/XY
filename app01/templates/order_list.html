@@ -4,6 +4,22 @@
     <div class="container">
         <div style="margin-bottom: 10px">
             <input type="button" value="新建计量" class="btn btn-success" data-toggle="modal" data-target="#myModal">
+
+             <div style="float: right;width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="输入品类进行查询"
+                               value="{{ search_data }}">
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                      </span>
+                    </div>
+                </form>
+            </div>
+
+
         </div>
 
         <!-- 订单列表 -->
@@ -64,6 +80,11 @@
                             aria-hidden="true">&times;</span></button>
                     <h4 class="modal-title" id="myModalLabel">新建</h4>
                 </div>
+
+                <div style="float: right;width: 300px;">
+
+            </div>
+
                 <div class="modal-body">
 
                     <form id="formAdd">

@@ -22,8 +22,13 @@ class OrderModelForm(BootStrapModelForm):
 
 
 def order_list(request):
-    queryset = models.Order.objects.all().order_by('-id')
+    data_dict = {}
+    search_data = request.GET.get('q', "")
+    if search_data:
+        data_dict["title"] = search_data
+    queryset = models.Order.objects.filter(**data_dict)
     page_object = Pagination(request, queryset)
+
     form = OrderModelForm()
 
     context = {

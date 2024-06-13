@@ -102,8 +102,7 @@ class Order(models.Model):
 
     status_choices = (
         (1, "移栽"),
-        (2, "点子"),
-        (3, "采收"),
+        (2, "采收"),
     )
     status = models.SmallIntegerField(verbose_name="类型", choices=status_choices, default=1)
     # admin_id
