@@ -13,7 +13,7 @@ def Hour_list(request):
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["工种__contains"] = search_data
+        data_dict["一级分类__contains"] = search_data
 
     queryset = models.BaseInfoWorkHour.objects.filter(**data_dict).order_by("-工种ID")
 
