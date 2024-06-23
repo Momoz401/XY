@@ -45,9 +45,10 @@ def get_second_level_categories(request):
     if request.method == 'GET' :
         # 解码参数
         level_one_id = request.GET.get('id', None)
+        print(level_one_id)
         # 根据一级分类 ID 获取相应的二级分类数据
         if level_one_id is not None:
-            second_level_categories = BaseInfoWorkType.objects.filter(父工种=level_one_id).values_list('工种ID', '工种名称')
+            second_level_categories = BaseInfoWorkType.objects.filter(父工种=level_one_id).values_list('工种名称', '工种名称')
             print(JsonResponse(dict(second_level_categories)))
             return JsonResponse(dict(second_level_categories))
         else:

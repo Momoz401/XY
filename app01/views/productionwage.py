@@ -70,7 +70,7 @@ def get_productionwate(request):
 
         # 根据一级分类和二级分类活动工种和价格
         if level_tow_id is not None:
-            work_type = BaseInfoWorkHour.objects.filter(一级分类=level_one_id ,二级分类=level_tow_id).values_list('工种ID', '工种')
+            work_type = BaseInfoWorkHour.objects.filter(一级分类=level_one_id ,二级分类=level_tow_id).values_list('工种', '工种')
             # print(work_type)
             return JsonResponse(dict(work_type))
         else:

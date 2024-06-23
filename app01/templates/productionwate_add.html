@@ -52,7 +52,8 @@
 
             function bindEvents(prefix) {
                 $('#' + prefix + '-一级分类').change(function () {
-                    var selectedValue = $(this).val();
+                    var selectedValue = $(this).find("option:selected").text()
+                    //alert(selectedValue);
                     $.ajax({
                         url: '/get_second_level_categories/',
                         type: 'GET',
@@ -75,6 +76,7 @@
                 $('#' + prefix + '-二级分类').change(function () {
                     var selectedValue_one = $('#' + prefix + '-一级分类 option:selected').text();
                     var selectedValue_tow = $('#' + prefix + '-二级分类 option:selected').text();
+
                     $.ajax({
                         url: '/get_productionwate/',
                         type: 'GET',

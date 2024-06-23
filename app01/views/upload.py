@@ -99,7 +99,7 @@ def upload_workhour_modal_form(request):
         records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
         for record in records:
             obj, created = BaseInfoWorkHour.objects.update_or_create(
-                工人=record['工人'],
+                工种=record['工种'],
                 一级分类=record['一级分类'],
                 二级分类=record['二级分类'],
                 单位=record['单位'],
