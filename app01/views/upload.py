@@ -105,6 +105,7 @@ def upload_workhour_modal_form(request):
                 单位=record['单位'],
                 单价=record['单价'],
                 备注=record['备注'],
+                默认计入成本=record['默认计入成本'],
                 # 假设 'name' 是唯一标识相同记录的字段
 
             )

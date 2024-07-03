@@ -11,7 +11,7 @@ def work_type_list(request):
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["工种名称"] = search_data
+        data_dict["分类名称"] = search_data
 
     queryset = models.BaseInfoWorkType.objects.filter(**data_dict).order_by("-工种ID")
 

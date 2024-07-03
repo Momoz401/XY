@@ -40,11 +40,12 @@
                 <thead>
                 <tr>
                     <th>工种ID</th>
-                    <th>一级工种</th>
-                    <th>二级工种</th>
+                    <th>一级分类</th>
+                    <th>二级分类</th>
                      <th>工种</th>
                     <th>单价</th>
                     <th>单位</th>
+                    <th>默认计入成本</th>
                     <th>备注</th>
                     <th>操作</th>
                 </tr>
@@ -55,9 +56,10 @@
                         <th>{{ obj.工种ID }}</th>
                         <td>{{ obj.一级分类 }}</td>
                         <td>{{ obj.二级分类 }}</td>
-                         <td>{{ obj.工种 }}</td>
+                        <td>{{ obj.工种 }}</td>
                         <td>{{ obj.单价 }}</td>
                         <td>{{ obj.单位 }}</td>
+                        <td>{{ obj.默认计入成本 }}</td>
                         <td>{{ obj.备注 }}</td>
                         <td>
                             <a class="btn btn-primary btn-xs" href="/WorkHour/{{ obj.工种ID }}/edit/">编辑</a>

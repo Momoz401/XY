@@ -67,11 +67,13 @@ def get_productionwate(request):
         # 解码参数
         level_one_id = request.GET.get('one', None)
         level_tow_id = request.GET.get('tow', None)
+        #print(level_tow_id)
+        #print(level_one_id)
 
         # 根据一级分类和二级分类活动工种和价格
         if level_tow_id is not None:
             work_type = BaseInfoWorkHour.objects.filter(一级分类=level_one_id ,二级分类=level_tow_id).values_list('工种', '工种')
-            # print(work_type)
+            print(work_type)
             return JsonResponse(dict(work_type))
         else:
             return JsonResponse({'error': '一级分类_id 参数缺失'}, status=400)
@@ -87,7 +89,7 @@ def get_productionwate_price(request):
 
         # 根据一级分类和二级分类活动工种和价格
         if level_tow_id is not None:
-            work_type = BaseInfoWorkHour.objects.filter(一级分类=level_one_id ,二级分类=level_tow_id,工种=level_three_id).values_list('工种ID', '单价')
+            work_type = BaseInfoWorkHour.objects.filter(一级分类=level_one_id,二级分类=level_tow_id,工种=level_three_id).values_list('工种ID', '单价')
             # print(work_type)
             return JsonResponse(dict(work_type))
         else:

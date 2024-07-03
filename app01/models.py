@@ -104,7 +104,7 @@ class Order(models.Model):
         (1, "移栽"),
         (2, "采收"),
     )
-    status = models.SmallIntegerField(verbose_name="类型", choices=status_choices, default=1)
+    status = models.SmallIntegerField(verbose_name="二级分类", choices=status_choices, default=1)
     # admin_id
     admin = models.ForeignKey(verbose_name="管理员", to="Admin", on_delete=models.CASCADE)
 
@@ -146,13 +146,13 @@ class BaseInfoWorkType(models.Model):
         (2, "2级分类"),
     )
 
-    工种名称 = models.CharField(max_length=255)
-    工种级别 = models.IntegerField(choices=level_choices, default=1)
-    父工种 = models.CharField(max_length=255, default='', null=True, blank=True)
+    分类名称 = models.CharField(max_length=255)
+    分类级别 = models.IntegerField(choices=level_choices, default=1)
+    父分类 = models.CharField(max_length=255, default='', null=True, blank=True)
     工种ID = models.AutoField(primary_key=True)
 
     def __str__(self):
-        return self.父工种
+        return self.父分类
 
 
 class BaseInfoWorkHour(models.Model):
@@ -163,6 +163,11 @@ class BaseInfoWorkHour(models.Model):
     备注 = models.CharField(max_length=50, null=True)
     一级分类 = models.CharField(max_length=255, null=True)
     二级分类 = models.CharField(max_length=255, null=True)
+    默认计入成本 = models.CharField(
+        max_length=2,
+        choices=[('是', '是'), ('否', '否')],
+        default='是'
+    )
 
 
 class PlanPlantBatch(models.Model):
@@ -424,8 +429,8 @@ class Agriculture_cost(models.Model):
 class Plant_batch(models.Model):
     ID = models.AutoField(primary_key=True)
     批次ID = models.CharField(max_length=10, null=True)
-    品种 = models.CharField(max_length=255, null=True)
-    品类 = models.CharField(max_length=255, null=True)
+    二级分类 = models.CharField(max_length=255, null=True)
+    一级分类 = models.CharField(max_length=255, null=True)
     地块 = models.CharField(max_length=255, null=True)
     面积 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     基地经理 = models.CharField(max_length=255, null=True, blank=True)

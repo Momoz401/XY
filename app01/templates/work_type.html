@@ -27,7 +27,7 @@
             <!-- Default panel contents -->
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
-                工种列表
+                分类列表
             </div>
 
             <!-- Table -->
@@ -37,7 +37,7 @@
                     <th class="text-center">分类ID</th>
                     <th class="text-center">分类名称</th>
                     <th class="text-center">级别</th>
-                    <th class="text-center">父工种</th>
+                    <th class="text-center">父分类</th>
                     <th class="text-center">操作</th>
                 </tr>
                 </thead>
@@ -45,9 +45,9 @@
                 {% for obj in queryset %}
                     <tr>
                         <th class="text-center" >{{ obj.工种ID}}</th>
-                        <td>{{ obj.工种名称 }}</td>
-                         <td>{{ obj.工种级别 }}</td>
-                        <td>{{ obj.父工种 }}</td>
+                        <td>{{ obj.分类名称 }}</td>
+                         <td>{{ obj.分类级别 }}</td>
+                        <td>{{ obj.父分类 }}</td>
                         <td>
                             <a class="btn btn-primary btn-xs" href="/BaseInfoWorkType/{{ obj.工种ID }}/edit/">编辑</a>
                             <a class="btn btn-danger btn-xs" href="/BaseInfoWorkType/{{ obj.工种ID}}/delete/">删除</a>
