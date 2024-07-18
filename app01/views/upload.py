@@ -81,6 +81,7 @@ class UpModelForm(BootStrapModelForm):
         fields = "__all__"
 
 
+
 def upload_workhour_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批量上传价格文件"
@@ -94,7 +95,7 @@ def upload_workhour_modal_form(request):
         # 字段 + 上传路径写入到数据库
         # print(form.cleaned_data)
         df = pd.read_excel(form.cleaned_data['excel_file'])
-        print(df)
+        #print(df)
         # data_to_db(df, 'tpx_hxb_province')
         records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
         for record in records:
@@ -149,6 +150,9 @@ def upload_productionwate_modal_form(request):
                 地块=record['地块'],
                 备注=record['备注'],
 
+
+
+
             )
         return redirect('/production_wage_list/list/')
     return render(request, 'upload_form.html', {"form": form, 'title': title})
@@ -189,10 +193,10 @@ def upload_agriculturecost_modal_form(request):
 
 def upload_Plant_batch_modal_form(request):
     """ 上传文件和数据（modelForm）"""
-    title = "批量农资成本文件"
+    title = "批次表文件上传"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title})
+        return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -215,8 +219,8 @@ def upload_Plant_batch_modal_form(request):
         for record in records:
             obj, created = Plant_batch.objects.update_or_create(
                 批次ID=record['批次ID'],
-                品种=record['品种'],
-                品类=record['品类'],
+                一级分类=record['一级分类'],
+                二级分类=record['二级分类'],
                 地块=record['地块'],
                 面积=record['面积'],
                 基地经理=record['基地经理'],
@@ -226,6 +230,22 @@ def upload_Plant_batch_modal_form(request):
                 点籽日期=record['点籽日期'],
                 用籽量=record['用籽量'],
                 备注=record['备注'],
+                uploader=request.session["info"]['name'],
+                生长周期=record['生长周期'],
+                采收初期=record['采收初期'],
+                采收末期=record['采收末期'],
+                采收期=record['采收期'],
+                周期批次=record['周期批次'],
+                总周期天数=record['总周期天数'],
+                销毁面积=record['销毁面积'],
+                销毁备注=record['销毁备注'],
+                总产量=record['总产量'],
+                总亩产=record['总亩产'],
+                正常产量=record['正常产量'],
+                正常亩产=record['正常亩产'],
+                栽种方式=record['栽种方式'],
+                下批前一天时间=record['下批前一天时间'],
+                周期 = record['周期']
 
             )
         return redirect('/Plant_batch/list/')

@@ -61,6 +61,7 @@ def login(request):
         # 用户名和密码正确
         # 网站生成随机字符串; 写到用户浏览器的cookie中；在写入到session中；
         request.session["info"] = {'id': 1, 'name':admin_object.username}
+        # print(request.session["info"]['name'])
         # session可以保存7天
         request.session.set_expiry(60 * 60 * 24 * 7)
 

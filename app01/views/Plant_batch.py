@@ -9,7 +9,7 @@ from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Ed
 
 
 def Plant_batch_list(request):
-    """ 工时列表 """
+    """ 批次列表 """
 
     data_dict = {}
     search_data = request.GET.get('q', "")
@@ -30,7 +30,7 @@ def Plant_batch_list(request):
 
 
 def Plant_batch_add(request):
-    """ 添加工价 """
+    """ 添加批次 """
     if request.method == "GET":
         form =Plant_batch_ModelForm()
         return render(request, 'Plant_batch_add.html', {"form": form})
