@@ -1,0 +1,79 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px" class="clearfix">
+            <a class="btn btn-success" href="/expense_allocation/add/">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                新建费用摊销
+            </a>
+
+            <div style="float: right;width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="text" name="q" class="form-control" placeholder="Search for..."
+                               value="{{ search_data }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                费用摊销列表
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>管理费</th>
+                    <th>生活费</th>
+                    <th>水电费</th>
+                    <th>服务费</th>
+                    <th>其他费用</th>
+                    <th>燃油费</th>
+                    <th>维修费</th>
+                    <th>出勤奖金</th>
+                    <th>销售费</th>
+                    <th>基地经理</th>
+                    <th>月份</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for obj in queryset %}
+                    <tr>
+                        <td>{{ obj.id }}</td>
+                        <td>{{ obj.管理费 }}</td>
+                        <td>{{ obj.生活费 }}</td>
+                        <td>{{ obj.水电费 }}</td>
+                        <td>{{ obj.服务费 }}</td>
+                        <td>{{ obj.其他费用 }}</td>
+                        <td>{{ obj.燃油费 }}</td>
+                        <td>{{ obj.维修费 }}</td>
+                        <td>{{ obj.出勤奖金 }}</td>
+                        <td>{{ obj.销售费 }}</td>
+                        <td>{{ obj.基地经理 }}</td>
+                        <td>{{ obj.月份|date:"Y年m月" }}</td>
+                        <td>
+                            <a class="btn btn-primary btn-xs" href="/expense_allocation/{{ obj.id }}/edit/">编辑</a>
+                            <a class="btn btn-danger btn-xs" href="/expense_allocation/{{ obj.id }}/delete/">删除</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="clearfix">
+            <ul class="pagination">
+                {{ page_string }}
+            </ul>
+        </div>
+    </div>
+{% endblock %}

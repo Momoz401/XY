@@ -44,7 +44,7 @@ def upload_form(request):
     title = "Form上传"
     if request.method == "GET":
         form = UpForm()
-        return render(request, 'upload_form.html', {"form": form, "title": title})
+        return render(request, 'upload_form.html', {"form": form, "title": title,'uploader_name': request.session["info"]['name']})
 
     form = UpForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -66,7 +66,7 @@ def upload_form(request):
             img=media_path,
         )
         return HttpResponse("...")
-    return render(request, 'upload_form.html', {"form": form, "title": title})
+    return render(request, 'upload_form.html', {"form": form, "title": title,'uploader_name': request.session["info"]['name']})
 
 
 from django import forms
@@ -87,7 +87,7 @@ def upload_workhour_modal_form(request):
     title = "批量上传价格文件"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title})
+        return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -111,7 +111,7 @@ def upload_workhour_modal_form(request):
 
             )
         return redirect('/WorkHour/list/')
-    return render(request, 'upload_form.html', {"form": form, 'title': title})
+    return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
 
 def upload_productionwate_modal_form(request):
@@ -119,7 +119,7 @@ def upload_productionwate_modal_form(request):
     title = "批量上传工价文件"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title})
+        return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -155,7 +155,7 @@ def upload_productionwate_modal_form(request):
 
             )
         return redirect('/production_wage_list/list/')
-    return render(request, 'upload_form.html', {"form": form, 'title': title})
+    return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
 
 def upload_agriculturecost_modal_form(request):
@@ -163,7 +163,7 @@ def upload_agriculturecost_modal_form(request):
     title = "批量农资成本文件"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title})
+        return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -188,7 +188,7 @@ def upload_agriculturecost_modal_form(request):
 
             )
         return redirect('/Agricureture/list/')
-    return render(request, 'upload_form.html', {"form": form, 'title': title})
+    return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
 
 def upload_Plant_batch_modal_form(request):
@@ -196,7 +196,8 @@ def upload_Plant_batch_modal_form(request):
     title = "批次表文件上传"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader': request.session["info"]['name']})
+        # print(request.session["info"]['name'])
+        return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -249,4 +250,4 @@ def upload_Plant_batch_modal_form(request):
 
             )
         return redirect('/Plant_batch/list/')
-    return render(request, 'Plant_batch.html', {"form": form, 'title': title})
+    return render(request, 'Plant_batch.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})

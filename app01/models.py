@@ -119,8 +119,7 @@ class Boss(models.Model):
 class uploader(models.Model):
     """ 城市 """
     update_date = models.DateField(verbose_name="上传时间", auto_now=True)
-    update_user = models.CharField(verbose_name="上传人", max_length=100, default="admin")
-
+    update_user = models.CharField(verbose_name="上传人", max_length=100, default="")
     # 本质上数据库也是CharField，自动保存数据。
     excel_file = models.FileField(verbose_name="excel_file", max_length=128, upload_to='city/', default='')
 
@@ -132,7 +131,8 @@ class BaseInfoBase(models.Model):
     代号 = models.CharField(max_length=255)
     基地经理 = models.CharField(max_length=255)
     面积 = models.FloatField(null=True, blank=True)
-
+    def __str__(self):
+        return self.基地经理
 
 class BaseInfoProduct(models.Model):
     品类iD = models.AutoField(primary_key=True)
@@ -152,7 +152,7 @@ class BaseInfoWorkType(models.Model):
     工种ID = models.AutoField(primary_key=True)
 
     def __str__(self):
-        return self.父分类
+        return self.分类名称 if self.分类名称 else 'Unnamed Category'
 
 
 class BaseInfoWorkHour(models.Model):
@@ -594,3 +594,150 @@ class Workhour_by_daily(models.Model):
 
     def __str__(self):
         return self.姓名
+
+
+from django.db import models
+
+class ExpenseAllocation(models.Model):
+    管理费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="管理费")
+    生活费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="生活费")
+    水电费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="水电费")
+    服务费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="服务费")
+    其他费用 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="其他费用")
+    燃油费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="燃油费")
+    维修费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="维修费")
+    出勤奖金 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="出勤奖金")
+    销售费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="销售费")
+    基地经理 = models.ForeignKey(BaseInfoBase, on_delete=models.CASCADE, verbose_name="基地经理",default=0)
+    月份 = models.DateField(verbose_name="月份",default=datetime.now().strftime("%Y-%m-01"))
+
+    class Meta:
+        verbose_name = "费用摊销"
+        verbose_name_plural = "费用摊销"
+
+    def __str__(self):
+        return f"ExpenseAllocation({self.id})"
+
+
+class DepreciationAllocation(models.Model):
+    地租 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="地租")
+    大棚管架 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="大棚管架")
+    大棚棚膜 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="大棚棚膜")
+    大棚喷灌 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="大棚喷灌")
+    其他资产 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="其他资产")
+    材料 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="材料")
+    基地经理 = models.ForeignKey(BaseInfoBase, on_delete=models.CASCADE, verbose_name="基地经理")
+    月份 = models.DateField(verbose_name="月份", default=datetime.now().strftime("%Y-%m-01"))
+
+    class Meta:
+        verbose_name = "折旧摊销"
+        verbose_name_plural = "折旧摊销"
+
+    def __str__(self):
+        return f"DepreciationAllocation({self.id})"
+
+class LossReport(models.Model):
+    报损时间 = models.DateTimeField(verbose_name="报损时间", default=datetime.now)
+    报损人 = models.CharField(max_length=255, verbose_name="报损人")
+    批次 = models.CharField(max_length=255, verbose_name="批次")
+    报损地块 = models.CharField(max_length=255, verbose_name="报损地块")
+    报损类型 = models.CharField(max_length=50, choices=[('地内报损', '地内报损'), ('销售报损', '销售报损')], verbose_name="报损类型")
+    报损数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="报损数量")
+    报损单位 = models.CharField(max_length=50, verbose_name="报损单位")
+
+    class Meta:
+        verbose_name = "报损"
+        verbose_name_plural = "报损"
+
+    def __str__(self):
+        return f"LossReport({self.id})"
+
+
+class Salesperson(models.Model):
+    姓名 = models.CharField(max_length=255, verbose_name="姓名")
+    所属公司 = models.CharField(max_length=255, verbose_name="所属公司")
+    电话 = models.CharField(max_length=20, verbose_name="电话")
+
+    class Meta:
+        verbose_name = "销售人员"
+        verbose_name_plural = "销售人员"
+
+    def __str__(self):
+        return self.姓名
+
+class Vehicle(models.Model):
+    车牌 = models.CharField(max_length=50, unique=True, verbose_name="车牌")
+    司机 = models.CharField(max_length=255, verbose_name="司机")
+    电话 = models.CharField(max_length=20, verbose_name="电话")
+    型号 = models.CharField(max_length=255, verbose_name="型号")
+    颜色 = models.CharField(max_length=255, verbose_name="颜色")
+    类型 = models.CharField(max_length=255, verbose_name="类型")
+    备注 = models.TextField(verbose_name="备注", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "车辆管理"
+        verbose_name_plural = "车辆管理"
+
+    def __str__(self):
+        return self.车牌
+
+from django.db import models
+
+class Market(models.Model):
+    市场名称 = models.CharField(max_length=255, unique=True, verbose_name="市场名称")
+    地区 = models.CharField(max_length=255, verbose_name="地区")
+    地址 = models.CharField(max_length=255, verbose_name="地址")
+    联系人 = models.CharField(max_length=255, verbose_name="联系人")
+    插入时间 = models.DateTimeField(auto_now_add=True, verbose_name="插入时间")
+
+    class Meta:
+        verbose_name = "市场信息"
+
+    def __str__(self):
+        return self.市场名称
+
+class Customer(models.Model):
+    客户名称 = models.CharField(max_length=255, verbose_name="客户名称")
+    联系人 = models.CharField(max_length=255, verbose_name="联系人")
+    联系电话 = models.CharField(max_length=20, verbose_name="联系电话")
+    邮箱 = models.EmailField(verbose_name="邮箱", null=True, blank=True)
+    地址 = models.CharField(max_length=255, verbose_name="地址", null=True, blank=True)
+    销售地区 = models.CharField(max_length=255, verbose_name="销售地区")
+    客户类型 = models.CharField(max_length=50, verbose_name="客户类型", choices=[('个人', '个人'), ('企业', '企业')])
+    公司名称 = models.CharField(max_length=255, verbose_name="公司名称", null=True, blank=True)
+    公司网站 = models.URLField(verbose_name="公司网站", null=True, blank=True)
+    公司地址 = models.CharField(max_length=255, verbose_name="公司地址", null=True, blank=True)
+    行业 = models.CharField(max_length=255, verbose_name="行业", null=True, blank=True)
+    备注 = models.TextField(verbose_name="备注", null=True, blank=True)
+    创建时间 = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
+    更新时间 = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+
+    class Meta:
+        verbose_name = "客户信息"
+        verbose_name_plural = "客户信息"
+
+    def __str__(self):
+        return self.客户名称
+
+
+class OutboundRecord(models.Model):
+    日期 = models.DateField(verbose_name="日期", default=timezone.now)
+    车牌 = models.ForeignKey('Vehicle', on_delete=models.CASCADE, verbose_name="车牌")
+    公司 = models.CharField(max_length=255, verbose_name="公司")
+    市场 = models.ForeignKey('Market', on_delete=models.CASCADE, verbose_name="市场")
+    一级分类 = models.ForeignKey('BaseInfoWorkType', on_delete=models.CASCADE, related_name='一级分类', verbose_name="一级分类")
+    二级分类 = models.ForeignKey('BaseInfoWorkType', on_delete=models.CASCADE, related_name='二级分类', verbose_name="二级分类")
+    规格 = models.CharField(max_length=255, verbose_name="规格")
+    单位 = models.CharField(max_length=50, verbose_name="单位")
+    数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="数量")
+    重量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="重量")
+    批次 = models.CharField(max_length=255, verbose_name="批次")
+    地块 = models.CharField(max_length=255, verbose_name="地块")
+    备注 = models.TextField(verbose_name="备注", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "出库记录"
+        verbose_name_plural = "出库记录"
+
+    def __str__(self):
+        return f"{self.日期} - {self.车牌} - {self.公司}"

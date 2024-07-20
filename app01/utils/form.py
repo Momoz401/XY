@@ -6,7 +6,8 @@ from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from django import forms
 
-from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage
+from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage, ExpenseAllocation, DepreciationAllocation, \
+    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord
 from app01.utils.bootstrap import BootStrapModelForm
 
 
@@ -347,3 +348,68 @@ class DynamicFieldsForm(forms.ModelForm):
 from django.forms import modelformset_factory
 
 DynamicFieldsFormSet = modelformset_factory(ProductionWage, form=DynamicFieldsForm, extra=1)
+
+class ExpenseAllocationForm(BootStrapModelForm):
+    月份 = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'month', 'class': 'form-control'}),
+        input_formats=['%Y-%m'],
+        label="月份"
+    )
+
+    class Meta:
+        model = ExpenseAllocation
+        fields = "__all__"
+
+
+
+class DepreciationAllocationForm(BootStrapModelForm):
+    月份 = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'month', 'class': 'form-control'}),
+        input_formats=['%Y-%m'],
+        label="月份"
+    )
+
+    class Meta:
+        model = DepreciationAllocation
+        fields = "__all__"
+
+
+class LossReportForm(BootStrapModelForm):
+    报损时间 = forms.DateTimeField(
+        widget=forms.DateTimeInput(attrs={'type': 'datetime-local', 'class': 'form-control'}),
+        label="报损时间"
+    )
+
+    class Meta:
+        model = LossReport
+        fields = "__all__"
+
+
+
+class SalespersonForm(BootStrapModelForm):
+    class Meta:
+        model = Salesperson
+        fields = "__all__"
+
+
+class VehicleForm(BootStrapModelForm):
+    class Meta:
+        model = Vehicle
+        fields = "__all__"
+
+
+class MarketForm(BootStrapModelForm):
+    class Meta:
+        model = Market
+        fields = "__all__"
+
+class CustomerForm(BootStrapModelForm):
+    class Meta:
+        model = Customer
+        fields = "__all__"
+
+
+class OutboundRecordForm(BootStrapModelForm):
+    class Meta:
+        model = OutboundRecord
+        fields = "__all__"

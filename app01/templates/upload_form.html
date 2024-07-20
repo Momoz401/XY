@@ -17,7 +17,7 @@
                             <label>{{ field.label }}</label>
                             {% if field.name == '上传人' %}
                                 <!-- 在模板中检查会话值，并将其作为字段的初始值传递给模板 -->
-                                <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}">
+                            <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.uploader_name }}">
                             {% else %}
                                 {{ field }}
                             {% endif %}

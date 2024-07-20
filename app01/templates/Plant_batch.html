@@ -1,6 +1,5 @@
 {% extends 'layout.html' %}
 
-
 {% block content %}
     <div class="container">
         <div style="margin-bottom: 10px" class="clearfix">
@@ -8,7 +7,7 @@
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 新建
             </a>
-             <a class="btn btn-success" href="/upload/Plant_batch/">
+            <a class="btn btn-success" href="/upload/Plant_batch/">
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 新建导入
             </a>
@@ -19,76 +18,123 @@
                         <input type="text" name="q" class="form-control" placeholder="Search for..."
                                value="{{ search_data }}">
                         <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">
-                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                        </button>
-                      </span>
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
                     </div>
                 </form>
             </div>
-
         </div>
+
         <div class="panel panel-default">
-            <!-- Default panel contents -->
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                 工价列表
             </div>
 
-            <!-- Table -->
-            <table class="table table-striped table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th>序号</th>
-                    <th>批次ID</th>
-                    <th>一级分类</th>
-                    <th>二级分类</th>
-                    <th>地块</th>
-                    <th>面积</th>
-                    <th>基地经理</th>
-                    <th>移栽日期</th>
-                    <th>移栽板量</th>
-                    <th>移栽板量</th>
-                    <th>点籽日期</th>
-                    <th>用籽量</th>
-                    <th>备注</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for obj in queryset %}
+            <div class="table-responsive"> <!-- 添加一个新的包含div -->
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
                     <tr>
-                        <th>{{ obj.ID }}</th>
-                        <th>{{ obj.批次ID }}</th>
-                        <th>{{ obj.一级分类 }}</th>
-                        <th>{{ obj.二级分类 }}</th>
-                        <th>{{ obj.地块 }}</th>
-                        <td>{{ obj.面积 }}</td>
-                        <td>{{ obj.基地经理 }}</td>
-                        <td>{{ obj.移栽日期 }}</td>
-                        <td>{{ obj.移栽板量 }}</td>
-                        <td>{{ obj.移栽数量 }}</td>
-                        <td>{{ obj.点籽日期 }}</td>
-                        <td>{{ obj.用籽量 }}</td>
-                        <td>{{ obj.备注 }}</td>
-                        <td>
-                            <a class="btn btn-primary btn-xs" href="/Plant_batch/{{ obj.ID }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/Plant_batch/{{ obj.ID }}/delete/">删除</a>
-                        </td>
+                        <th>序号</th>
+                        <th>批次ID</th>
+                        <th>一级分类</th>
+                        <th>二级分类</th>
+                        <th>地块</th>
+                        <th>面积</th>
+                        <th>基地经理</th>
+                        <th>移栽日期</th>
+                        <th>移栽板量</th>
+                        <th>移栽数量</th>
+                        <th>点籽日期</th>
+                        <th>用籽量</th>
+                        <th>备注</th>
+                        <th>生长周期</th>
+                        <th>采收初期</th>
+                        <th>采收末期</th>
+                        <th>采收期</th>
+                        <th>周期批次</th>
+                        <th>总周期天数</th>
+                        <th>销毁面积</th>
+                        <th>销毁备注</th>
+                        <th>总产量</th>
+                        <th>总亩产</th>
+                        <th>正常产量</th>
+                        <th>正常亩产</th>
+                        <th>栽种方式</th>
+                        <th>下批前一天时间</th>
+                        <th>周期</th>
+                        <th>操作</th>
                     </tr>
-                {% endfor %}
-
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for obj in queryset %}
+                        <tr>
+                            <td>{{ obj.ID }}</td>
+                            <td>{{ obj.批次ID }}</td>
+                            <td>{{ obj.一级分类 }}</td>
+                            <td>{{ obj.二级分类 }}</td>
+                            <td>{{ obj.地块 }}</td>
+                            <td>{{ obj.面积 }}</td>
+                            <td>{{ obj.基地经理 }}</td>
+                            <td>{{ obj.移栽日期 }}</td>
+                            <td>{{ obj.移栽板量 }}</td>
+                            <td>{{ obj.移栽数量 }}</td>
+                            <td>{{ obj.点籽日期 }}</td>
+                            <td>{{ obj.用籽量 }}</td>
+                            <td>{{ obj.备注 }}</td>
+                            <td>{{ obj.生长周期 }}</td>
+                            <td>{{ obj.采收初期 }}</td>
+                            <td>{{ obj.采收末期 }}</td>
+                            <td>{{ obj.采收期 }}</td>
+                            <td>{{ obj.周期批次 }}</td>
+                            <td>{{ obj.总周期天数 }}</td>
+                            <td>{{ obj.销毁面积 }}</td>
+                            <td>{{ obj.销毁备注 }}</td>
+                            <td>{{ obj.总产量 }}</td>
+                            <td>{{ obj.总亩产 }}</td>
+                            <td>{{ obj.正常产量 }}</td>
+                            <td>{{ obj.正常亩产 }}</td>
+                            <td>{{ obj.栽种方式 }}</td>
+                            <td>{{ obj.下批前一天时间 }}</td>
+                            <td>{{ obj.周期 }}</td>
+                            <td>
+                                <a class="btn btn-primary btn-xs" href="/Plant_batch/{{ obj.ID }}/edit/">编辑</a>
+                                <a class="btn btn-danger btn-xs" href="/Plant_batch/{{ obj.ID }}/delete/">删除</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+
         <div class="clearfix">
             <ul class="pagination">
                 {{ page_string }}
             </ul>
-
         </div>
-
     </div>
 
-
+    <style>
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            white-space: nowrap; /* 防止换行 */
+        }
+        th {
+            background-color: #f2f2f2;
+            line-height: 1.2; /* 调整行高 */
+        }
+    </style>
 {% endblock %}
