@@ -540,25 +540,17 @@ def sales_record_add(request, outbound_id):
 
     return render(request, 'sales_record_add.html', {'form': form, 'outbound_record': outbound_record})
 
-def sales_record_edit(request, record_id):
-    sales_record = get_object_or_404(SalesRecord, id=record_id)
-    outbound_record = sales_record.出库记录
+def sales_record_edit(request, pk):
+    record = get_object_or_404(SalesRecord, pk=pk)
     if request.method == 'POST':
-        form = SalesRecordForm(request.POST, instance=sales_record)
+        form = SalesRecordForm(request.POST, instance=record)
         if form.is_valid():
-            updated_sales_record = form.save(commit=False)
-
-            # 检查销售数量是否超过出库数量
-            total_sales_quantity = sum(record.数量 for record in outbound_record.sales_records.all()) - sales_record.数量 + updated_sales_record.数量
-            if total_sales_quantity > outbound_record.数量:
-                form.add_error('数量', '销售数量不能超过出库数量')
-            else:
-                updated_sales_record.save()
-                return redirect('outbound_list')
+            form.save()
+            return redirect('outbound_list')  # 重定向到出库记录列表或其他页面
     else:
-        form = SalesRecordForm(instance=sales_record)
-
+        form = SalesRecordForm(instance=record)
     return render(request, 'sales_record_edit.html', {'form': form})
+
 def sales_record_delete(request, pk):
     record = get_object_or_404(SalesRecord, pk=pk)
     record.delete()
