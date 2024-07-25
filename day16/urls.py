@@ -26,7 +26,9 @@ from app01.views.views import create_expense_allocation, expense_allocation_list
     depreciation_allocation_edit, depreciation_allocation_delete, loss_report_list, loss_report_add, loss_report_edit, \
     loss_report_delete, get_plant_batch_dk, loss_report_autocomplete, salesperson_list, salesperson_add, \
     salesperson_edit, salesperson_delete, vehicle_list, vehicle_add, vehicle_edit, vehicle_delete, market_list, \
-    market_add, market_edit, market_delete, customer_list, customer_add, customer_edit, customer_delete
+    market_add, market_edit, market_delete, customer_list, customer_add, customer_edit, customer_delete, \
+    add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
+    outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -201,8 +203,15 @@ urlpatterns = [
     path('customer/<int:nid>/edit/', customer_edit, name='customer_edit'),
     path('customer/<int:nid>/delete/', customer_delete, name='customer_delete'),
     # 出库
-    path('outbound/list/', views.outbound_list, name='outbound_list'),
-    path('outbound/add/', views.outbound_add, name='outbound_add'),
-    path('outbound/edit/<int:nid>/', views.outbound_edit, name='outbound_edit'),
-    path('outbound/delete/<int:nid>/', views.outbound_delete, name='outbound_delete'),
+    path('outbound/list/', outbound_list, name='outbound_list'),
+    path('outbound/add/', outbound_add, name='outbound_add'),
+    path('outbound/edit/<int:nid>/', outbound_edit, name='outbound_edit'),
+    path('outbound/delete/<int:nid>/', outbound_delete, name='outbound_delete'),
+    path('get_sales_records/', get_sales_records, name='get_sales_records'),
+    path('add_sale_form/', add_sale_form, name='add_sale_form'),
+    path('fetch_unique_second_level_categories/', fetch_unique_second_level_categories,
+         name='fetch_unique_second_level_categories'),
+    path('sales_record/add/<int:outbound_id>/', sales_record_add, name='sales_record_add'),
+    path('sales_record/edit/<int:pk>/', sales_record_edit, name='sales_record_edit'),
+    path('sales_record/delete/<int:pk>/', sales_record_delete, name='sales_record_delete'),
 ]

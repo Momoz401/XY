@@ -1,9 +1,11 @@
 
 from django.http import JsonResponse
+from django.template.loader import render_to_string
+
 from app01.models import Plant_batch, BaseInfoWorkHour, BaseInfoBase, ExpenseAllocation, DepreciationAllocation, \
-    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord
+    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord
 from app01.utils.form import WorkHourFormSet, ExpenseAllocationForm, DepreciationAllocationForm, LossReportForm, \
-    SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm
+    SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm, SalesRecordForm
 from django.db.models.functions import Substr
 
 from django.http import JsonResponse
@@ -436,18 +438,17 @@ def customer_delete(request, nid):
     return redirect('/customer/list/')
 
 def outbound_list(request):
-    """出库记录列表"""
     search_data = request.GET.get('q', "")
-    queryset = OutboundRecord.objects.all()
     if search_data:
-        queryset = queryset.filter(公司__icontains=search_data)
+        queryset = OutboundRecord.objects.filter(公司__contains=search_data)
+    else:
+        queryset = OutboundRecord.objects.all()
 
     page_object = Pagination(request, queryset)
-
     context = {
         "search_data": search_data,
-        "queryset": page_object.page_queryset,
-        "page_string": page_object.html()
+        "queryset": page_object.page_queryset,  # 分完页的数据
+        "page_string": page_object.html()  # 页码
     }
     return render(request, 'outbound_list.html', context)
 
@@ -479,3 +480,86 @@ def outbound_edit(request, nid):
 def outbound_delete(request, nid):
     OutboundRecord.objects.filter(id=nid).delete()
     return redirect('/outbound/list/')
+
+
+def add_sales_record(request, outbound_id):
+    outbound_record = get_object_or_404(OutboundRecord, id=outbound_id)
+    if request.method == 'POST':
+        form = SalesRecordForm(request.POST)
+        if form.is_valid():
+            sales_record = form.save(commit=False)
+            sales_record.出库记录 = outbound_record
+            if sales_record.数量 <= outbound_record.数量 - sum([sr.数量 for sr in outbound_record.sales_records.all()]):
+                sales_record.save()
+                return redirect('outbound_list')
+            else:
+                form.add_error('数量', '销售数量不能超过出库数量')
+    else:
+        form = SalesRecordForm()
+    return render(request, 'add_sales_record.html', {'form': form, 'outbound_record': outbound_record})
+
+def fetch_unique_second_level_categories(request):
+    first_level_category_name = request.GET.get('name')
+    second_level_categories = BaseInfoWorkType.objects.filter(父分类=first_level_category_name, 分类级别=2).distinct('分类名称').values_list('分类名称', flat=True)
+    return JsonResponse({'second_level_categories': list(second_level_categories)})
+
+
+def get_sales_records(request):
+    outbound_id = request.GET.get('outbound_id')
+    outbound_record = get_object_or_404(OutboundRecord, id=outbound_id)
+    sales_records = outbound_record.sales_records.all()
+    html = render_to_string('sales_records.html', {'sales_records': sales_records})
+    return JsonResponse({'html': html})
+
+def add_sale_form(request):
+    outbound_id = request.GET.get('outbound_id')
+    outbound_record = get_object_or_404(OutboundRecord, id=outbound_id)
+    form = SalesRecordForm()
+    html = render_to_string('add_sale_form.html', {'form': form, 'outbound_record': outbound_record}, request=request)
+    return JsonResponse({'html': html})
+
+def sales_record_add(request, outbound_id):
+    outbound_record = get_object_or_404(OutboundRecord, id=outbound_id)
+    if request.method == 'POST':
+        form = SalesRecordForm(request.POST)
+        if form.is_valid():
+            sales_record = form.save(commit=False)
+            sales_record.出库记录 = outbound_record
+            sales_record.批次 = outbound_record.批次
+            sales_record.销售日期 = outbound_record.日期
+
+            # 检查销售数量是否超过出库数量
+            total_sales_quantity = sum(record.数量 for record in outbound_record.sales_records.all()) + sales_record.数量
+            if total_sales_quantity > outbound_record.数量:
+                form.add_error('数量', '销售数量不能超过出库数量')
+            else:
+                sales_record.save()
+                return redirect('outbound_list')
+    else:
+        form = SalesRecordForm()
+
+    return render(request, 'sales_record_add.html', {'form': form, 'outbound_record': outbound_record})
+
+def sales_record_edit(request, record_id):
+    sales_record = get_object_or_404(SalesRecord, id=record_id)
+    outbound_record = sales_record.出库记录
+    if request.method == 'POST':
+        form = SalesRecordForm(request.POST, instance=sales_record)
+        if form.is_valid():
+            updated_sales_record = form.save(commit=False)
+
+            # 检查销售数量是否超过出库数量
+            total_sales_quantity = sum(record.数量 for record in outbound_record.sales_records.all()) - sales_record.数量 + updated_sales_record.数量
+            if total_sales_quantity > outbound_record.数量:
+                form.add_error('数量', '销售数量不能超过出库数量')
+            else:
+                updated_sales_record.save()
+                return redirect('outbound_list')
+    else:
+        form = SalesRecordForm(instance=sales_record)
+
+    return render(request, 'sales_record_edit.html', {'form': form})
+def sales_record_delete(request, pk):
+    record = get_object_or_404(SalesRecord, pk=pk)
+    record.delete()
+    return redirect('outbound_list')  # 重定向到出库记录列表或其他页面

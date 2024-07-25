@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django import forms
 
 from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage, ExpenseAllocation, DepreciationAllocation, \
-    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord
+    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord
 from app01.utils.bootstrap import BootStrapModelForm
 
 
@@ -413,3 +413,9 @@ class OutboundRecordForm(BootStrapModelForm):
     class Meta:
         model = OutboundRecord
         fields = "__all__"
+
+
+class SalesRecordForm(BootStrapModelForm):
+    class Meta:
+        model = SalesRecord
+        fields = ['客户', '数量', '单价', '金额', '应收金额', '实收金额', '备注']

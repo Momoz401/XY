@@ -1,0 +1,33 @@
+<div class="table-responsive">
+    <table class="table table-bordered table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>客户</th>
+                <th>数量</th>
+                <th>单价</th>
+                <th>金额</th>
+                <th>应收金额</th>
+                <th>实收金额</th>
+                <th>备注</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in sales_records %}
+                <tr>
+                    <td>{{ record.客户 }}</td>
+                    <td>{{ record.数量 }}</td>
+                    <td>{{ record.单价 }}</td>
+                    <td>{{ record.金额 }}</td>
+                    <td>{{ record.应收金额 }}</td>
+                    <td>{{ record.实收金额 }}</td>
+                    <td>{{ record.备注 }}</td>
+                    <td>
+                        <a class="btn btn-primary btn-sm" href="{% url 'sales_record_edit' record.id %}">修改</a>
+                        <a class="btn btn-danger btn-sm" href="{% url 'sales_record_delete' record.id %}">删除</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,8 @@
+<div class="add-sale-container">
+    <form method="post" class="add-sale-form" action="{% url 'add_sale' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="hidden" name="outbound_id" value="{{ outbound_record.id }}">
+        <button type="submit">保存</button>
+    </form>
+</div>

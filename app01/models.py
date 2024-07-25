@@ -155,6 +155,9 @@ class BaseInfoWorkType(models.Model):
         return self.分类名称 if self.分类名称 else 'Unnamed Category'
 
 
+
+
+
 class BaseInfoWorkHour(models.Model):
     工种ID = models.AutoField(primary_key=True)
     工种 = models.CharField(max_length=255)
@@ -721,16 +724,16 @@ class Customer(models.Model):
 
 
 class OutboundRecord(models.Model):
-    日期 = models.DateField(verbose_name="日期", default=timezone.now)
-    车牌 = models.ForeignKey('Vehicle', on_delete=models.CASCADE, verbose_name="车牌")
+    日期 = models.DateField(null=True, default=timezone.now)
+    车牌 = models.ForeignKey(Vehicle, on_delete=models.CASCADE, verbose_name="车牌")
     公司 = models.CharField(max_length=255, verbose_name="公司")
-    市场 = models.ForeignKey('Market', on_delete=models.CASCADE, verbose_name="市场")
-    一级分类 = models.ForeignKey('BaseInfoWorkType', on_delete=models.CASCADE, related_name='一级分类', verbose_name="一级分类")
-    二级分类 = models.ForeignKey('BaseInfoWorkType', on_delete=models.CASCADE, related_name='二级分类', verbose_name="二级分类")
+    市场 = models.ForeignKey(Market, on_delete=models.CASCADE, verbose_name="市场")
+    一级分类 = models.ForeignKey(BaseInfoWorkType, on_delete=models.CASCADE, verbose_name="一级分类", related_name='一级分类', limit_choices_to={'分类级别': 1})
+    二级分类 = models.ForeignKey(BaseInfoWorkType, on_delete=models.CASCADE, verbose_name="二级分类", related_name='二级分类', limit_choices_to={'分类级别': 2})
     规格 = models.CharField(max_length=255, verbose_name="规格")
-    单位 = models.CharField(max_length=50, verbose_name="单位")
-    数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="数量")
-    重量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="重量")
+    单位 = models.CharField(max_length=255, verbose_name="单位")
+    数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="数量", default=0)
+    重量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="重量", default=0)
     批次 = models.CharField(max_length=255, verbose_name="批次")
     地块 = models.CharField(max_length=255, verbose_name="地块")
     备注 = models.TextField(verbose_name="备注", null=True, blank=True)
@@ -741,3 +744,22 @@ class OutboundRecord(models.Model):
 
     def __str__(self):
         return f"{self.日期} - {self.车牌} - {self.公司}"
+
+class SalesRecord(models.Model):
+    出库记录 = models.ForeignKey(OutboundRecord, on_delete=models.CASCADE, related_name='sales_records')
+    批次 = models.CharField(max_length=255, verbose_name="批次",default=None)
+    销售日期 = models.DateField(null=True, default=timezone.now, verbose_name="销售日期")
+    客户 = models.CharField(max_length=255, verbose_name="客户")
+    数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="数量", default=0)
+    单价 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="单价", default=0)
+    金额 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="金额", default=0)
+    应收金额 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="应收金额", default=0)
+    实收金额 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="实收金额", default=0)
+    备注 = models.TextField(verbose_name="备注", null=True, blank=True)
+
+    class Meta:
+        verbose_name = "销售记录"
+        verbose_name_plural = "销售记录"
+
+    def __str__(self):
+        return f"{self.客户} - {self.数量}"
