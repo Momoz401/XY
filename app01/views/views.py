@@ -555,3 +555,45 @@ def sales_record_delete(request, pk):
     record = get_object_or_404(SalesRecord, pk=pk)
     record.delete()
     return redirect('outbound_list')  # 重定向到出库记录列表或其他页面
+
+
+# 单独管理销售记录的视图函数
+def sales_record_management_list(request):
+    search_data = request.GET.get('q', "")
+    if search_data:
+        queryset = SalesRecord.objects.filter(客户__contains=search_data)
+    else:
+        queryset = SalesRecord.objects.all()
+    context = {
+        "search_data": search_data,
+        "queryset": queryset,
+    }
+    return render(request, 'sales_record_management_list.html', context)
+
+def sales_record_management_add(request):
+    if request.method == 'POST':
+        form = SalesRecordForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('sales_record_management_list')
+    else:
+        form = SalesRecordForm()
+    return render(request, 'sales_record_management_add.html', {'form': form})
+
+def sales_record_management_edit(request, pk):
+    sales_record = get_object_or_404(SalesRecord, pk=pk)
+    if request.method == 'POST':
+        form = SalesRecordForm(request.POST, instance=sales_record)
+        if form.is_valid():
+            form.save()
+            return redirect('sales_record_management_list')
+    else:
+        form = SalesRecordForm(instance=sales_record)
+    return render(request, 'sales_record_management_edit.html', {'form': form})
+
+def sales_record_management_delete(request, pk):
+    sales_record = get_object_or_404(SalesRecord, pk=pk)
+    sales_record.delete()
+    return redirect('sales_record_management_list')
+
+

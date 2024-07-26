@@ -214,4 +214,15 @@ urlpatterns = [
     path('sales_record/add/<int:outbound_id>/', sales_record_add, name='sales_record_add'),
     path('sales_record/edit/<int:pk>/', sales_record_edit, name='sales_record_edit'),
     path('sales_record/delete/<int:pk>/', sales_record_delete, name='sales_record_delete'),
+
+    # 单独管理销售记录的URL
+    path('sales_record/management/list/', views.sales_record_management_list, name='sales_record_management_list'),
+    path('sales_record/management/add/', views.sales_record_management_add, name='sales_record_management_add'),
+    path('sales_record/management/<int:pk>/edit/', views.sales_record_management_edit,
+         name='sales_record_management_edit'),
+    path('sales_record/management/<int:pk>/delete/', views.sales_record_management_delete,
+         name='sales_record_management_delete'),
+
+
+
 ]
