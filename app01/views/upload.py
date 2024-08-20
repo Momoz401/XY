@@ -190,64 +190,86 @@ def upload_agriculturecost_modal_form(request):
         return redirect('/Agricureture/list/')
     return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
-
 def upload_Plant_batch_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批次表文件上传"
     if request.method == "GET":
         form = UpModelForm()
-        # print(request.session["info"]['name'])
         return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
-        # 对于文件：自动保存；
-        # 字段 + 上传路径写入到数据库
-        # print(form.cleaned_data)
-        df = pd.read_excel(form.cleaned_data['excel_file'])
-        # 将日期时间列转换为 pandas 的 datetime 类型，同时处理错误
-        date_columns = ['移栽日期', '点籽日期']
-        for column in date_columns:
-            df[column] = pd.to_datetime(df[column], errors='coerce')
+        try:
+            # 读取 Excel 文件
+            df = pd.read_excel(form.cleaned_data['excel_file'])
 
-            # 填充 NaT 值（用一个默认值），然后转换时区
-            df[column] = df[column].fillna(pd.Timestamp('1970-01-01'))
-            df[column] = df[column].dt.tz_localize('UTC').dt.tz_convert('Asia/Shanghai')
+            # 检查必要的列是否存在
+            required_columns = ['批次ID', '移栽日期', '点籽日期', '面积', '移栽板量', '移栽数量']
+            for column in required_columns:
+                if column not in df.columns:
+                    raise ValueError(f"缺少必要的列：{column}")
 
-        # print(df)
-        # data_to_db(df, 'tpx_hxb_province')
-        records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
-        for record in records:
-            obj, created = Plant_batch.objects.update_or_create(
-                批次ID=record['批次ID'],
-                一级分类=record['一级分类'],
-                二级分类=record['二级分类'],
-                地块=record['地块'],
-                面积=record['面积'],
-                基地经理=record['基地经理'],
-                移栽日期=record['移栽日期'],
-                移栽板量=record['移栽板量'],
-                移栽数量=record['移栽数量'],
-                点籽日期=record['点籽日期'],
-                用籽量=record['用籽量'],
-                备注=record['备注'],
-                uploader=request.session["info"]['name'],
-                生长周期=record['生长周期'],
-                采收初期=record['采收初期'],
-                采收末期=record['采收末期'],
-                采收期=record['采收期'],
-                周期批次=record['周期批次'],
-                总周期天数=record['总周期天数'],
-                销毁面积=record['销毁面积'],
-                销毁备注=record['销毁备注'],
-                总产量=record['总产量'],
-                总亩产=record['总亩产'],
-                正常产量=record['正常产量'],
-                正常亩产=record['正常亩产'],
-                栽种方式=record['栽种方式'],
-                下批前一天时间=record['下批前一天时间'],
-                周期 = record['周期']
+            # 转换日期列为字符串格式
+            date_columns = ['移栽日期', '点籽日期', '采收初期', '采收末期', '下批前一天时间']
+            for column in date_columns:
+                df[column] = df[column].apply(lambda x: x.strftime('%Y-%m-%d') if pd.notna(x) else None)
 
-            )
-        return redirect('/Plant_batch/list/')
-    return render(request, 'Plant_batch.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
+            # 处理 NaN 值的列，比如面积
+            df['面积'] = df['面积'].fillna(0)
+
+            # 将 DataFrame 转换为字典列表
+            records = df.to_dict(orient='records')
+
+            for record in records:
+                try:
+                    data = {
+                        '一级分类': record.get('一级分类'),
+                        '二级分类': record.get('二级分类'),
+                        '地块': record.get('地块'),
+                        '面积': record.get('面积', 0),
+                        '基地经理': record.get('基地经理'),
+                        '移栽日期': record.get('移栽日期'),
+                        '移栽板量': record.get('移栽板量', 0),
+                        '移栽数量': record.get('移栽数量', 0),
+                        '点籽日期': record.get('点籽日期'),
+                        '用籽量': record.get('用籽量', 0),
+                        '备注': record.get('备注'),
+                        '生长周期': record.get('生长周期'),
+                        '采收初期': record.get('采收初期'),
+                        '采收末期': record.get('采收末期'),
+                        '采收期': record.get('采收期'),
+                        '周期批次': record.get('周期批次'),
+                        '总周期天数': record.get('总周期天数'),
+                        '销毁面积': record.get('销毁面积', 0),
+                        '销毁备注': record.get('销毁备注'),
+                        '总产量': record.get('总产量', 0),
+                        '总亩产': record.get('总亩产', 0),
+                        '正常产量': record.get('正常产量', 0),
+                        '正常亩产': record.get('正常亩产', 0),
+                        '栽种方式': record.get('栽种方式'),
+                        '下批前一天时间': record.get('下批前一天时间'),
+                        '周期': record.get('周期'),
+                        'uploader': request.session["info"]['name'],
+                    }
+
+                    # 单独尝试每一个字段，捕捉并记录出错的字段
+                    for key, value in data.items():
+                        try:
+                            if key in ['移栽日期', '点籽日期', '采收初期', '采收末期', '下批前一天时间'] and value:
+                                # 尝试将日期字符串转换为日期对象以确保格式正确
+                                value = pd.to_datetime(value).strftime('%Y-%m-%d')
+                            obj, created = Plant_batch.objects.update_or_create(
+                                批次ID=record['批次ID'],
+                                defaults={key: value}
+                            )
+                        except Exception as field_error:
+                            print(f"处理字段 '{key}' 的值 '{value}' 时出错: {field_error}")
+                            raise  # 重新抛出异常以便在外层捕获
+
+                except Exception as e:
+                    print(f"在处理记录时发生错误，字段 {record} 报错: {e}")
+            return redirect('/Plant_batch/list/')
+        except Exception as e:
+            print(f"处理过程中出现错误：{e}")
+            form.add_error(None, "上传过程中出现问题，请检查数据格式并重试。")
+    return render(request, 'Plant_batch.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})

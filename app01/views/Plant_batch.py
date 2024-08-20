@@ -14,9 +14,9 @@ def Plant_batch_list(request):
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["名称__contains"] = search_data
+        data_dict["批次ID__contains"] = search_data
 
-    queryset = models.Plant_batch.objects.filter(**data_dict).order_by("-ID")
+    queryset = models.Plant_batch.objects.filter(**data_dict)
 
     page_object = Pagination(request, queryset)
 

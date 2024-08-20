@@ -223,6 +223,8 @@ urlpatterns = [
     path('sales_record/management/<int:pk>/delete/', views.sales_record_management_delete,
          name='sales_record_management_delete'),
 
+    # 日历显示种植批次
+    path('Plant_batch/calendar/', views.plant_batch_calendar_view, name='plant_batch_calendar_view'),
 
 
 ]

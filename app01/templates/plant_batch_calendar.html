@@ -1,0 +1,27 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container">
+    <h2>批次日历视图</h2>
+    <div id="calendar"></div>
+</div>
+
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: {{ events|safe }},
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay'
+            },
+            locale: 'zh-cn'
+        });
+        calendar.render();
+    });
+</script>
+{% endblock %}
