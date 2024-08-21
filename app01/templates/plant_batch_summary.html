@@ -1,0 +1,93 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+
+   <hr>
+    <form method="get" class="form-inline mb-3">
+        <div class="form-group">
+            <label for="start_date">开始日期:</label>
+            <input type="date" id="start_date" name="start_date" value="{{ start_date }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="end_date">结束日期:</label>
+            <input type="date" id="end_date" name="end_date" value="{{ end_date }}" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">查询</button>
+    </form>
+    <hr>
+    <table id="summaryTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>批次ID</th>
+                <th>移栽日期</th>
+                <th>一级分类</th>
+                <th>二级分类</th>
+                <th>面积</th>
+                <th>总计划内成本</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in summary_data %}
+            <tr data-batch-id="{{ row.批次ID }}">
+                <td>{{ row.批次ID }}</td>
+                <td>{{ row.移栽日期 }}</td>
+                <td>{{ row.批次一级分类 }}</td>
+                <td>{{ row.批次二级分类 }}</td>
+                <td>{{ row.地块 }}</td>
+                <td>{{ row.总计划内成本|floatformat:2 }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    var table = $('#summaryTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: [
+            'copy', 'csv', 'excel', 'pdf', 'print'
+        ],
+        columnDefs: [
+            {
+                targets: [5], // 针对总计划内成本列
+                render: $.fn.dataTable.render.number(',', '.', 2, '') // 保留小数点2位
+            }
+        ]
+    });
+
+    $('#summaryTable tbody').on('click', 'tr', function() {
+        var batchId = $(this).data('batch-id');
+
+        // 如果子表已存在，移除它
+        if ($(this).next().hasClass('child-row')) {
+            $(this).next().remove();
+            return;
+        }
+
+        // 向服务器请求子表数据
+        $.ajax({
+            url: '/get_batch_details/',
+            method: 'GET',
+            data: {
+                batch_id: batchId
+            },
+            success: function(data) {
+                var childRow = $('<tr class="child-row"><td colspan="6">' + data.html + '</td></tr>');
+                childRow.insertAfter($('tr[data-batch-id="' + batchId + '"]'));
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,12 +1,20 @@
-
+import pandas as pd
+from django.db import connection
 from django.http import JsonResponse
+from django.template.defaultfilters import floatformat
 from django.template.loader import render_to_string
 
 from app01.models import Plant_batch, BaseInfoWorkHour, BaseInfoBase, ExpenseAllocation, DepreciationAllocation, \
-    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord
+    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord, ProductionWage
 from app01.utils.form import WorkHourFormSet, ExpenseAllocationForm, DepreciationAllocationForm, LossReportForm, \
-    SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm, SalesRecordForm
-from django.db.models.functions import Substr
+    SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm, SalesRecordForm, \
+    ExpenseAllocationModelForm
+from django.db.models.functions import Substr, TruncDate
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.db.models import Sum
+
+
 
 from django.http import JsonResponse
 from django.db.models.functions import Substr
@@ -638,3 +646,197 @@ def plant_batch_calendar_view(request):
     }
 
     return render(request, 'plant_batch_calendar.html', context)
+# 这里设计一个批次成本汇总数据
+def plant_batch_summary(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    now = datetime.now()
+
+    if not start_date:
+        first_day_of_month = now.replace(day=1)
+        start_date = first_day_of_month.strftime('%Y-%m-%d')
+    else:
+        first_day_of_month = datetime.strptime(start_date, '%Y-%m-%d')
+
+    if not end_date:
+        last_day_of_month = (first_day_of_month + timedelta(days=31)).replace(day=1) - timedelta(days=1)
+        end_date = last_day_of_month.strftime('%Y-%m-%d')
+    else:
+        last_day_of_month = datetime.strptime(end_date, '%Y-%m-%d')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                批次ID,
+                移栽日期,
+                批次一级分类,
+                批次二级分类,
+                面积,
+                总计划内成本
+            FROM
+                views_批次计划内成本汇总
+            WHERE
+                移栽日期 BETWEEN %s AND %s
+            GROUP BY
+                批次ID, 移栽日期, 批次一级分类, 批次二级分类, 面积
+        """, [start_date, end_date])
+        rows = cursor.fetchall()
+
+    summary_data = [
+        {
+            '批次ID': row[0],
+            '移栽日期': row[1],
+            '批次一级分类': row[2],
+            '批次二级分类': row[3],
+            '地块': row[4],
+            '总计划内成本': row[5]
+        }
+        for row in rows
+    ]
+
+    context = {
+        'summary_data': summary_data,
+        'start_date': start_date,
+        'end_date': end_date,
+        'default_start_date': first_day_of_month.strftime('%Y-%m-%d'),
+        'default_end_date': last_day_of_month.strftime('%Y-%m-%d')
+    }
+
+    return render(request, 'plant_batch_summary.html', context)
+def get_batch_details(request):
+    batch_id = request.GET.get('batch_id')
+
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT
+                批次ID,
+                移栽日期,
+                工种,
+                单价,
+                计量系数,
+                计划内成本
+            FROM
+                views_批次计划内成本
+            WHERE
+                批次ID = %s
+        """, [batch_id])
+        details_data = cursor.fetchall()
+
+    # 生成 HTML 内容
+    html = '<table class="table table-striped">'
+    html += '<tr><th>批次ID</th><th>移栽日期</th><th>工种</th><th>单价</th><th>计量系数</th><th>计划内成本</th></tr>'
+    for row in details_data:
+        html += f'<tr><td>{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td>{row[4]}</td><td>{row[5]}</td></tr>'
+    html += '</table>'
+
+    return JsonResponse({'html': html})
+
+from django.shortcuts import render
+from django.db import connection
+
+
+def production_wage_summary(request):
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    now = datetime.now()
+
+    if not start_date:
+        start_date = now.strftime("%Y-%m-01")
+
+    if not end_date:
+        end_date = now.strftime("%Y-%m-%d")
+
+    # 查询第一层汇总数据，按批次进行汇总
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 批次, SUM(合计工资) AS total_wage
+            FROM app01_productionwage
+            WHERE 日期 >= %s AND 日期 <= %s
+            GROUP BY 批次
+        """, [start_date, end_date])
+        summary_data = cursor.fetchall()
+
+    return render(request, 'production_wage_summary.html', {
+        'summary_data': summary_data,
+        'start_date': start_date,
+        'end_date': end_date
+    })
+
+
+def production_wage_second_level(request):
+    batch = request.GET.get('batch')
+
+    # 查询第二层数据，按工人进行汇总
+    with connection.cursor() as cursor:
+        cursor.execute("""
+            SELECT 工人, SUM(合计工资) AS total_wage
+            FROM app01_productionwage
+            WHERE 批次 = %s
+            GROUP BY 工人
+        """, [batch])
+        second_level_data = cursor.fetchall()
+
+    # 生成 HTML 内容
+    html = '<table class="table table-striped">'
+    html += '<tr><th>工人</th><th>合计工资</th></tr>'
+    for row in second_level_data:
+        html += f'<tr data-worker="{row[0]}"><td>{row[0]}</td><td>{row[1]:.2f}</td></tr>'
+    html += '</table>'
+
+    return JsonResponse({'html': html})
+
+
+def production_wage_details(request):
+    worker = request.GET.get('worker')
+    batch = request.GET.get('batch')
+
+    # 查询第三层数据，显示详细信息
+    details = ProductionWage.objects.filter(工人=worker, 批次=batch).values()
+
+    # 生成 HTML 内容
+    html = '<table class="table table-striped">'
+    html += '<tr><th>日期</th><th>工种</th><th>一级分类</th><th>二级分类</th><th>工时</th><th>数量</th><th>工价</th><th>累计工时</th><th>合计工资</th></tr>'
+    for row in details:
+        html += f"<tr><td>{row['日期']}</td><td>{row['工种']}</td><td>{row['一级分类']}</td><td>{row['二级分类']}</td><td>{row['工时']:.2f}</td><td>{row['数量']:.2f}</td><td>{row['工价']:.2f}</td><td>{row['累计工时']:.2f}</td><td>{row['合计工资']:.2f}</td></tr>"
+    html += '</table>'
+
+    return JsonResponse({'html': html})
+
+
+# 费用分摊设计
+
+def expense_allocation_add(request):
+    """ 添加费用摊销 """
+    if request.method == "GET":
+        form = ExpenseAllocationModelForm()
+        return render(request, 'expense_allocation_form.html', {"form": form})
+
+    form = ExpenseAllocationModelForm(data=request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect('/expense_allocation/list/')
+    return render(request, 'expense_allocation_form.html', {"form": form})
+
+def expense_allocation_edit(request, nid):
+    """ 编辑费用摊销 """
+    row_object = ExpenseAllocation.objects.filter(id=nid).first()
+
+    if request.method == "GET":
+        form = ExpenseAllocationModelForm(instance=row_object)
+        return render(request, 'expense_allocation_form.html', {"form": form})
+
+    form = ExpenseAllocationModelForm(data=request.POST, instance=row_object)
+    if form.is_valid():
+        form.save()
+        return redirect('/expense_allocation/list/')
+    return render(request, 'expense_allocation_form.html', {"form": form})
+
+def expense_allocation_delete(request, nid):
+    ExpenseAllocation.objects.filter(id=nid).delete()
+    return redirect('/expense_allocation/list/')
+
+
+
+

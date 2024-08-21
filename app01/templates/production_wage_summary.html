@@ -1,0 +1,71 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+      <hr>
+    <form method="get" class="form-inline">
+        <label for="start_date">开始日期:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date }}" class="form-control">
+
+        <label for="end_date">结束日期:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date }}" class="form-control">
+
+        <button type="submit" class="btn btn-primary">查询</button>
+    </form>
+
+    <hr>
+
+    <table id="summary_table" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>批次</th>
+                <th>合计工资</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in summary_data %}
+                <tr data-batch-id="{{ data.0 }}">
+                    <td>{{ data.0 }}</td>
+                    <td>{{ data.1|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script>
+    $(document).ready(function() {
+        var table = $('#summary_table').DataTable({
+            responsive: true,
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+
+        $('#summary_table tbody').on('click', 'tr', function () {
+            var batchId = $(this).data('batch-id');
+            var tr = $(this);
+            if (tr.next().hasClass('details-row')) {
+                tr.next().remove();
+            } else {
+                $.get('/production_wage_second_level/', {batch: batchId}, function(response) {
+                    tr.after('<tr class="details-row"><td colspan="2">' + response.html + '</td></tr>');
+                    $('.details-row').find('tr').on('click', function() {
+                        var worker = $(this).data('worker');
+                        var trWorker = $(this);
+                        if (trWorker.next().hasClass('details-row-worker')) {
+                            trWorker.next().remove();
+                        } else {
+                            $.get('/production_wage_details/', {worker: worker, batch: batchId}, function(response) {
+                                trWorker.after('<tr class="details-row-worker"><td colspan="2">' + response.html + '</td></tr>');
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

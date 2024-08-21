@@ -345,6 +345,8 @@ class DynamicFieldsForm(forms.ModelForm):
         return cleaned_data
 
 
+
+
 from django.forms import modelformset_factory
 
 DynamicFieldsFormSet = modelformset_factory(ProductionWage, form=DynamicFieldsForm, extra=1)
@@ -419,3 +421,10 @@ class SalesRecordForm(BootStrapModelForm):
     class Meta:
         model = SalesRecord
         fields = ['客户', '数量', '单价', '金额', '应收金额', '实收金额', '备注']
+
+
+# 费用分摊
+class ExpenseAllocationModelForm(BootStrapModelForm):
+    class Meta:
+        model = ExpenseAllocation
+        fields = "__all__"

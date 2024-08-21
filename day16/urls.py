@@ -21,6 +21,7 @@ from django.conf import settings
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report
+from app01.views.upload import upload_depreciation_excel, upload_expense_allocation
 from app01.views.views import create_expense_allocation, expense_allocation_list, expense_allocation_add, \
     expense_allocation_edit, expense_allocation_delete, depreciation_allocation_list, depreciation_allocation_add, \
     depreciation_allocation_edit, depreciation_allocation_delete, loss_report_list, loss_report_add, loss_report_edit, \
@@ -28,7 +29,9 @@ from app01.views.views import create_expense_allocation, expense_allocation_list
     salesperson_edit, salesperson_delete, vehicle_list, vehicle_add, vehicle_edit, vehicle_delete, market_list, \
     market_add, market_edit, market_delete, customer_list, customer_add, customer_edit, customer_delete, \
     add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
-    outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add
+    outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
+    plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details
+
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -225,6 +228,23 @@ urlpatterns = [
 
     # 日历显示种植批次
     path('Plant_batch/calendar/', views.plant_batch_calendar_view, name='plant_batch_calendar_view'),
+
+    # 显示计划内成本汇总
+    path('plant_batch_summary/', plant_batch_summary, name='plant_batch_summary'),
+    path('get_batch_details/', views.get_batch_details, name='get_batch_details'),
+
+    #工价汇总
+    path('production_wage_summary/', production_wage_summary, name='production_wage_summary'),
+    path('production_wage_second_level/', production_wage_second_level, name='production_wage_second_level'),
+    path('production_wage_details/', production_wage_details, name='production_wage_details'),
+
+
+    #折旧分摊表
+    path('expense_allocation/list/', expense_allocation_list, name='expense_allocation_list'),
+    path('expense_allocation/add/', expense_allocation_add, name='expense_allocation_add'),
+    path('expense_allocation/<int:nid>/edit/', expense_allocation_edit, name='expense_allocation_edit'),
+    path('expense_allocation/<int:nid>/delete/', expense_allocation_delete, name='expense_allocation_delete'),
+    path('upload/expense_allocation/', upload_expense_allocation, name='upload_expense_allocation'),
 
 
 ]

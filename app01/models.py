@@ -602,18 +602,28 @@ class Workhour_by_daily(models.Model):
 from django.db import models
 
 class ExpenseAllocation(models.Model):
-    管理费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="管理费")
+    批次= models.CharField(max_length=100)
+    散工工时 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="散工工时")
+    浇水打杂费用 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="浇水打杂费用")
+    材料费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="材料费")
+    管理费1 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="管理费1")
     生活费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="生活费")
     水电费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="水电费")
-    服务费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="服务费")
+    报销费用 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="报销费用")
     其他费用 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="其他费用")
-    燃油费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="燃油费")
-    维修费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="维修费")
-    出勤奖金 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="出勤奖金")
-    销售费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="销售费")
-    基地经理 = models.ForeignKey(BaseInfoBase, on_delete=models.CASCADE, verbose_name="基地经理",default=0)
-    月份 = models.DateField(verbose_name="月份",default=datetime.now().strftime("%Y-%m-01"))
-
+    地租 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="地租")
+    大棚折旧 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="大棚折旧")
+    其他资产 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="其他资产")
+    农家肥 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="农家肥")
+    有机肥 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="有机肥")
+    草莓土 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="草莓土")
+    出勤奖 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="出勤奖")
+    服务费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="服务费")
+    地租大棚摊销 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="地租大棚摊销")
+    基地经理 = models.CharField(max_length=100)
+    燃油费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="燃油费", default=0)
+    维修费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="维修费", default=0)
+    销售费 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="销售费", default=0)
     class Meta:
         verbose_name = "费用摊销"
         verbose_name_plural = "费用摊销"

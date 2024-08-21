@@ -30,7 +30,7 @@ def upload_list(request):
 
 from django import forms
 from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
-from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch
+from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch, ExpenseAllocation
 
 
 class UpForm(BootStrapForm):
@@ -113,49 +113,87 @@ def upload_workhour_modal_form(request):
         return redirect('/WorkHour/list/')
     return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
-
+# 工时工价上传
 def upload_productionwate_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批量上传工价文件"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
+        return render(request, 'upload_form.html',
+                      {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
-        # 对于文件：自动保存；
-        # 字段 + 上传路径写入到数据库
-        # print(form.cleaned_data)
         df = pd.read_excel(form.cleaned_data['excel_file'])
-        dftemp=df.fillna(0)
-        # print(df)
-        # data_to_db(df, 'tpx_hxb_province')
-        records = dftemp.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
+
+        # 对于 DecimalField 类型字段进行清洗
+        decimal_fields = ['工价', '数量', '工时', '累计工时', '合计工资']  # 你需要确保这些字段名正确
+        for field in decimal_fields:
+            df[field] = pd.to_numeric(df[field], errors='coerce').fillna(0)  # 将无法转换为数字的值转换为NaN，然后用0填充
+
+        records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
         for record in records:
             obj, created = ProductionWage.objects.update_or_create(
-
                 基地=record['基地'],
                 工人=record['工人'],
                 日期=record['日期'],
                 负责人=record['基地经理'],
-                一级分类=record['一级工种'],
-                二级分类=record['二级工种'],
-                工种=record['二级工种'],
-                工价=record['单价'],
-                数量=record['数量'],
-                工时=record['工时'],
-                累计工时=record['合计工时'],
-                合计工资=record['合计工资'],
-                批次=record['批次'],
-                地块=record['地块'],
-                备注=record['备注'],
-
-
-
-
+                一级分类=record['一级分类'],
+                二级分类=record['二级分类'],
+                工种=record['工种'],
+                defaults={  # 使用 defaults 来简化 update_or_create 的使用
+                    '工价': record['工价'],
+                    '数量': record['数量'],
+                    '工时': record['工时'],
+                    '累计工时': record['累计工时'],
+                    '合计工资': record['合计工资'],
+                    '批次': record['批次'],
+                    '地块': record['地块'],
+                    '备注': record['备注'],
+                }
             )
         return redirect('/production_wage_list/list/')
-    return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
+    return render(request, 'upload_form.html',
+                  {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
+
+
+def upload_depreciation_excel(request):
+    """ 上传折旧摊销表 """
+    title = "折旧摊销表文件上传"
+    if request.method == "GET":
+        form = UpModelForm()
+        return render(request, 'upload_form.html', {
+            "form": form,
+            'title': title,
+            'uploader_name': request.session["info"]['name']
+        })
+
+    form = UpModelForm(data=request.POST, files=request.FILES)
+    if form.is_valid():
+        file = form.cleaned_data['excel_file']
+        file_name = file.name
+
+        # 保存文件到指定目录
+        file_path = os.path.join(settings.MEDIA_ROOT, file_name)
+        with open(file_path, 'wb') as f:
+            for chunk in file.chunks():
+                f.write(chunk)
+
+        # 读取并处理Excel文件 (这里你可以根据需求进一步处理文件)
+        try:
+            df = pd.read_excel(file_path)
+            # 此处可以根据df进行进一步的数据处理或存入数据库操作
+            # 例如：处理 df 数据，将其写入到数据库中的其他表中
+        except Exception as e:
+            return HttpResponse(f"文件处理失败: {e}")
+
+        return HttpResponse(f"文件 {file_name} 上传成功，并保存在 {file_path}")
+
+    return render(request, 'upload_form.html', {
+        "form": form,
+        'title': title,
+        'uploader_name': request.session["info"]['name']
+    })
 
 
 def upload_agriculturecost_modal_form(request):
@@ -273,3 +311,48 @@ def upload_Plant_batch_modal_form(request):
             print(f"处理过程中出现错误：{e}")
             form.add_error(None, "上传过程中出现问题，请检查数据格式并重试。")
     return render(request, 'Plant_batch.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
+
+
+def upload_expense_allocation(request):
+    """ 上传费用摊销数据 """
+    if request.method == "GET":
+        return render(request, 'upload_expense_allocation.html')
+
+    file_object = request.FILES.get("excel_file")
+    df = pd.read_excel(file_object)
+    df = df.fillna(0)  # 填充空值
+    records = df.to_dict(orient='records')
+
+    for record in records:
+        ExpenseAllocation.objects.update_or_create(
+            批次=record['批次'],  # 假设批次是唯一标识
+            defaults={
+                '生活费': record['生活费'],
+                '水电费': record['水电费'],
+                '服务费': record['服务费'],
+                '其他费用': record['其他费用'],
+                '燃油费': record['燃油费'],
+                '维修费': record['维修费'],
+                '销售费': record['销售费'],
+                '基地经理': record['基地经理'],
+                '散工工时': record['散工工时'],
+                '浇水打杂费用': record['浇水打杂费用'],
+                '材料费': record['材料费'],
+                '管理费1': record['管理费1'],
+                '报销费用': record['报销费用'],
+                '地租': record['地租'],
+                '大棚折旧': record['大棚折旧'],
+                '其他资产': record['其他资产'],
+                '农家肥': record['农家肥'],
+                '有机肥': record['有机肥'],
+                '草莓土': record['草莓土'],
+                '出勤奖': record['出勤奖'],
+                '服务费': record['服务费'],
+                '地租大棚摊销': record['地租大棚摊销'],
+            }
+        )
+
+    return redirect('/expense_allocation/list/')
+
+
+
