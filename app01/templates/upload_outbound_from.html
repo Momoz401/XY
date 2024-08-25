@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">上传出库文件</h3>
+            </div>
+            <div class="panel-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="excel_file">选择Excel文件</label>
+                        <input type="file" name="excel_file" class="form-control" id="excel_file" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">上传</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

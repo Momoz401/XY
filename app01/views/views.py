@@ -1,26 +1,25 @@
 import pandas as pd
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db import connection
 from django.http import JsonResponse
 from django.template.defaultfilters import floatformat
 from django.template.loader import render_to_string
 
 from app01.models import Plant_batch, BaseInfoWorkHour, BaseInfoBase, ExpenseAllocation, DepreciationAllocation, \
-    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord, ProductionWage
+    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord, ProductionWage, \
+    V_Profit_Summary
 from app01.utils.form import WorkHourFormSet, ExpenseAllocationForm, DepreciationAllocationForm, LossReportForm, \
     SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm, SalesRecordForm, \
-    ExpenseAllocationModelForm
+    ExpenseAllocationModelForm, OutboundUploadForm
 from django.db.models.functions import Substr, TruncDate
 from django.utils import timezone
 from datetime import datetime, timedelta
-from django.db.models import Sum
-
-
+from django.db.models import Sum, Q
 
 from django.http import JsonResponse
 from django.db.models.functions import Substr
 
 from app01.utils.pagination import Pagination
-
 
 def autocomplete(request):
     print(request.GET)
@@ -446,17 +445,17 @@ def customer_delete(request, nid):
     return redirect('/customer/list/')
 
 def outbound_list(request):
+    """出库记录列表"""
     search_data = request.GET.get('q', "")
+    queryset = OutboundRecord.objects.all()
     if search_data:
-        queryset = OutboundRecord.objects.filter(公司__contains=search_data)
-    else:
-        queryset = OutboundRecord.objects.all()
+        queryset = queryset.filter(公司__contains=search_data)
 
     page_object = Pagination(request, queryset)
     context = {
         "search_data": search_data,
-        "queryset": page_object.page_queryset,  # 分完页的数据
-        "page_string": page_object.html()  # 页码
+        "queryset": page_object.page_queryset,  # 分页后的数据
+        "page_string": page_object.html()  # 分页HTML
     }
     return render(request, 'outbound_list.html', context)
 
@@ -486,6 +485,7 @@ def outbound_edit(request, nid):
     return render(request, 'outbound_form.html', {"form": form, "title": "编辑出库记录"})
 
 def outbound_delete(request, nid):
+    """删除出库记录"""
     OutboundRecord.objects.filter(id=nid).delete()
     return redirect('/outbound/list/')
 
@@ -497,7 +497,7 @@ def add_sales_record(request, outbound_id):
         if form.is_valid():
             sales_record = form.save(commit=False)
             sales_record.出库记录 = outbound_record
-            if sales_record.数量 <= outbound_record.数量 - sum([sr.数量 for sr in outbound_record.sales_records.all()]):
+            if sales_record.数量 <= outbound_record.数量_筐 - sum([sr.数量 for sr in outbound_record.sales_records.all()]):
                 sales_record.save()
                 return redirect('outbound_list')
             else:
@@ -538,7 +538,7 @@ def sales_record_add(request, outbound_id):
 
             # 检查销售数量是否超过出库数量
             total_sales_quantity = sum(record.数量 for record in outbound_record.sales_records.all()) + sales_record.数量
-            if total_sales_quantity > outbound_record.数量:
+            if total_sales_quantity > outbound_record.数量_筐:
                 form.add_error('数量', '销售数量不能超过出库数量')
             else:
                 sales_record.save()
@@ -567,16 +567,22 @@ def sales_record_delete(request, pk):
 
 # 单独管理销售记录的视图函数
 def sales_record_management_list(request):
+    """销售记录列表"""
+    data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        queryset = SalesRecord.objects.filter(客户__contains=search_data)
-    else:
-        queryset = SalesRecord.objects.all()
+        data_dict["客户__icontains"] = search_data
+
+    queryset = SalesRecord.objects.filter(**data_dict).order_by("-id")
+    page_object = Pagination(request, queryset)  # 使用分页功能
+
     context = {
         "search_data": search_data,
-        "queryset": queryset,
+        "queryset": page_object.page_queryset,  # 分页后的数据
+        "page_string": page_object.html()  # 页码
     }
     return render(request, 'sales_record_management_list.html', context)
+
 
 def sales_record_management_add(request):
     if request.method == 'POST':
@@ -837,6 +843,28 @@ def expense_allocation_delete(request, nid):
     ExpenseAllocation.objects.filter(id=nid).delete()
     return redirect('/expense_allocation/list/')
 
+# 利润
+def profit_summary(request):
+    # 获取查询参数
+    search_data = request.GET.get('q', "")
 
+    # 获取时间区间参数
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
 
+    # 基于时间区间筛选数据
+    queryset = V_Profit_Summary.objects.all()
+    if start_date and end_date:
+        queryset = queryset.filter(批次__range=[start_date, end_date])
+
+    # 分页处理
+    page_object = Pagination(request, queryset)
+
+    context = {
+        "search_data": search_data,
+        "queryset": page_object.page_queryset,  # 分页后的数据
+        "page_string": page_object.html()  # 页码
+    }
+
+    return render(request, 'profit_summary.html', context)
 

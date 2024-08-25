@@ -1,4 +1,6 @@
 import os
+
+from babel.dates import parse_date
 from django.conf import settings
 from django.shortcuts import render, HttpResponse, redirect
 from app01 import models
@@ -6,6 +8,7 @@ import pandas as pd
 import openpyxl
 
 from app01.utils.database import data_to_db
+from app01.utils.form import OutboundUploadForm, SalesRecordUploadForm
 
 
 def upload_list(request):
@@ -30,7 +33,8 @@ def upload_list(request):
 
 from django import forms
 from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
-from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch, ExpenseAllocation
+from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch, ExpenseAllocation, \
+    OutboundRecord, Vehicle, Market, SalesRecord
 
 
 class UpForm(BootStrapForm):
@@ -354,5 +358,114 @@ def upload_expense_allocation(request):
 
     return redirect('/expense_allocation/list/')
 
+def outbound_upload(request):
+    """上传出库记录"""
+    if request.method == "GET":
+        form = OutboundUploadForm()
+        return render(request, 'upload_outbound_from.html', {"form": form, "title": "上传出库记录"})
+
+    form = OutboundUploadForm(data=request.POST, files=request.FILES)
+
+    if form.is_valid():
+        df = pd.read_excel(form.cleaned_data['excel_file'])
+
+        # 处理NaN值，将其替换为0或其他合适的默认值
+        df = df.fillna({
+            '运送数量': 0,
+            '数量_筐': 0,
+            '重量_kg': 0,
+            '盖布_块': 0,
+            '备注': '',
+            '挑菜': '',
+            '客户': ''
+        })
+
+        records = df.to_dict(orient='records')
+
+        for record in records:
+            OutboundRecord.objects.update_or_create(
+                批次=record['批次'],
+                defaults={
+                    '日期': record['日期'],
+                    '运送数量': record['运送数量'],
+                    '车牌': record['车牌'],  # 直接保存车牌号
+                    '公司': record['公司'],
+                    '市场': record['市场'],  # 直接保存市场名称
+                    '品类': record['品类'],
+                    '品种': record['品种'],
+                    '规格': record['规格'],
+                    '单位': record['单位'],
+                    '数量_筐': record['数量_筐'],
+                    '重量_kg': record['重量_kg'],
+                    '地块': record['地块'],
+                    '盖布_块': record['盖布_块'],
+                    '备注': record['备注'],
+                    '挑菜': record['挑菜'],
+                    '客户': record['客户'],
+                }
+            )
+
+        # 成功上传后跳转到列表页
+        return redirect('/outbound/list/')
+    return render(request, 'upload_outbound_from.html', {"form": form, "title": "上传出库记录"})
 
 
+def upload_sales_record(request):
+    if request.method == "POST":
+        form = SalesRecordUploadForm(request.POST, request.FILES)
+        if form.is_valid():
+            # 读取上传的Excel文件
+            excel_file = form.cleaned_data['excel_file']
+            df = pd.read_excel(excel_file)
+
+            # 遍历每一行数据并创建或更新 SalesRecord 对象
+            for _, row in df.iterrows():
+                # 根据批次号查找出库记录
+                outbound_record = OutboundRecord.objects.filter(批次=row['批次']).first()
+                if outbound_record:
+                    # 处理日期字段
+                    sales_date = None
+                    payment_date = None
+
+                    try:
+                        if pd.notna(row['销售日期']):
+                            sales_date = parse_date(str(row['销售日期']))
+                    except Exception as e:
+                        print(f"销售日期解析错误: {e}")
+
+                    try:
+                        if pd.notna(row['收款日期']):
+                            payment_date = parse_date(str(row['收款日期']))
+                    except Exception as e:
+                        print(f"收款日期解析错误: {e}")
+
+                    # 创建或更新销售记录
+                    SalesRecord.objects.update_or_create(
+                        出库记录=outbound_record,
+                        批次=row['批次'],  # 根据批次号查找
+                        defaults={
+                            '销售日期': sales_date,
+                            '客户': row['客户'],
+                            '数量': row['数量'],
+                            '单价': row['单价'],
+                            '金额': row['金额'],
+                            '应收金额': row['应收金额'],
+                            '实收金额': row['实收金额'],
+                            '备注': row['备注'],
+                            '收款日期': payment_date,
+                            '销售人员': row['销售人员'],
+                            '单位': row['单位'],
+                            '规格': row['规格'],
+                            '收款方式': row['收款方式'],
+                        }
+                    )
+                else:
+                    # 处理找不到对应出库记录的情况，可以记录错误或跳过
+                    print(f"找不到批次号为 {row['批次']} 的出库记录")
+
+                    # 成功后重定向到出库记录列表页面
+                return redirect('outbound_list')
+    else:
+        form = SalesRecordUploadForm()
+
+    return render(request, 'upload_sales_record.html', {'form': form})

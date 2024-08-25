@@ -18,10 +18,12 @@ from django.urls import path, re_path
 from django.views.static import serve
 from django.conf import settings
 
+from app01.mobile.views import mobile_login, mobile_home, mobile_logout, mobile_gongshiluru
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report
-from app01.views.upload import upload_depreciation_excel, upload_expense_allocation
+from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
+    upload_sales_record
 from app01.views.views import create_expense_allocation, expense_allocation_list, expense_allocation_add, \
     expense_allocation_edit, expense_allocation_delete, depreciation_allocation_list, depreciation_allocation_add, \
     depreciation_allocation_edit, depreciation_allocation_delete, loss_report_list, loss_report_add, loss_report_edit, \
@@ -30,8 +32,7 @@ from app01.views.views import create_expense_allocation, expense_allocation_list
     market_add, market_edit, market_delete, customer_list, customer_add, customer_edit, customer_delete, \
     add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
     outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
-    plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details
-
+    plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details, profit_summary
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -206,14 +207,18 @@ urlpatterns = [
     path('customer/<int:nid>/edit/', customer_edit, name='customer_edit'),
     path('customer/<int:nid>/delete/', customer_delete, name='customer_delete'),
     # 出库
+
+
     path('outbound/list/', outbound_list, name='outbound_list'),
     path('outbound/add/', outbound_add, name='outbound_add'),
     path('outbound/edit/<int:nid>/', outbound_edit, name='outbound_edit'),
     path('outbound/delete/<int:nid>/', outbound_delete, name='outbound_delete'),
+    path('upload/outbound/', outbound_upload, name='outbound_upload'),
+
+
     path('get_sales_records/', get_sales_records, name='get_sales_records'),
     path('add_sale_form/', add_sale_form, name='add_sale_form'),
-    path('fetch_unique_second_level_categories/', fetch_unique_second_level_categories,
-         name='fetch_unique_second_level_categories'),
+    path('fetch_unique_second_level_categories/', fetch_unique_second_level_categories, name='fetch_unique_second_level_categories'),
     path('sales_record/add/<int:outbound_id>/', sales_record_add, name='sales_record_add'),
     path('sales_record/edit/<int:pk>/', sales_record_edit, name='sales_record_edit'),
     path('sales_record/delete/<int:pk>/', sales_record_delete, name='sales_record_delete'),
@@ -225,7 +230,7 @@ urlpatterns = [
          name='sales_record_management_edit'),
     path('sales_record/management/<int:pk>/delete/', views.sales_record_management_delete,
          name='sales_record_management_delete'),
-
+    path('upload/sales_record/', upload_sales_record, name='upload_sales_record'),
     # 日历显示种植批次
     path('Plant_batch/calendar/', views.plant_batch_calendar_view, name='plant_batch_calendar_view'),
 
@@ -246,5 +251,14 @@ urlpatterns = [
     path('expense_allocation/<int:nid>/delete/', expense_allocation_delete, name='expense_allocation_delete'),
     path('upload/expense_allocation/', upload_expense_allocation, name='upload_expense_allocation'),
 
+    # 利润
+    path('profit_summary/', profit_summary, name='profit_summary_list'),
+
+
+    path('mobile_login/', mobile_login, name='mobile_login'),
+    path('mobile/home/', mobile_home, name='mobile_home'),
+    path('mobile/logout/', mobile_logout, name='mobile_logout'),
+    # 手机端工时录入
+    path('mobile/gongshiluru/', mobile_gongshiluru, name='mobile_gongshiluru'),
 
 ]

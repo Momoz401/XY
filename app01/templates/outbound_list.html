@@ -7,6 +7,14 @@
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 添加出库记录
             </a>
+            <a class="btn btn-primary" href="{% url 'outbound_upload' %}">
+                <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+                上传出库记录
+            </a>
+            <a class="btn btn-primary" href="{% url 'upload_sales_record' %}">
+    <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+    上传销售记录
+</a>
             <div style="float: right;width: 300px;">
                 <form method="get">
                     <div class="input-group">
@@ -32,18 +40,22 @@
                         <tr>
                             <th>ID</th>
                             <th>日期</th>
+                            <th>运送数量</th>
                             <th>车牌</th>
                             <th>公司</th>
                             <th>市场</th>
-                            <th>一级分类</th>
-                            <th>二级分类</th>
+                            <th>品类</th>
+                            <th>品种</th>
                             <th>规格</th>
                             <th>单位</th>
-                            <th>数量</th>
-                            <th>重量</th>
-                            <th>批次</th>
+                            <th>数量/筐</th>
+                            <th>重量/kg</th>
                             <th>地块</th>
+                            <th>批次</th>
+                            <th>盖布/块</th>
                             <th>备注</th>
+                            <th>挑菜</th>
+                            <th>客户</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -52,18 +64,22 @@
                             <tr>
                                 <td>{{ obj.id }}</td>
                                 <td>{{ obj.日期 }}</td>
+                                <td>{{ obj.运送数量 }}</td>
                                 <td>{{ obj.车牌 }}</td>
                                 <td>{{ obj.公司 }}</td>
                                 <td>{{ obj.市场 }}</td>
-                                <td>{{ obj.一级分类 }}</td>
-                                <td>{{ obj.二级分类 }}</td>
+                                <td>{{ obj.品类 }}</td>
+                                <td>{{ obj.品种 }}</td>
                                 <td>{{ obj.规格 }}</td>
                                 <td>{{ obj.单位 }}</td>
-                                <td id="outbound-quantity-{{ obj.id }}">{{ obj.数量 }}</td>
-                                <td>{{ obj.重量 }}</td>
-                                <td>{{ obj.批次 }}</td>
+                                <td>{{ obj.数量_筐 }}</td>
+                                <td>{{ obj.重量_kg }}</td>
                                 <td>{{ obj.地块 }}</td>
+                                <td>{{ obj.批次 }}</td>
+                                <td>{{ obj.盖布_块 }}</td>
                                 <td>{{ obj.备注 }}</td>
+                                <td>{{ obj.挑菜 }}</td>
+                                <td>{{ obj.客户 }}</td>
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="{% url 'outbound_edit' obj.id %}">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="{% url 'outbound_delete' obj.id %}">删除</a>
@@ -71,7 +87,7 @@
                                 </td>
                             </tr>
                             <tr id="sales-records-{{ obj.id }}" style="display: none;">
-                                <td colspan="15">
+                                <td colspan="18">
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
@@ -80,10 +96,15 @@
                                                     <th>批次</th>
                                                     <th>客户</th>
                                                     <th>数量</th>
+                                                    <th>单位</th>
+                                                    <th>规格</th>
                                                     <th>单价</th>
                                                     <th>金额</th>
                                                     <th>应收金额</th>
                                                     <th>实收金额</th>
+                                                    <th>收款日期</th>
+                                                    <th>销售人员</th>
+                                                    <th>收款方式</th>
                                                     <th>备注</th>
                                                     <th>操作</th>
                                                 </tr>
@@ -95,10 +116,15 @@
                                                         <td>{{ record.批次 }}</td>
                                                         <td>{{ record.客户 }}</td>
                                                         <td class="sales-quantity">{{ record.数量 }}</td>
+                                                        <td>{{ record.单位 }}</td>
+                                                        <td>{{ record.规格 }}</td>
                                                         <td>{{ record.单价 }}</td>
                                                         <td>{{ record.金额 }}</td>
                                                         <td>{{ record.应收金额 }}</td>
                                                         <td>{{ record.实收金额 }}</td>
+                                                        <td>{{ record.收款日期 }}</td>
+                                                        <td>{{ record.销售人员 }}</td>
+                                                        <td>{{ record.收款方式 }}</td>
                                                         <td>{{ record.备注 }}</td>
                                                         <td>
                                                             <a class="btn btn-primary btn-xs" href="{% url 'sales_record_edit' record.id %}">编辑</a>
@@ -155,26 +181,6 @@
                 toggleButton.innerText = '查看销售记录';
             }
         }
-
-        function validateSalesQuantity(outboundId, salesQuantity) {
-            var totalSalesQuantity = salesQuantity;
-            var outboundQuantity = parseFloat(document.getElementById('outbound-quantity-' + outboundId).innerText);
-            document.querySelectorAll('#sales-records-' + outboundId + ' .sales-quantity').forEach(function(element) {
-                totalSalesQuantity += parseFloat(element.innerText);
-            });
-            return totalSalesQuantity <= outboundQuantity;
-        }
-
-        document.querySelectorAll('form').forEach(function(form) {
-            form.addEventListener('submit', function(event) {
-                var outboundId = form.dataset.outboundId;
-                var salesQuantity = parseFloat(form.querySelector('input[name="数量"]').value);
-                if (!validateSalesQuantity(outboundId, salesQuantity)) {
-                    alert('销售数量不能超过出库数量');
-                    event.preventDefault();
-                }
-            });
-        });
 
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelectorAll('[id^="sales-records-"]').forEach(function(element) {

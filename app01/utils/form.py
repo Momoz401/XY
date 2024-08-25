@@ -23,6 +23,27 @@ class UserModelForm(BootStrapModelForm):
         fields = ["name", "password", "age", 'account', 'create_time', "gender", "depart"]
 
 
+from django import forms
+from app01.utils.bootstrap import BootStrapForm
+from app01.utils.encrypt import md5
+
+class MobileLoginForm(BootStrapForm):
+    username = forms.CharField(
+        label="用户名",
+        widget=forms.TextInput,
+        required=True
+    )
+    password = forms.CharField(
+        label="密码",
+        widget=forms.PasswordInput(render_value=True),
+        required=True
+    )
+
+    def clean_password(self):
+        pwd = self.cleaned_data.get("password")
+        return md5(pwd)
+
+
 class PrettyModelForm(BootStrapModelForm):
     # 验证：方式1
     mobile = forms.CharField(
@@ -345,8 +366,6 @@ class DynamicFieldsForm(forms.ModelForm):
         return cleaned_data
 
 
-
-
 from django.forms import modelformset_factory
 
 DynamicFieldsFormSet = modelformset_factory(ProductionWage, form=DynamicFieldsForm, extra=1)
@@ -420,11 +439,29 @@ class OutboundRecordForm(BootStrapModelForm):
 class SalesRecordForm(BootStrapModelForm):
     class Meta:
         model = SalesRecord
-        fields = ['客户', '数量', '单价', '金额', '应收金额', '实收金额', '备注']
-
-
-# 费用分摊
-class ExpenseAllocationModelForm(BootStrapModelForm):
+        fields = [
+            '客户',
+            '数量',
+            '单价',
+            '金额',
+            '应收金额',
+            '实收金额',
+            '收款日期',  # 新增字段
+            '销售人员',  # 新增字段
+            '单位',      # 新增字段
+            '规格',      # 新增字段
+            '收款方式',  # 新增字段
+            '备注'
+        ]
+class ExpenseAllocationModelForm(forms.ModelForm):
     class Meta:
         model = ExpenseAllocation
         fields = "__all__"
+
+
+class OutboundUploadForm(forms.Form):
+    excel_file = forms.FileField(label="上传Excel文件")
+
+
+class SalesRecordUploadForm(forms.Form):
+    excel_file = forms.FileField(label="上传销售记录")

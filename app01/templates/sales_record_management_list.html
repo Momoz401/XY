@@ -27,39 +27,57 @@
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                 销售记录列表
             </div>
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>客户</th>
-                    <th>数量</th>
-                    <th>单价</th>
-                    <th>金额</th>
-                    <th>应收金额</th>
-                    <th>实收金额</th>
-                    <th>备注</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for record in queryset %}
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
                     <tr>
-                        <td>{{ record.id }}</td>
-                        <td>{{ record.客户 }}</td>
-                        <td>{{ record.数量 }}</td>
-                        <td>{{ record.单价 }}</td>
-                        <td>{{ record.金额 }}</td>
-                        <td>{{ record.应收金额 }}</td>
-                        <td>{{ record.实收金额 }}</td>
-                        <td>{{ record.备注 }}</td>
-                        <td>
-                            <a class="btn btn-primary btn-xs" href="{% url 'sales_record_management_edit' record.pk %}">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="{% url 'sales_record_management_delete' record.pk %}">删除</a>
-                        </td>
+                        <th>ID</th>
+                        <th>出库记录</th>
+                        <th>批次</th>
+                        <th>销售日期</th>
+                        <th>客户</th>
+                        <th>数量</th>
+                        <th>单位</th>
+                        <th>规格</th>
+                        <th>单价</th>
+                        <th>金额</th>
+                        <th>应收金额</th>
+                        <th>实收金额</th>
+                        <th>收款日期</th>
+                        <th>销售人员</th>
+                        <th>收款方式</th>
+                        <th>备注</th>
+                        <th>操作</th>
                     </tr>
-                {% endfor %}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for record in queryset %}
+                        <tr>
+                            <td>{{ record.id }}</td>
+                            <td>{{ record.出库记录 }}</td>
+                            <td>{{ record.批次 }}</td>
+                            <td>{{ record.销售日期 }}</td>
+                            <td>{{ record.客户 }}</td>
+                            <td>{{ record.数量 }}</td>
+                            <td>{{ record.单位 }}</td>
+                            <td>{{ record.规格 }}</td>
+                            <td>{{ record.单价 }}</td>
+                            <td>{{ record.金额 }}</td>
+                            <td>{{ record.应收金额 }}</td>
+                            <td>{{ record.实收金额 }}</td>
+                            <td>{{ record.收款日期 }}</td>
+                            <td>{{ record.销售人员 }}</td>
+                            <td>{{ record.收款方式 }}</td>
+                            <td>{{ record.备注 }}</td>
+                            <td>
+                                <a class="btn btn-primary btn-xs" href="{% url 'sales_record_management_edit' record.pk %}">编辑</a>
+                                <a class="btn btn-danger btn-xs" href="{% url 'sales_record_management_delete' record.pk %}">删除</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="clearfix">
             <ul class="pagination">

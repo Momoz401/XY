@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>工时录入</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h4 class="text-center">工时录入</h4>
+        <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+                {{ fixed_form.as_p }}
+            </div>
+            <div class="mb-3">
+                {{ formset.as_p }}
+            </div>
+            <button type="submit" class="btn btn-primary w-100">提交</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function() {
+            // 当一级分类改变时，更新二级分类
+            $('#id_一级分类').change(function() {
+                var 一级分类ID = $(this).val();
+                $.ajax({
+                    url: '/get_secondary_category/',  // 需要在后端实现这个URL
+                    data: {
+                        '一级分类ID': 一级分类ID
+                    },
+                    success: function(data) {
+                        var 二级分类Select = $('#id_二级分类');
+                        二级分类Select.empty();
+                        $.each(data, function(key, value) {
+                            二级分类Select.append($('<option></option>').attr('value', key).text(value));
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
