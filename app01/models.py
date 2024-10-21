@@ -32,31 +32,20 @@ class UserInfo(models.Model):
     name = models.CharField(verbose_name="姓名", max_length=16)
     password = models.CharField(verbose_name="密码", max_length=64)
     age = models.IntegerField(verbose_name="年龄")
-    account = models.DecimalField(verbose_name="账户余额", max_digits=10, decimal_places=2, default=0)
-    # create_time = models.DateTimeField(verbose_name="入职时间")
-    create_time = models.DateField(verbose_name="入职时间")
+    salary = models.DecimalField(verbose_name="工资", max_digits=10, decimal_places=2, default=0, null=True, blank=True)
+    create_time = models.DateField(verbose_name="入职时间", null=True, blank=True)
+    depart = models.ForeignKey(verbose_name="部门", to="Department", to_field="id", on_delete=models.CASCADE, null=True, blank=True)
 
-    # 无约束
-    # depart_id = models.BigIntegerField(verbose_name="部门ID")
-    # 1.有约束
-    #   - to，与那张表关联
-    #   - to_field，表中的那一列关联
-    # 2.django自动
-    #   - 写的depart
-    #   - 生成数据列 depart_id
-    # 3.部门表被删除
-    # ### 3.1 级联删除
-    depart = models.ForeignKey(verbose_name="部门", to="Department", to_field="id", on_delete=models.CASCADE)
-    # ### 3.2 置空
-    # depart = models.ForeignKey(to="Department", to_field="id", null=True, blank=True, on_delete=models.SET_NULL)
-
-    # 在django中做的约束
     gender_choices = (
         (1, "男"),
         (2, "女"),
     )
-    gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices)
+    gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices, null=True, blank=True)
+    phone = models.CharField(verbose_name="手机号码", max_length=20, null=True, blank=True)
+    bank_account = models.CharField(verbose_name="银行卡号", max_length=64, null=True, blank=True)
 
+    def __str__(self):
+        return self.name
 
 class PrettyNum(models.Model):
     """ 靓号表 """
@@ -819,3 +808,35 @@ class V_Profit_Summary(models.Model):
     class Meta:
         managed = False  # Django不管理这个模型
         db_table = 'V_Profit_Summary'  # 对应的数据库视图名
+
+
+
+# 分类表
+class JobCategoryInfo(models.Model):
+    LEVEL_CHOICES = (
+        (1, "一级分类"),
+        (2, "二级分类"),
+    )
+
+    category_name = models.CharField(verbose_name="分类名称", max_length=50)
+    category_level = models.IntegerField(verbose_name="分类级别", choices=LEVEL_CHOICES)
+    parent_category = models.ForeignKey('self', verbose_name="父分类", null=True, blank=True, on_delete=models.CASCADE, related_name="subcategories")
+
+    def __str__(self):
+        return self.category_name
+
+
+# 工种表
+class JobTypeDetailInfo(models.Model):
+    CATEGORY_CHOICES = (
+        (1, "一级工种"),
+        (2, "二级工种"),
+    )
+
+    job_name = models.CharField(verbose_name="工种名称", max_length=50)
+    job_level = models.IntegerField(verbose_name="工种级别", choices=CATEGORY_CHOICES)
+    parent_job = models.ForeignKey('self', verbose_name="父工种", null=True, blank=True, on_delete=models.CASCADE, related_name="sub_work_types")
+    job_category = models.ForeignKey(JobCategoryInfo, verbose_name="所属二级分类", on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.job_name

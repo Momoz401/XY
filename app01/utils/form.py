@@ -13,14 +13,14 @@ from app01.utils.bootstrap import BootStrapModelForm
 
 class UserModelForm(BootStrapModelForm):
     name = forms.CharField(
-        min_length=3,
+        min_length=2,
         label="用户名",
         widget=forms.TextInput(attrs={"class": "form-control"})
     )
 
     class Meta:
         model = models.UserInfo
-        fields = ["name", "password", "age", 'account', 'create_time', "gender", "depart"]
+        fields = ["name", "password", "age", "salary", "create_time", "gender", "depart", "phone", "bank_account"]
 
 
 from django import forms
@@ -101,7 +101,7 @@ class work_type_ModelForm(BootStrapModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # 获取所有工种级别为1的工种，构建成选择框的选项
-        level_one_choices = BaseInfoWorkType.objects.filter(工种级别=1).values_list('分类名称', '分类名称')
+        level_one_choices = BaseInfoWorkType.objects.filter(分类级别=1).values_list('分类名称', '分类名称')
         # 添加一个空的选项，表示可以为空
         choices = [('', '')] + list(level_one_choices)
         self.fields['父分类'].choices = choices

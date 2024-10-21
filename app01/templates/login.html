@@ -1,59 +1,86 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+<!--begin::Head-->
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link rel="stylesheet" href="{% static 'plugins/bootstrap-3.4.1/css/bootstrap.min.css' %}">
-    <style>
-        .account {
-            width: 400px;
-            border: 1px solid #dddddd;
-            border-radius: 5px;
-            box-shadow: 5px 5px 20px #aaa;
-
-            margin-left: auto;
-            margin-right: auto;
-            margin-top: 100px;
-            padding: 20px 40px;
-        }
-
-        .account h2 {
-            margin-top: 10px;
-            text-align: center;
-        }
-    </style>
+    {% load static %}
+    <base href="/" />
+    <title>泰兴欢迎你</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!--begin::Fonts-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,400,500,600,700" />
+    <!--end::Fonts-->
+    <!--begin::Global Stylesheets Bundle-->
+    <link href="{% static 'assets/plugins/global/plugins.bundle.css' %}" rel="stylesheet" type="text/css" />
+    <link href="{% static 'assets/css/style.bundle.css' %}" rel="stylesheet" type="text/css" />
+    <!--end::Global Stylesheets Bundle-->
 </head>
-<body>
-<div class="account">
-    <h2>用户登录</h2>
-    <form method="post" novalidate>
-        {% csrf_token %}
-        <div class="form-group">
-            <label>用户名</label>
-            {{ form.username }}
-            <span style="color: red;">{{ form.username.errors.0 }}</span>
-        </div>
-        <div class="form-group">
-            <label>密码</label>
-            {{ form.password }}
-            <span style="color: red;">{{ form.password.errors.0 }}</span>
-        </div>
-        <div class="form-group">
-            <label for="id_code">图片验证码</label>
-            <div class="row">
-                <div class="col-xs-7">
-                    {{ form.code }}
-                    <span style="color: red;">{{ form.code.errors.0 }}</span>
-                </div>
-                <div class="col-xs-5">
-                    <img id="image_code" src="/image/code/" style="width: 125px;">
-                </div>
+<!--end::Head-->
+<!--begin::Body-->
+<body id="kt_body" class="auth-bg bgi-size-cover bgi-attachment-fixed bgi-position-center">
+    <!--begin::Main-->
+    <div class="d-flex flex-column flex-root">
+        <!--begin::Page bg image-->
+        <style>body { background-image: url('{% static 'assets/media/auth/bg10.jpeg' %}'); }</style>
+        <!--end::Page bg image-->
+        <div class="d-flex flex-column flex-lg-row flex-column-fluid">
+            <!--begin::Image-->
+            <div class="d-flex flex-lg-row-fluid d-none d-lg-flex align-items-center justify-content-center">
+                <img src="{% static 'assets/media/auth/login.jpg' %}" alt="Login Image" class="mw-100 mh-100" style="max-width: 300px; max-height: 700px;">
             </div>
-        </div>
-        <input type="submit" value="登 录" class="btn btn-primary">
-    </form>
-</div>
+            <!--end::Image-->
 
+            <!--begin::Body-->
+            <div class="d-flex flex-column-fluid flex-lg-row-auto justify-content-center justify-content-lg-end p-12">
+                <!--begin::Wrapper-->
+                <div class="bg-body d-flex flex-column flex-center rounded-4 w-md-600px p-10">
+                    <!--begin::Content-->
+                    <div class="d-flex flex-center flex-column align-items-stretch h-lg-100 w-md-400px">
+                        <div class="d-flex flex-center flex-column flex-column-fluid pb-15 pb-lg-20">
+                            <!--begin::Form-->
+                            <form class="form w-100" method="POST" action="{% url 'login' %}">
+                                {% csrf_token %}
+                                <div class="text-center mb-11">
+                                    <h1 class="text-gray-900 fw-bolder mb-3">登录</h1>
+                                    <div class="text-gray-500 fw-semibold fs-6">请输入您的账户信息</div>
+                                </div>
+
+                                <!-- 错误信息显示 -->
+                                {% if error_message %}
+                                    <div class="alert alert-danger">
+                                        {{ error_message }}
+                                    </div>
+                                {% endif %}
+
+                                <!--begin::Input group-->
+                                <div class="fv-row mb-8">
+                                    <input type="text" placeholder="用户名" name="username" autocomplete="off" class="form-control bg-transparent" required/>
+                                </div>
+                                <div class="fv-row mb-3">
+                                    <input type="password" placeholder="密码" name="password" autocomplete="off" class="form-control bg-transparent" required/>
+                                </div>
+                                <!--end::Input group-->
+                                <!--begin::Submit button-->
+                                <div class="d-grid mb-10">
+                                    <button type="submit" class="btn btn-primary">登录</button>
+                                </div>
+                                <!--end::Submit button-->
+                            </form>
+                            <!--end::Form-->
+                        </div>
+                    </div>
+                    <!--end::Content-->
+                </div>
+                <!--end::Wrapper-->
+            </div>
+            <!--end::Body-->
+        </div>
+    </div>
+    <!--end::Main-->
+    <!--begin::Javascript-->
+    <script src="{% static 'assets/plugins/global/plugins.bundle.js' %}"></script>
+    <script src="{% static 'assets/js/scripts.bundle.js' %}"></script>
+    <!--end::Javascript-->
 </body>
+<!--end::Body-->
 </html>
