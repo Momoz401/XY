@@ -7,7 +7,7 @@ from django.core.exceptions import ValidationError
 from django import forms
 
 from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage, ExpenseAllocation, DepreciationAllocation, \
-    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord
+    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord,DailyPriceReport
 from app01.utils.bootstrap import BootStrapModelForm
 
 
@@ -465,3 +465,24 @@ class OutboundUploadForm(forms.Form):
 
 class SalesRecordUploadForm(forms.Form):
     excel_file = forms.FileField(label="上传销售记录")
+
+
+from app01.models import JobCategoryInfo, JobTypeDetailInfo
+
+class JobCategoryInfoModelForm(BootStrapModelForm):
+    class Meta:
+        model = JobCategoryInfo
+        fields = "__all__"
+
+class JobTypeDetailInfoModelForm(BootStrapModelForm):
+    class Meta:
+        model = JobTypeDetailInfo
+        fields = "__all__"
+
+
+# forms.py
+
+class DailyPriceReportForm(forms.ModelForm):
+    class Meta:
+        model = DailyPriceReport
+        fields = ['日期', '品种', '市场', '价格']

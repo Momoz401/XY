@@ -21,7 +21,9 @@ from django.conf import settings
 from app01.mobile.views import mobile_login, mobile_home, mobile_logout, mobile_gongshiluru
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
-    WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report
+    WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
+    daily_price_report_views
+from app01.views.daily_price_report_views import daily_price_report
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
     upload_sales_record
 from app01.views.views import create_expense_allocation, expense_allocation_list, expense_allocation_add, \
@@ -260,5 +262,20 @@ urlpatterns = [
     path('mobile/logout/', mobile_logout, name='mobile_logout'),
     # 手机端工时录入
     path('mobile/gongshiluru/', mobile_gongshiluru, name='mobile_gongshiluru'),
+
+    # 分类相关的 URL 路由
+    path('job_category/list/', views.job_category_list, name='job_category_list'),
+    path('job_category/add/', views.job_category_add, name='job_category_add'),
+    path('job_category/<int:pk>/edit/', views.job_category_edit, name='job_category_edit'),
+
+    # 工种相关的 URL 路由
+    path('job_type/list/', job_type_views.job_type_list, name='job_type_list'),
+    path('job_type/add/', job_type_views.job_type_add, name='job_type_add'),
+    path('job_type/<int:pk>/edit/', job_type_views.job_type_edit, name='job_type_edit'),
+    path('job_type/<int:pk>/delete/', job_type_views.job_type_delete, name='job_type_delete'),
+
+    # 每日价格录入相关的 URL 路由
+    path('daily_price_report/',daily_price_report, name='daily_price_report'),
+
 
 ]

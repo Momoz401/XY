@@ -5,12 +5,13 @@ from django.http import JsonResponse
 from django.template.defaultfilters import floatformat
 from django.template.loader import render_to_string
 
+from app01 import models
 from app01.models import Plant_batch, BaseInfoWorkHour, BaseInfoBase, ExpenseAllocation, DepreciationAllocation, \
     LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord, ProductionWage, \
-    V_Profit_Summary
+    V_Profit_Summary, JobCategoryInfo
 from app01.utils.form import WorkHourFormSet, ExpenseAllocationForm, DepreciationAllocationForm, LossReportForm, \
     SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm, SalesRecordForm, \
-    ExpenseAllocationModelForm, OutboundUploadForm
+    ExpenseAllocationModelForm, OutboundUploadForm, JobCategoryInfoModelForm, JobTypeDetailInfoModelForm
 from django.db.models.functions import Substr, TruncDate
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -867,4 +868,48 @@ def profit_summary(request):
     }
 
     return render(request, 'profit_summary.html', context)
+
+
+
+# 分类列表
+def job_category_list(request):
+    categories = models.JobCategoryInfo.objects.all()
+    return render(request, 'job_category_list.html', {"categories": categories})
+
+# 添加分类
+def job_category_add(request):
+    if request.method == "POST":
+        form = JobCategoryInfoModelForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('/job_category/list/')
+    else:
+        form = JobCategoryInfoModelForm()
+
+    parent_categories = JobCategoryInfo.objects.filter(category_level=1)
+    return render(request, 'job_category_add.html', {'form': form, 'parent_categories': parent_categories})
+
+# 编辑分类
+def job_category_edit(request, pk):
+    category = get_object_or_404(models.JobCategoryInfo, pk=pk)
+    # 获取所有一级分类，用于二级分类选择父分类
+    parent_categories = models.JobCategoryInfo.objects.filter(category_level=1)  # 获取所有一级分类
+
+    if request.method == "GET":
+        form = JobCategoryInfoModelForm(instance=category)
+        return render(request, 'job_category_edit.html', {
+            "form": form,
+            "parent_categories": parent_categories,
+        })
+
+    form = JobCategoryInfoModelForm(request.POST, instance=category)
+    if form.is_valid():
+        form.save()
+        return redirect('/job_category/list/')
+
+    return render(request, 'job_category_edit.html', {
+        "form": form,
+        "parent_categories": parent_categories,
+    })
+
 
