@@ -23,7 +23,10 @@ from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
     daily_price_report_views
+
 from app01.views.daily_price_report_views import daily_price_report
+from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
+
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
     upload_sales_record
 from app01.views.views import create_expense_allocation, expense_allocation_list, expense_allocation_add, \
@@ -34,7 +37,9 @@ from app01.views.views import create_expense_allocation, expense_allocation_list
     market_add, market_edit, market_delete, customer_list, customer_add, customer_edit, customer_delete, \
     add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
     outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
-    plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details, profit_summary
+    plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details, profit_summary, \
+    daily_price_report_list, daily_price_report_edit, daily_price_report_delete
+from app01.views.views_daily_plan import daily_plan_list, daily_plan_create, daily_plan_edit, daily_plan_delete
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -275,7 +280,22 @@ urlpatterns = [
     path('job_type/<int:pk>/delete/', job_type_views.job_type_delete, name='job_type_delete'),
 
     # 每日价格录入相关的 URL 路由
-    path('daily_price_report/',daily_price_report, name='daily_price_report'),
+    path('daily_price_report/add/',daily_price_report, name='daily_price_report_add'),
+    path('daily_price_report/list/', daily_price_report_list, name='daily_price_report_list'),
+    path('daily_price_report/<int:pk>/edit/', daily_price_report_edit, name='daily_price_report_edit'),
+    path('daily_price_report/<int:pk>/delete/', daily_price_report_delete, name='daily_price_report_delete'),
 
+
+    # 月度计划
+    path('monthly_plan/', monthly_plan_list, name='monthly_plan_list'),
+    path('monthly_plan/add/', monthly_plan_create, name='monthly_plan_create'),
+    path('monthly_plan/edit/<int:pk>/', monthly_plan_edit, name='monthly_plan_edit'),
+    path('monthly_plan/delete/<int:pk>/', monthly_plan_delete, name='monthly_plan_delete'),
+
+    # ri度计划
+    path('daily_plan/', daily_plan_list, name='daily_plan_list'),
+    path('daily_plan/add/', daily_plan_create, name='daily_plan_create'),
+    path('daily_plan/<str:pk>/edit/', daily_plan_edit, name='daily_plan_edit'),
+    path('daily_plan/delete/<str:batch_id>/', daily_plan_delete, name='daily_plan_delete'),
 
 ]

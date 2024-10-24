@@ -8,10 +8,11 @@ from django.template.loader import render_to_string
 from app01 import models
 from app01.models import Plant_batch, BaseInfoWorkHour, BaseInfoBase, ExpenseAllocation, DepreciationAllocation, \
     LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord, ProductionWage, \
-    V_Profit_Summary, JobCategoryInfo
+    V_Profit_Summary, JobCategoryInfo, DailyPriceReport
 from app01.utils.form import WorkHourFormSet, ExpenseAllocationForm, DepreciationAllocationForm, LossReportForm, \
     SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm, SalesRecordForm, \
-    ExpenseAllocationModelForm, OutboundUploadForm, JobCategoryInfoModelForm, JobTypeDetailInfoModelForm
+    ExpenseAllocationModelForm, OutboundUploadForm, JobCategoryInfoModelForm, JobTypeDetailInfoModelForm, \
+    DailyPriceReportForm
 from django.db.models.functions import Substr, TruncDate
 from django.utils import timezone
 from datetime import datetime, timedelta
@@ -913,3 +914,52 @@ def job_category_edit(request, pk):
     })
 
 
+# 每日价格上报列表
+
+
+# 每日价格上报列表
+def daily_price_report_list(request):
+    """每日价格上报列表"""
+    data_dict = {}
+    search_data = request.GET.get('q', "")
+    if search_data:
+        data_dict["品种__category_name__icontains"] = search_data
+
+    # 根据查询条件过滤数据并排序
+    queryset = DailyPriceReport.objects.filter(**data_dict).order_by("-id")
+
+    # 使用自定义分页类
+    page_object = Pagination(request, queryset)
+
+    context = {
+        "search_data": search_data,
+        "queryset": page_object.page_queryset,  # 分页后的数据
+        "page_string": page_object.html()  # 页码
+    }
+    return render(request, 'daily_price_report_list.html', context)
+
+
+def daily_price_report_edit(request, pk):
+    """编辑每日价格上报"""
+    report = get_object_or_404(DailyPriceReport, pk=pk)
+
+    if request.method == 'POST':
+        form = DailyPriceReportForm(request.POST, instance=report)
+        if form.is_valid():
+            form.save()
+            return redirect('daily_price_report_list')  # 假设您的列表页面路径名称为 daily_price_report_list
+    else:
+        form = DailyPriceReportForm(instance=report)
+
+    context = {
+        'form': form,
+        'report': report,
+    }
+    return render(request, 'daily_price_report_edit.html', context)
+
+
+def daily_price_report_delete(request, pk):
+    """删除每日价格上报"""
+    report = get_object_or_404(DailyPriceReport, pk=pk)
+    report.delete()
+    return redirect('daily_price_report_list')

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from django.utils import timezone
 
@@ -121,7 +121,7 @@ class BaseInfoBase(models.Model):
     基地经理 = models.CharField(max_length=255)
     面积 = models.FloatField(null=True, blank=True)
     def __str__(self):
-        return self.基地经理
+        return self.代号
 
 class BaseInfoProduct(models.Model):
     品类iD = models.AutoField(primary_key=True)
@@ -855,3 +855,29 @@ class DailyPriceReport(models.Model):
 
     def __str__(self):
         return f"{self.日期} - {self.品种} - {self.市场}"
+
+
+
+class MonthlyPlan(models.Model):
+    日期 = models.DateField()
+    二级分类 = models.ForeignKey(JobCategoryInfo, on_delete=models.CASCADE)
+    面积 = models.DecimalField(max_digits=10, decimal_places=2)
+    周期 = models.IntegerField()
+    基地 = models.CharField(max_length=255)
+    地块 = models.CharField(max_length=255)
+
+# 日计划
+class DailyPlan(models.Model):
+    批次ID = models.CharField(max_length=100, primary_key=True, verbose_name="批次 ID")
+    基地经理 = models.CharField(max_length=255, verbose_name="基地经理")
+    地块 = models.CharField(max_length=255, verbose_name="地块")
+    面积 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="面积")
+    种植日期 = models.DateField(verbose_name="种植日期")
+    生长周期 = models.IntegerField(verbose_name="生长周期", help_text="单位为天")
+    采收期 = models.IntegerField(verbose_name="采收期", help_text="单位为天")
+    采收初期 = models.DateField(verbose_name="采收初期", null=True, blank=True)
+    采收末期 = models.DateField(verbose_name="采收末期", null=True, blank=True)
+    备注 = models.TextField(verbose_name="备注", null=True, blank=True)
+
+    def __str__(self):
+        return self.批次ID

@@ -7,7 +7,8 @@ from django.core.exceptions import ValidationError
 from django import forms
 
 from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage, ExpenseAllocation, DepreciationAllocation, \
-    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord,DailyPriceReport
+    LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord, DailyPriceReport, MonthlyPlan, \
+    BaseInfoBase, DailyPlan
 from app01.utils.bootstrap import BootStrapModelForm
 
 
@@ -482,7 +483,18 @@ class JobTypeDetailInfoModelForm(BootStrapModelForm):
 
 # forms.py
 
-class DailyPriceReportForm(forms.ModelForm):
+class DailyPriceReportForm(BootStrapModelForm):
     class Meta:
         model = DailyPriceReport
         fields = ['日期', '品种', '市场', '价格']
+
+class MonthlyPlanForm(BootStrapModelForm):
+    class Meta:
+        model = MonthlyPlan
+        fields = ['日期', '二级分类', '面积', '周期', '基地', '地块']
+
+
+class DailyPlanForm(BootStrapModelForm):
+    class Meta:
+        model = DailyPlan
+        fields = ['基地经理', '地块', '面积', '生长周期', '采收期', '备注']

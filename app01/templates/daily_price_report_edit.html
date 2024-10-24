@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <h2>编辑每日价格上报</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-success">保存</button>
+        <a class="btn btn-secondary" href="{% url 'daily_price_report_list' %}">取消</a>
+    </form>
+</div>
+{% endblock %}

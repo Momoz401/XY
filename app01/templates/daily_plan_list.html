@@ -1,0 +1,99 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container">
+        <div style="margin-bottom: 10px" class="clearfix">
+            <a class="btn btn-success" href="{% url 'daily_plan_create' %}">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                新建日计划
+            </a>
+            <div style="float: right; width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <input type="date" name="date" class="form-control" placeholder="按种植日期搜索..."
+                               value="{{ search_date }}">
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+                日计划列表
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>批次ID</th>
+                            <th>种植日期</th>
+                            <th>基地经理</th>
+                            <th>地块</th>
+                            <th>面积</th>
+                            <th>采收初期</th>
+                            <th>采收末期</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plan in plans %}
+                            <tr>
+                                <td>{{ plan.批次ID }}</td>
+                                <td>{{ plan.种植日期 }}</td>
+                                <td>{{ plan.基地经理 }}</td>
+                                <td>{{ plan.地块 }}</td>
+                                <td>{{ plan.面积 }}</td>
+                                <td>{{ plan.采收初期 }}</td>
+                                <td>{{ plan.采收末期 }}</td>
+                                <td>
+                                    <a class="btn btn-primary btn-xs" href="{% url 'daily_plan_edit' plan.批次ID %}">编辑</a>
+                                    <a class="btn btn-danger btn-xs" href="{% url 'daily_plan_delete' plan.批次ID %}">删除</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="8">没有找到相关的日计划数据</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 分页控件 -->
+        <div class="clearfix">
+            <ul class="pagination">
+                {{ page_string|safe }}  <!-- 使用你自定义的分页控件HTML -->
+            </ul>
+        </div>
+    </div>
+
+    <style>
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+{% endblock %}
