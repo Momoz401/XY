@@ -1,0 +1,16 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <div class="container">
+        <h2>未达成反馈</h2>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="feedback">反馈信息：</label>
+                <textarea id="feedback" name="feedback" class="form-control" rows="5" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">提交反馈</button>
+            <a href="{% url 'monthly_plan_rate' %}" class="btn btn-secondary">取消</a>
+        </form>
+    </div>
+{% endblock %}

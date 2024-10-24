@@ -865,7 +865,8 @@ class MonthlyPlan(models.Model):
     周期 = models.IntegerField()
     基地 = models.CharField(max_length=255)
     地块 = models.CharField(max_length=255)
-
+   # 添加反馈字段
+    未达成反馈 = models.TextField(verbose_name="未达成反馈", null=True, blank=True)
 # 日计划
 class DailyPlan(models.Model):
     批次ID = models.CharField(max_length=100, primary_key=True, verbose_name="批次 ID")

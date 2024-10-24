@@ -1,6 +1,7 @@
 from datetime import date, datetime
 
 from django.core.paginator import Paginator
+from django.db.models.functions import TruncMonth
 from django.shortcuts import render, redirect, get_object_or_404
 from app01.models import MonthlyPlan, JobCategoryInfo, BaseInfoBase
 from app01.utils.form import MonthlyPlanForm
@@ -11,10 +12,19 @@ from app01.utils.pagination import Pagination
 # 显示月度计划列表（带分页和搜索功能）
 def monthly_plan_list(request):
     data_dict = {}
-    search_data = request.GET.get('q', "")
+    selected_month = request.GET.get('month', "")
 
-    if search_data:
-        data_dict["二级分类__category_name__icontains"] = search_data  # 搜索二级分类
+    # 获取数据库中所有的唯一月份
+    months = MonthlyPlan.objects.annotate(month=TruncMonth('日期')).values_list('month', flat=True).distinct()
+
+    # 如果用户选择了月份，则进行过滤
+    if selected_month:
+        try:
+            search_year, search_month = selected_month.split('-')
+            data_dict["日期__year"] = int(search_year)
+            data_dict["日期__month"] = int(search_month)
+        except ValueError:
+            pass  # 如果输入格式不正确，可以忽略这个搜索，或给出提示
 
     # 根据查询条件过滤数据并排序
     queryset = MonthlyPlan.objects.filter(**data_dict).order_by("-id")
@@ -23,11 +33,13 @@ def monthly_plan_list(request):
     page_object = Pagination(request, queryset)
 
     context = {
-        "search_data": search_data,
+        "selected_month": selected_month,
+        "months": months,  # 将所有的月份传递给前端
         "queryset": page_object.page_queryset,  # 分页后的数据
         "page_string": page_object.html()  # 页码
     }
     return render(request, 'monthly_plan_list.html', context)
+
 # 创建新的月度计划
 
 

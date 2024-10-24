@@ -26,6 +26,7 @@ from app01.views import depart, user, pretty, admin, account, task, order, chart
 
 from app01.views.daily_price_report_views import daily_price_report
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
+from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
 
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
     upload_sales_record
@@ -297,5 +298,11 @@ urlpatterns = [
     path('daily_plan/add/', daily_plan_create, name='daily_plan_create'),
     path('daily_plan/<str:pk>/edit/', daily_plan_edit, name='daily_plan_edit'),
     path('daily_plan/delete/<str:batch_id>/', daily_plan_delete, name='daily_plan_delete'),
+
+
+    # 月度计划实现
+    path('monthly_plan_rate/', monthly_plan_rate, name='monthly_plan_rate'), #显示
+    path('monthly_plan/download/', monthly_plan_download, name='monthly_plan_download'),  # 下载月度计划
+    path('monthly_plan/feedback/<int:plan_id>/', plan_feedback, name='feedback'),  # 未达成反馈
 
 ]

@@ -3,25 +3,32 @@
 
 {% block content %}
     <div class="container">
-        <div style="margin-bottom: 10px" class="clearfix">
-            <a class="btn btn-success" href="{% url 'monthly_plan_create' %}">
-                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                新建月度计划
-            </a>
-            <div style="float: right; width: 300px;">
-                <form method="get">
-                    <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="搜索二级分类..."
-                               value="{{ search_data }}">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="submit">
-                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                </form>
-            </div>
+    <div style="margin-bottom: 10px" class="clearfix">
+        <a class="btn btn-success" href="{% url 'monthly_plan_create' %}">
+            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+            新建月度计划
+        </a>
+        <div style="float: right; width: 300px;">
+            <form method="get">
+                <div class="input-group">
+                    <!-- 下拉菜单显示数据库中的日期选项 -->
+                    <select name="month" class="form-control">
+                        <option value="">选择月份...</option>
+                        {% for month in months %}
+                            <option value="{{ month|date:"Y-m" }}" {% if selected_month == month|date:"Y-m" %}selected{% endif %}>
+                                {{ month|date:"Y年m月" }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                    </span>
+                </div>
+            </form>
         </div>
+    </div>
 
         <div class="panel panel-default">
             <div class="panel-heading">
