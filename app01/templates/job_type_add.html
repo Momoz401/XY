@@ -9,6 +9,7 @@
             <div class="panel-body">
                 <form method="post">
                     {% csrf_token %}
+
                     <div class="form-group">
                         <label>工种名称</label>
                         <input type="text" class="form-control" placeholder="工种名称" name="job_name" />
@@ -29,14 +30,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label>所属二级分类</label>
-                        <select class="form-control" name="job_category">
-                            {% for category in job_categories %}
-                                <option value="{{ category.id }}">{{ category.category_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+
                     <button type="submit" class="btn btn-primary">提交</button>
                     <a href="/job_type/list/" class="btn btn-default">取消</a>
                 </form>

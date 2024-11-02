@@ -1,8 +1,6 @@
 {% extends 'layout.html' %}
 
-
 {% block content %}
-
     <div class="container">
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -31,38 +29,55 @@
                             </ul>
                         </div>
                     {% endif %}
-                    <button type="submit" class="btn btn-primary">提 交</button>
+                    <button type="submit" class="btn btn-primary">提交</button>
                 </form>
             </div>
         </div>
     </div>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#id_一级分类').change(function () {
-                var selectedValue = $('#id_一级分类').val();
-                //alert(selectedValue)
-                $.ajax({
-                    url: '/get_second_level_categories/',
-                    type: 'GET',
-                    data: {
-                        'id': selectedValue
-                    },
-                    success: function (data) {
 
-                        $('#id_二级分类').empty();
-                        $.each(data, function (key, value) {
-                            $('#id_二级分类').append($('<option></option>').attr('value', key).text(value));
-                        });
-                    },
-                    error: function (xhr, status, error) {
-                        console.log("Ajax请求失败:", error);
-                    }
-                });
+<script type="text/javascript">
+$(document).ready(function () {
+ // 在前端的 JS 代码中，检查二级分类的动态加载
+$('#id_一级分类').change(function () {
+    var selectedValue = $(this).val();
+    $.ajax({
+        url: '/get_second_level_categories/',
+        type: 'GET',
+        data: {
+            'id': selectedValue
+        },
+        success: function (data) {
+            $('#id_二级分类').empty();
+            $.each(data, function (index, item) {
+                $('#id_二级分类').append($('<option></option>').attr('value', item.id).text(item.category_name));
             });
-        });
-    </script>
+        },
+        error: function (xhr, status, error) {
+            console.log("Ajax请求失败:", error);
+        }
+    });
+});
 
-
-
-
+// 对应二级工种的动态加载
+$('#id_一级工种').change(function () {
+    var selectedValue = $(this).val();
+    $.ajax({
+        url: '/get_second_level_jobs/',
+        type: 'GET',
+        data: {
+            'id': selectedValue
+        },
+        success: function (data) {
+            $('#id_二级工种').empty();
+            $.each(data, function (index, item) {
+                $('#id_二级工种').append($('<option></option>').attr('value', item.id).text(item.job_name));
+            });
+        },
+        error: function (xhr, status, error) {
+            console.log("Ajax请求失败:", error);
+        }
+    });
+});
+});
+</script>
 {% endblock %}

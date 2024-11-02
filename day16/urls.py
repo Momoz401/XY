@@ -23,8 +23,10 @@ from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
     daily_price_report_views
+from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
 
 from app01.views.daily_price_report_views import daily_price_report
+
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
 from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
 
@@ -88,7 +90,6 @@ urlpatterns = [
     path('get_productionwate/', productionwage.get_productionwate), # ajax获得价格和类型
     path('get_productionwate_price/', productionwage.get_productionwate_price),  # ajax获得价格和类型
     path('get_Plant_batch_dk/', productionwage.get_Plant_batch_dk),  # ajax获得地块
-    path('get_second_level_categories/', WorkHour.get_second_level_categories),  # ajax二级类型和类型
 
 
     # 工价管理
@@ -97,6 +98,11 @@ urlpatterns = [
     path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),
     path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),
     path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工价批量上传
+
+    # 获取二级分类和工种的 Ajax 请求 URL
+    path('get_second_level_categories/',get_second_level_categories,
+         name='get_second_level_categories'),
+    path('get_second_level_jobs/', get_second_level_jobs, name='get_second_level_jobs'),
 
     # 农资管理
     path('Agricureture/list/', agriculturecost.agriculture_cost_list),
@@ -215,15 +221,11 @@ urlpatterns = [
     path('customer/<int:nid>/edit/', customer_edit, name='customer_edit'),
     path('customer/<int:nid>/delete/', customer_delete, name='customer_delete'),
     # 出库
-
-
     path('outbound/list/', outbound_list, name='outbound_list'),
     path('outbound/add/', outbound_add, name='outbound_add'),
     path('outbound/edit/<int:nid>/', outbound_edit, name='outbound_edit'),
     path('outbound/delete/<int:nid>/', outbound_delete, name='outbound_delete'),
     path('upload/outbound/', outbound_upload, name='outbound_upload'),
-
-
     path('get_sales_records/', get_sales_records, name='get_sales_records'),
     path('add_sale_form/', add_sale_form, name='add_sale_form'),
     path('fetch_unique_second_level_categories/', fetch_unique_second_level_categories, name='fetch_unique_second_level_categories'),
@@ -279,6 +281,7 @@ urlpatterns = [
     path('job_type/add/', job_type_views.job_type_add, name='job_type_add'),
     path('job_type/<int:pk>/edit/', job_type_views.job_type_edit, name='job_type_edit'),
     path('job_type/<int:pk>/delete/', job_type_views.job_type_delete, name='job_type_delete'),
+    # 根据二级分类获取父工种
 
     # 每日价格录入相关的 URL 路由
     path('daily_price_report/add/',daily_price_report, name='daily_price_report_add'),

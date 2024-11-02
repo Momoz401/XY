@@ -144,23 +144,59 @@ class BaseInfoWorkType(models.Model):
         return self.分类名称 if self.分类名称 else 'Unnamed Category'
 
 
-
-
-
 class BaseInfoWorkHour(models.Model):
     工种ID = models.AutoField(primary_key=True)
-    工种 = models.CharField(max_length=255)
+    一级工种 = models.ForeignKey(
+        'JobTypeDetailInfo',
+        verbose_name="一级工种",
+        on_delete=models.CASCADE,
+        related_name="一级工种",
+        limit_choices_to={'job_level': 1},  # 仅限一级工种
+        null=True,
+        blank=True
+    )
+    二级工种 = models.ForeignKey(
+        'JobTypeDetailInfo',
+        verbose_name="二级工种",
+        on_delete=models.CASCADE,
+        related_name="二级工种",
+        limit_choices_to={'job_level': 2},  # 仅限二级工种
+        null=True,
+        blank=True
+    )
+
     单价 = models.DecimalField(max_digits=10, decimal_places=2, null=True)
     单位 = models.CharField(max_length=255, null=True)
     备注 = models.CharField(max_length=50, null=True)
-    一级分类 = models.CharField(max_length=255, null=True)
-    二级分类 = models.CharField(max_length=255, null=True)
+
+    一级分类 = models.ForeignKey(
+        'JobCategoryInfo',
+        verbose_name="一级分类",
+        on_delete=models.CASCADE,
+        related_name="一级分类",
+        limit_choices_to={'category_level': 1},  # 仅限一级分类
+        null=True,
+        blank=True
+    )
+
+    二级分类 = models.ForeignKey(
+        'JobCategoryInfo',
+        verbose_name="二级分类",
+        on_delete=models.CASCADE,
+        related_name="二级分类",
+        limit_choices_to={'category_level': 2},  # 仅限二级分类
+        null=True,
+        blank=True
+    )
+
     默认计入成本 = models.CharField(
         max_length=2,
         choices=[('是', '是'), ('否', '否')],
         default='是'
     )
 
+    def __str__(self):
+        return f"{self.一级工种.job_name} - {self.二级工种.job_name if self.二级工种 else ''}"
 
 class PlanPlantBatch(models.Model):
     ID = models.AutoField(primary_key=True)
@@ -720,7 +756,6 @@ class Customer(models.Model):
     def __str__(self):
         return self.客户名称
 
-
 class OutboundRecord(models.Model):
     日期 = models.DateField(null=True, default=timezone.now, verbose_name="日期")
     运送数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="运送数量")
@@ -746,10 +781,6 @@ class OutboundRecord(models.Model):
 
     def __str__(self):
         return f"{self.日期} - {self.车牌} - {self.公司}"
-
-
-
-
 class SalesRecord(models.Model):
     出库记录 = models.ForeignKey(OutboundRecord, on_delete=models.CASCADE, related_name='sales_records')
     批次 = models.CharField(max_length=255, verbose_name="批次", default=None)
@@ -774,7 +805,6 @@ class SalesRecord(models.Model):
 
     def __str__(self):
         return f"{self.客户} - {self.数量}"
-
 
 from django.db import models
 
@@ -809,8 +839,6 @@ class V_Profit_Summary(models.Model):
         managed = False  # Django不管理这个模型
         db_table = 'V_Profit_Summary'  # 对应的数据库视图名
 
-
-
 # 分类表
 class JobCategoryInfo(models.Model):
     LEVEL_CHOICES = (
@@ -825,8 +853,8 @@ class JobCategoryInfo(models.Model):
     def __str__(self):
         return self.category_name
 
-
 # 工种表
+# models.py
 class JobTypeDetailInfo(models.Model):
     CATEGORY_CHOICES = (
         (1, "一级工种"),
@@ -836,11 +864,9 @@ class JobTypeDetailInfo(models.Model):
     job_name = models.CharField(verbose_name="工种名称", max_length=50)
     job_level = models.IntegerField(verbose_name="工种级别", choices=CATEGORY_CHOICES)
     parent_job = models.ForeignKey('self', verbose_name="父工种", null=True, blank=True, on_delete=models.CASCADE, related_name="sub_work_types")
-    job_category = models.ForeignKey(JobCategoryInfo, verbose_name="所属二级分类", on_delete=models.CASCADE)
 
     def __str__(self):
         return self.job_name
-
 
 
 class DailyPriceReport(models.Model):
@@ -855,8 +881,6 @@ class DailyPriceReport(models.Model):
 
     def __str__(self):
         return f"{self.日期} - {self.品种} - {self.市场}"
-
-
 
 class MonthlyPlan(models.Model):
     日期 = models.DateField()

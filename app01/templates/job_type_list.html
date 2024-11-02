@@ -37,7 +37,7 @@
                             <th>工种名称</th>
                             <th>工种级别</th>
                             <th>父工种</th>
-                            <th>所属分类</th>
+
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -54,7 +54,7 @@
                                         无
                                     {% endif %}
                                 </td>
-                                <td>{{ job_type.job_category.category_name }}</td>
+
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="/job_type/{{ job_type.id }}/edit/">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="/job_type/{{ job_type.id }}/delete/">删除</a>

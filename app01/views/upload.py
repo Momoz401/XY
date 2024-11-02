@@ -34,7 +34,7 @@ def upload_list(request):
 from django import forms
 from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
 from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch, ExpenseAllocation, \
-    OutboundRecord, Vehicle, Market, SalesRecord
+    OutboundRecord, Vehicle, Market, SalesRecord, JobCategoryInfo, JobTypeDetailInfo
 
 
 class UpForm(BootStrapForm):
@@ -91,32 +91,54 @@ def upload_workhour_modal_form(request):
     title = "批量上传价格文件"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
+        return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
-        # 对于文件：自动保存；
-        # 字段 + 上传路径写入到数据库
-        # print(form.cleaned_data)
+        # 读取上传的 Excel 文件
         df = pd.read_excel(form.cleaned_data['excel_file'])
-        #print(df)
-        # data_to_db(df, 'tpx_hxb_province')
         records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
+
         for record in records:
+            # 获取或创建相关的一级分类和二级分类对象
+            一级分类_obj = JobCategoryInfo.objects.filter(category_name=record['一级分类'], category_level=1).first()
+            if not 一级分类_obj:
+                continue  # 如果没有找到对应的一级分类，跳过该记录
+
+            二级分类_obj = None
+            if '二级分类' in record and record['二级分类']:
+                二级分类_obj = JobCategoryInfo.objects.filter(category_name=record['二级分类'], category_level=2).first()
+                if not 二级分类_obj:
+                    continue  # 如果没有找到对应的二级分类，跳过该记录
+
+            # 获取或创建相关的一级工种和二级工种对象
+            一级工种_obj = JobTypeDetailInfo.objects.filter(job_name=record['一级工种'], job_level=1).first()
+            if not 一级工种_obj:
+                continue  # 如果没有找到对应的一级工种，跳过该记录
+
+            二级工种_obj = None
+            if '二级工种' in record and record['二级工种']:
+                二级工种_obj = JobTypeDetailInfo.objects.filter(job_name=record['二级工种'], job_level=2).first()
+                if not 二级工种_obj:
+                    continue  # 如果没有找到对应的二级工种，跳过该记录
+
+            # 创建或更新 BaseInfoWorkHour 对象
             obj, created = BaseInfoWorkHour.objects.update_or_create(
-                工种=record['工种'],
-                一级分类=record['一级分类'],
-                二级分类=record['二级分类'],
-                单位=record['单位'],
-                单价=record['单价'],
-                备注=record['备注'],
-                默认计入成本=record['默认计入成本'],
-                # 假设 'name' 是唯一标识相同记录的字段
-
+                工种ID=record.get('工种ID'),  # 假设 `工种ID` 是唯一标识
+                defaults={
+                    '一级分类': 一级分类_obj,
+                    '二级分类': 二级分类_obj,
+                    '一级工种': 一级工种_obj,
+                    '二级工种': 二级工种_obj,
+                    '单位': record['单位'],
+                    '单价': record['单价'],
+                    '备注': record['备注'],
+                    '默认计入成本': record['默认计入成本'],
+                }
             )
-        return redirect('/WorkHour/list/')
-    return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
 
+        return redirect('/WorkHour/list/')
+    return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
 # 工时工价上传
 def upload_productionwate_modal_form(request):
     """ 上传文件和数据（modelForm）"""

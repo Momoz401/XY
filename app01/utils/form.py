@@ -147,49 +147,56 @@ class baseInfoModelForm(BootStrapModelForm):
         return txt_mobile
 
 
-class workHourModelForm(BootStrapModelForm):
+class workHourModelForm(forms.ModelForm):
     class Meta:
-        model = models.BaseInfoWorkHour
-        # fields = "__all__"
-        # exclude = ['level']
-        fields = ['工种ID', '工种', '一级分类', '二级分类', '单价', '单位','默认计入成本','备注']
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # 获取所有工种级别为1的工种，构建成选择框的选项
-        level_one_choices = BaseInfoWorkType.objects.filter(分类级别=1).values_list('分类名称', '分类名称')
-        # 添加一个空的选项，表示可以为空
-        choices = list(level_one_choices)
-        self.fields['一级分类'].choices = choices
-        # 重新设置字段
-        self.fields['一级分类'] = forms.ChoiceField(choices=choices, required=True,
-                                                    widget=forms.Select(attrs={'class': 'form-control'}))
-        self.fields['二级分类'].choices = []
-        self.fields['二级分类'].widget = forms.Select(attrs={'class': 'form-control'})
+        model = BaseInfoWorkHour
+        fields = ['工种ID', '一级分类', '二级分类', '一级工种', '二级工种', '单价', '单位', '备注', '默认计入成本']
 
     def clean(self):
         cleaned_data = super().clean()
-        selected_work_type = cleaned_data.get('二级分类')
 
-        # print(selected_work_type)
-        # 获取工种选项的文本值
-        if selected_work_type:
-            corresponding_object = BaseInfoWorkType.objects.filter(工种级别=2, 工种ID=selected_work_type).first()
-            # print(corresponding_object.一级分类)
-            if corresponding_object:
-                # 保存选项的文本值
-                cleaned_data['二级分类'] = corresponding_object.分类名称
-                cleaned_data['一级分类'] = corresponding_object.父分类
-                # print(cleaned_data)
+        # 获取一级分类、二级分类、一级工种、二级工种的ID或实例
+        一级分类 = cleaned_data.get('一级分类')
+        二级分类 = cleaned_data.get('二级分类')
+        一级工种 = cleaned_data.get('一级工种')
+        二级工种 = cleaned_data.get('二级工种')
+
+        # 如果一级分类不是实例，则将其转换为 JobCategoryInfo 实例
+        if isinstance(一级分类, str) or isinstance(一级分类, int):
+            try:
+                cleaned_data['一级分类'] = JobCategoryInfo.objects.get(id=int(一级分类))
+            except JobCategoryInfo.DoesNotExist:
+                self.add_error('一级分类', '选择的一级分类无效')
+
+        # 如果二级分类不是实例，则将其转换为 JobCategoryInfo 实例
+        if isinstance(二级分类, str) or isinstance(二级分类, int):
+            try:
+                cleaned_data['二级分类'] = JobCategoryInfo.objects.get(id=int(二级分类))
+            except JobCategoryInfo.DoesNotExist:
+                self.add_error('二级分类', '选择的二级分类无效')
+
+        # 如果一级工种不是实例，则将其转换为 JobTypeDetailInfo 实例
+        if isinstance(一级工种, str) or isinstance(一级工种, int):
+            try:
+                cleaned_data['一级工种'] = JobTypeDetailInfo.objects.get(id=int(一级工种))
+            except JobTypeDetailInfo.DoesNotExist:
+                self.add_error('一级工种', '选择的一级工种无效')
+
+        # 如果二级工种不是实例，则将其转换为 JobTypeDetailInfo 实例
+        if isinstance(二级工种, str) or isinstance(二级工种, int):
+            try:
+                cleaned_data['二级工种'] = JobTypeDetailInfo.objects.get(id=int(二级工种))
+            except JobTypeDetailInfo.DoesNotExist:
+                self.add_error('二级工种', '选择的二级工种无效')
+
         return cleaned_data
-
 
 class workHour_Edit_ModelForm(BootStrapModelForm):
     class Meta:
         model = models.BaseInfoWorkHour
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['工种ID', '工种', '一级分类', '二级分类', '单价', '单位', '默认计入成本','备注']
+        fields =['工种ID', '一级工种', '二级工种', '单价', '单位', '备注', '一级分类', '二级分类', '默认计入成本']
 
 
 class production_wage_ModelForm(BootStrapModelForm):
@@ -296,7 +303,7 @@ from django.forms import modelformset_factory
 class WorkHourModelForm(forms.ModelForm):
     class Meta:
         model = BaseInfoWorkHour
-        fields = ['工种ID', '工种', '一级分类', '二级分类', '单价', '单位', '备注']
+        fields = ['工种ID', '一级工种', '二级工种', '单价', '单位', '备注', '一级分类', '二级分类', '默认计入成本']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

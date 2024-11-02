@@ -1,7 +1,7 @@
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from app01 import models
-from app01.models import BaseInfoWorkHour, BaseInfoWorkType
+from app01.models import BaseInfoWorkHour, BaseInfoWorkType, JobCategoryInfo, JobTypeDetailInfo
 
 from app01.utils.pagination import Pagination
 from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm
@@ -28,34 +28,6 @@ def Hour_list(request):
     return render(request, 'workhour.html', context)
 
 
-def WorkHour_add(request):
-    """ 添加工种 """
-    if request.method == "GET":
-        form = workHourModelForm()
-        return render(request, 'workhour_add.html', {"form": form})
-    form = workHourModelForm(data=request.POST)
-    # 限制一级工种只能从规定的类别列选择
-    if form.is_valid():
-        form.save()
-        return redirect('/WorkHour/list/')
-    return render(request, 'workhour_add.html', {"form": form})
-
-
-def get_second_level_categories(request):
-    if request.method == 'GET' :
-        # 解码参数
-        level_one_id = request.GET.get('id', None)
-        print(level_one_id)
-        # 根据一级分类 ID 获取相应的二级分类数据
-        if level_one_id is not None:
-            second_level_categories = BaseInfoWorkType.objects.filter(父分类=level_one_id).values_list('分类名称','分类名称')
-            print(JsonResponse(dict(second_level_categories)))
-            return JsonResponse(dict(second_level_categories))
-        else:
-            return JsonResponse({'error': '一级分类_id 参数缺失'}, status=400)
-    else:
-        return JsonResponse({'error': '无效请求'}, status=400)
-
 
 def work_hour_edit(request, nid):
     """ 编辑工时 """
@@ -76,3 +48,61 @@ def work_hour_edit(request, nid):
 def work_hour_delete(request, nid):
     models.BaseInfoWorkHour.objects.filter(工种ID=nid).delete()
     return redirect('/WorkHour/list/')
+
+
+def WorkHour_add(request):
+    """ 添加工种 """
+    if request.method == "GET":
+        form = workHourModelForm()
+        return render(request, 'workhour_add.html', {"form": form})
+
+    form = workHourModelForm(data=request.POST)
+
+    # 打印调试信息
+    print("POST 数据: ", request.POST)
+
+    # 验证表单是否有效
+    if form.is_valid():
+        # 打印清理后的数据
+        print("清理后的数据: ", form.cleaned_data)
+
+        form.save()
+        return redirect('/WorkHour/list/')
+    else:
+        # 如果表单无效，打印表单错误
+        print("表单错误: ", form.errors)
+
+    return render(request, 'workhour_add.html', {"form": form})
+
+def get_second_level_categories(request):
+    """ 根据一级分类动态加载二级分类 """
+    if request.method == 'GET':
+        level_one_id = request.GET.get('id', None)
+        if level_one_id:
+            second_level_categories = JobCategoryInfo.objects.filter(
+                parent_category_id=level_one_id, category_level=2).values('id', 'category_name')
+
+            if second_level_categories.exists():
+                return JsonResponse(list(second_level_categories), safe=False)
+            else:
+                return JsonResponse({'error': '没有找到对应的二级分类'}, status=404)
+        else:
+            return JsonResponse({'error': '一级分类 ID 缺失'}, status=400)
+    return JsonResponse({'error': '无效请求'}, status=400)
+
+
+def get_second_level_jobs(request):
+    """ 根据一级工种动态加载二级工种 """
+    if request.method == 'GET':
+        level_one_job_id = request.GET.get('id', None)
+        if level_one_job_id:
+            second_level_jobs = JobTypeDetailInfo.objects.filter(
+                parent_job_id=level_one_job_id, job_level=2).values('id', 'job_name')
+
+            if second_level_jobs.exists():
+                return JsonResponse(list(second_level_jobs), safe=False)
+            else:
+                return JsonResponse({'error': '没有找到对应的二级工种'}, status=404)
+        else:
+            return JsonResponse({'error': '一级工种 ID 缺失'}, status=400)
+    return JsonResponse({'error': '无效请求'}, status=400)
