@@ -1,66 +1,88 @@
-from django.http import JsonResponse
-from django.shortcuts import render, redirect
-from app01 import models
-from app01.models import BaseInfoWorkHour, BaseInfoWorkType,ProductionWage,Agriculture_cost
+from datetime import datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from app01.models import Plant_batch, BaseInfoBase, JobCategoryInfo
+from app01.utils.form import PlantBatchEditForm, PlantBatchCreateForm
 
 from app01.utils.pagination import Pagination
-from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm, production_wage_ModelForm, \
-    production_wage_Edit_ModelForm, agriculture_cost_ModelForm, agriculture_cost_Edit_ModelForm, Plant_batch_ModelForm
-
 
 def Plant_batch_list(request):
     """ 批次列表 """
-
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
         data_dict["批次ID__contains"] = search_data
 
-    queryset = models.Plant_batch.objects.filter(**data_dict)
-
+    queryset = Plant_batch.objects.filter(**data_dict)
     page_object = Pagination(request, queryset)
 
     context = {
         "search_data": search_data,
-
         "queryset": page_object.page_queryset,  # 分完页的数据
         "page_string": page_object.html()  # 页码
     }
     return render(request, 'Plant_batch.html', context)
 
-
+# 新增视图
 def Plant_batch_add(request):
-    """ 添加批次 """
     if request.method == "GET":
-        form =Plant_batch_ModelForm()
-        return render(request, 'Plant_batch_add.html', {"form": form})
-    form = Plant_batch_ModelForm(data=request.POST)
-    # 限制一级工种只能从规定的类别列选择
+        form = PlantBatchCreateForm()
+        bases = BaseInfoBase.objects.all()
+        job_categories = JobCategoryInfo.objects.filter(category_level=2)
+        return render(request, 'Plant_batch_add.html', {
+            "form": form,
+            "bases": bases,
+            "job_categories": job_categories
+        })
+
+    form = PlantBatchCreateForm(data=request.POST)
     if form.is_valid():
         form.save()
         return redirect('/Plant_batch/list/')
-    return render(request, 'Plant_batch.html', {"form": form})
 
+    bases = BaseInfoBase.objects.all()
+    job_categories = JobCategoryInfo.objects.filter(category_level=2)
+    return render(request, 'Plant_batch_add.html', {
+        "form": form,
+        "bases": bases,
+        "job_categories": job_categories
+    })
 
-
-
-
+# 编辑视图
 def Plant_batch_edit(request, nid):
-    """ 编辑工时 """
-    row_object = models.Plant_batch.objects.filter(ID=nid).first()
+    # 获取对应的批次对象，如果不存在则返回 404
+    row_object = get_object_or_404(Plant_batch, ID=nid)
 
     if request.method == "GET":
-        form = Plant_batch_ModelForm(instance=row_object)
-        return render(request, 'work_type_edit.html', {"form": form})
+        # 创建编辑表单实例并预填充当前数据
+        form = PlantBatchEditForm(instance=row_object)
 
-    form = Plant_batch_ModelForm(data=request.POST, instance=row_object)
+        # 获取所有基地和二级分类数据
+        bases = BaseInfoBase.objects.all()
+        job_categories = JobCategoryInfo.objects.filter(category_level=2)
+
+        return render(request, 'Plant_batch_edit.html', {
+            "form": form,
+            "bases": bases,
+            "job_categories": job_categories
+        })
+
+    # 提交后的表单处理
+    form = PlantBatchEditForm(data=request.POST, instance=row_object)
     if form.is_valid():
         form.save()
         return redirect('/Plant_batch/list/')
 
-    return render(request, 'Plant_batch.html', {"form": form})
+    # 如果表单验证失败，重新加载编辑页面
+    bases = BaseInfoBase.objects.all()
+    job_categories = JobCategoryInfo.objects.filter(category_level=2)
 
+    return render(request, 'Plant_batch_edit.html', {
+        "form": form,
+        "bases": bases,
+        "job_categories": job_categories
+    })
 
 def Plant_batch_delete(request, nid):
-    models.Plant_batch.objects.filter(ID=nid).delete()
+    """ 删除批次 """
+    Plant_batch.objects.filter(ID=nid).delete()
     return redirect('/Plant_batch/list/')

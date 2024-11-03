@@ -1,0 +1,23 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">编辑批次</h3>
+            </div>
+            <div class="panel-body">
+                <form method="post" id="plantBatchEditForm">
+                    {% csrf_token %}
+
+                    <!-- 使用 form.as_p 展示所有字段 -->
+                    {{ form.as_p }}
+
+
+
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

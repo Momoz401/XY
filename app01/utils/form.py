@@ -8,7 +8,7 @@ from django import forms
 
 from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage, ExpenseAllocation, DepreciationAllocation, \
     LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord, DailyPriceReport, MonthlyPlan, \
-    BaseInfoBase, DailyPlan
+    BaseInfoBase, DailyPlan, Plant_batch
 from app01.utils.bootstrap import BootStrapModelForm
 
 
@@ -277,30 +277,24 @@ class agriculture_cost_Edit_ModelForm(BootStrapModelForm):
         # exclude = ['level']
         fields = ['日期', '工种', '数量', '农资种类', '名称', '单价', '金额', '批次', '地块']
 
-
-class Plant_batch_ModelForm(BootStrapModelForm):
+# 新增时只显示部分字段
+class PlantBatchCreateForm(BootStrapModelForm):
     class Meta:
-        model = models.Plant_batch
-        # fields = "__all__"
-        # exclude = ['level']
-        fields = ['批次ID', '二级分类', '一级分类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期',
-                  '用籽量', '备注']
+        model = Plant_batch
+        fields = ['批次ID', '种植日期', '基地', '基地经理', '地块', '面积', '备注']  # 只显示需要的字段
 
-
-class Plant_batch_Edit_ModelForm(BootStrapModelForm):
+# 编辑时显示所有字段
+class PlantBatchEditForm(BootStrapModelForm):
     class Meta:
-        model = models.Plant_batch
-        # fields = "__all__"
-        # exclude = ['level']
-        fields = ['批次ID', '二级分类', '一级分类', '地块', '面积', '基地经理', '移栽日期', '移栽板量', '移栽数量', '点籽日期',
-                  '用籽量', '备注']
+        model = Plant_batch
+        fields = '__all__'  # 显示所有字段
 
 
 from django import forms
 from django.forms import modelformset_factory
 
 
-class WorkHourModelForm(forms.ModelForm):
+class WorkHourModelForm(BootStrapModelForm):
     class Meta:
         model = BaseInfoWorkHour
         fields = ['工种ID', '一级工种', '二级工种', '单价', '单位', '备注', '一级分类', '二级分类', '默认计入成本']

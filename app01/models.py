@@ -454,38 +454,56 @@ class Agriculture_cost(models.Model):
     地块 = models.CharField(max_length=255, null=True)
 
 
+from django.db import models
+from django.utils import timezone
+
+
 class Plant_batch(models.Model):
     ID = models.AutoField(primary_key=True)
-    批次ID = models.CharField(max_length=10, null=True,blank=True)
-    二级分类 = models.CharField(max_length=255, null=True,blank=True)
-    一级分类 = models.CharField(max_length=255, null=True,blank=True)
-    地块 = models.CharField(max_length=255, null=True,blank=True)
-    面积 = models.DecimalField(max_digits=10, decimal_places=2, null=True,blank=True)
+    批次ID = models.CharField(max_length=50, unique=True, null=True, blank=True)  # 生成的批次ID
+    二级分类 = models.CharField(max_length=255, null=True, blank=True)
+    一级分类 = models.CharField(max_length=255, null=True, blank=True)
+    基地 = models.CharField(max_length=255, null=True, blank=True)  # 新增的基地字段
+    地块 = models.CharField(max_length=255, null=True, blank=True)
+    面积 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     基地经理 = models.CharField(max_length=255, null=True, blank=True)
+    种植日期 = models.DateField(default=timezone.now, null=True, blank=True)  # 默认值为当天日期
     移栽日期 = models.DateField(null=True, blank=True)
     移栽板量 = models.FloatField(null=True, blank=True)
     移栽数量 = models.FloatField(null=True, blank=True)
     点籽日期 = models.DateField(null=True, blank=True)
     用籽量 = models.FloatField(null=True, blank=True)
-    备注 = models.CharField(max_length=255, null=True,blank=True)
+    备注 = models.CharField(max_length=255, null=True, blank=True)
     update_date = models.DateField(null=True, blank=True, default=timezone.now)
-    uploader = models.CharField(max_length=255, null=True)
-    生长周期 = models.DecimalField(max_digits=10, decimal_places=2, null=True,blank=True)
-    采收期 = models.CharField(max_length=255, null=True,blank=True)
-    采收初期 = models.DateField(null=True,blank=True)
-    采收末期 = models.DateField(null=True,blank=True)
-    周期批次 = models.CharField(max_length=255, null=True,blank=True)
-    总周期天数 = models.DecimalField(max_digits=10, decimal_places=2, null=True,blank=True)
-    销毁面积 = models.DecimalField(max_digits=10, decimal_places=2, null=True,blank=True)
-    销毁备注 = models.CharField(max_length=255, null=True,blank=True)
-    栽种方式 = models.CharField(max_length=255, null=True,blank=True)
-    正常产量 = models.DecimalField(max_digits=10, decimal_places=2, null=True,blank=True)
-    正常亩产 = models.DecimalField(max_digits=10, decimal_places=2, null=True,blank=True)
-    总产量 = models.DecimalField(max_digits=10, decimal_places=2, null=True,blank=True)
-    总亩产 = models.DecimalField(max_digits=10, decimal_places=2, null=True,blank=True)
-    下批前一天时间 = models.DateField(null=True,blank=True)
-    周期 = models.CharField(max_length=255, null=True,blank=True)
+    uploader = models.CharField(max_length=255, null=True, blank=True)
+    生长周期 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    采收期 = models.CharField(max_length=255, null=True, blank=True)
+    采收初期 = models.DateField(null=True, blank=True)
+    采收末期 = models.DateField(null=True, blank=True)
+    周期批次 = models.CharField(max_length=255, null=True, blank=True)
+    总周期天数 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    销毁面积 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    销毁备注 = models.CharField(max_length=255, null=True, blank=True)
+    栽种方式 = models.CharField(max_length=255, null=True, blank=True)
+    正常产量 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    正常亩产 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    总产量 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    总亩产 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    下批前一天时间 = models.DateField(null=True, blank=True)
+    周期 = models.CharField(max_length=255, null=True, blank=True)
 
+    def save(self, *args, **kwargs):
+        # 自动生成批次ID（如果尚未设置）
+        if not self.批次ID:
+            base_code = self.基地 if self.基地 else "BASE"
+            plant_date_str = self.种植日期.strftime('%Y%m%d') if self.种植日期 else "DATE"
+            category_name = self.二级分类 if self.二级分类 else "CAT"
+            self.批次ID = f"{base_code}-{plant_date_str}-{category_name}"
+
+        super().save(*args, **kwargs)  # 保存到数据库
+
+    def __str__(self):
+        return f"批次: {self.批次ID}, 种植日期: {self.种植日期}, 基地: {self.基地}, 面积: {self.面积}"
 
 class Salary_by_plople(models.Model):
     日期 = models.CharField(max_length=6)  # 假设日期字段已经是 "YYYYMM" 格式

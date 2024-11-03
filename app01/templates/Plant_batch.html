@@ -1,5 +1,6 @@
 {% extends 'layout.html' %}
-{% load static %} <!-- 确保加载了 static 模板标签 -->
+{% load static %}
+
 {% block content %}
     <div class="container">
         <div style="margin-bottom: 10px" class="clearfix">
@@ -11,18 +12,15 @@
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 新建导入
             </a>
-
-              <a class="btn btn-primary" href="{% static 'files/批次表上传模板.xlsx' %}" download>
+            <a class="btn btn-primary" href="{% static 'files/批次表上传模板.xlsx' %}" download>
                 <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
                 下载模板
             </a>
 
-
-            <div style="float: right;width: 300px;">
+            <div style="float: right; width: 300px;">
                 <form method="get">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search for..."
-                               value="{{ search_data }}">
+                        <input type="text" name="q" class="form-control" placeholder="Search for..." value="{{ search_data }}">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">
                                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -36,10 +34,10 @@
         <div class="panel panel-default">
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
-                工价列表
+                批次列表
             </div>
 
-            <div class="table-responsive"> <!-- 添加一个新的包含div -->
+            <div class="table-responsive">
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
                     <tr>
@@ -47,6 +45,8 @@
                         <th>批次ID</th>
                         <th>一级分类</th>
                         <th>二级分类</th>
+                        <th>基地</th>
+                        <th>种植日期</th>
                         <th>地块</th>
                         <th>面积</th>
                         <th>基地经理</th>
@@ -81,6 +81,8 @@
                             <td>{{ obj.批次ID }}</td>
                             <td>{{ obj.一级分类 }}</td>
                             <td>{{ obj.二级分类 }}</td>
+                            <td>{{ obj.基地 }}</td>
+                            <td>{{ obj.种植日期 }}</td>
                             <td>{{ obj.地块 }}</td>
                             <td>{{ obj.面积 }}</td>
                             <td>{{ obj.基地经理 }}</td>
@@ -134,13 +136,16 @@
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 6px;
             text-align: left;
-            white-space: nowrap; /* 防止换行 */
+            white-space: nowrap;
         }
         th {
             background-color: #f2f2f2;
-            line-height: 1.2; /* 调整行高 */
+            font-size: 12px;
+        }
+        td {
+            font-size: 12px;
         }
     </style>
 {% endblock %}
