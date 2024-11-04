@@ -1,7 +1,8 @@
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import render, redirect
 from app01 import models
-from app01.models import BaseInfoWorkHour, BaseInfoWorkType, ProductionWage, Plant_batch
+from app01.models import BaseInfoWorkHour, BaseInfoWorkType, ProductionWage, Plant_batch, JobCategoryInfo, \
+    JobTypeDetailInfo, BaseInfoBase
 
 from app01.utils.pagination import Pagination
 from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm, production_wage_ModelForm, \
@@ -28,6 +29,11 @@ def production_wage_list(request):
     }
     return render(request, 'productionwage.html', context)
 
+# 获得基地信息
+def get_base_options(request):
+    bases = BaseInfoBase.objects.values('代号', '基地')  # 使用实际的字段名称
+    base_options = {str(base['代号']): base['基地'] for base in bases}  # 将 ID 转换为字符串以符合 JSON 格式
+    return JsonResponse(base_options)
 
 def production_wage_add(request):
     if request.method == 'POST':
@@ -80,23 +86,30 @@ def get_productionwate(request):
     else:
         return JsonResponse({'error': '无效请求'}, status=400)
 #获得公价
-def get_productionwate_price(request):
-    if request.method == 'GET' :
-        # 解码参数
-        level_one_id = request.GET.get('one', None)
-        level_tow_id = request.GET.get('tow', None)
-        level_three_id = request.GET.get('three', None)
 
-        # 根据一级分类和二级分类活动工种和价格
-        if level_tow_id is not None:
-            work_type = BaseInfoWorkHour.objects.filter(一级分类=level_one_id,二级分类=level_tow_id,工种=level_three_id).values_list('工种ID', '单价')
-            # print(work_type)
-            return JsonResponse(dict(work_type))
+def get_productionwate_price(request):
+    if request.method == 'GET':
+        # 解码参数
+        second_category_name = request.GET.get('one', None)  # 二级分类
+        primary_work_type_name = request.GET.get('tow', None)  # 一级工种
+        secondary_work_type_name = request.GET.get('three', None)  # 二级工种
+
+        # 验证输入参数是否齐全
+        if second_category_name and primary_work_type_name and secondary_work_type_name:
+            # 根据二级分类、一级工种和二级工种查找工价
+            work_type = BaseInfoWorkHour.objects.filter(
+                二级分类__category_name=second_category_name,
+                一级工种__job_name=primary_work_type_name,
+                二级工种__job_name=secondary_work_type_name
+            ).values_list('工种ID', '单价')
+
+            # 将查询结果转换为字典格式
+            work_type_dict = {str(item[0]): item[1] for item in work_type}
+            return JsonResponse(work_type_dict)
         else:
-            return JsonResponse({'error': '一级分类_id 参数缺失'}, status=400)
+            return JsonResponse({'error': '参数缺失'}, status=400)
     else:
         return JsonResponse({'error': '无效请求'}, status=400)
-
 
 def get_Plant_batch_dk(request):
     if request.method == 'GET' :
@@ -113,10 +126,47 @@ def get_Plant_batch_dk(request):
     else:
         return JsonResponse({'error': '无效请求'}, status=400)
 
+def get_primary_work_types(request):
+    second_category_name = request.GET.get('second_category', None)
+    if second_category_name:
+        try:
+            # 获取二级分类ID
+            second_category_id = JobCategoryInfo.objects.get(category_name=second_category_name).id
 
+            # 查找对应的一级工种ID
+            work_types = BaseInfoWorkHour.objects.filter(二级分类_id=second_category_id).values('一级工种').distinct()
 
+            # 获取一级工种的中文名称
+            primary_work_type_names = [
+                JobTypeDetailInfo.objects.get(id=work_type['一级工种']).job_name
+                for work_type in work_types
+            ]
 
+            # 构造 JSON 响应
+            return JsonResponse(primary_work_type_names, safe=False)
 
+        except JobCategoryInfo.DoesNotExist:
+            return JsonResponse({'error': '未找到对应的二级分类'}, status=400)
+    return JsonResponse({'error': '无效请求'}, status=400)
+
+def get_secondary_work_types(request):
+    primary_work_type_name = request.GET.get('primary_work_type_name', '')
+
+    # 打印选择的一级工种名称
+    print(f"Selected Primary Work Type Name: {primary_work_type_name}")
+
+    # 查询父工种名称对应的工种
+    secondary_work_types = JobTypeDetailInfo.objects.filter(
+        parent_job__job_name=primary_work_type_name, job_level=2
+    ).values('id', 'job_name')
+
+    # 打印二级工种查询集
+    print(f"Secondary Work Types Queryset: {secondary_work_types}")
+
+    data = list(secondary_work_types)
+    print(f"Data to return: {data}")
+
+    return JsonResponse(data, safe=False)
 def productionwate_edit(request, nid):
     """ 编辑工时 """
     row_object = models.ProductionWage.objects.filter(id=nid).first()

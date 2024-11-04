@@ -4,11 +4,12 @@ from django.db import connection
 from django.http import JsonResponse
 from django.template.defaultfilters import floatformat
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_GET
 
 from app01 import models
 from app01.models import Plant_batch, BaseInfoWorkHour, BaseInfoBase, ExpenseAllocation, DepreciationAllocation, \
     LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord, ProductionWage, \
-    V_Profit_Summary, JobCategoryInfo, DailyPriceReport
+    V_Profit_Summary, JobCategoryInfo, DailyPriceReport, UserInfo
 from app01.utils.form import WorkHourFormSet, ExpenseAllocationForm, DepreciationAllocationForm, LossReportForm, \
     SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm, SalesRecordForm, \
     ExpenseAllocationModelForm, OutboundUploadForm, JobCategoryInfoModelForm, JobTypeDetailInfoModelForm, \
@@ -963,3 +964,15 @@ def daily_price_report_delete(request, pk):
     report = get_object_or_404(DailyPriceReport, pk=pk)
     report.delete()
     return redirect('daily_price_report_list')
+
+def employee_autocomplete(request):
+    if request.method == 'GET':
+        query = request.GET.get('term', '').strip()
+        if query:
+            employees = UserInfo.objects.filter(name__startswith=query).values_list('id', 'name', 'create_time')
+            employee_list = [{'id': emp[0], 'name': emp[1], 'birthdate': emp[2].strftime('%Y-%m-%d') if emp[2] else 'N/A'} for emp in employees]
+            return JsonResponse(employee_list, safe=False)
+        else:
+            return JsonResponse([], safe=False)
+    return JsonResponse({'error': 'Invalid request'}, status=400)
+

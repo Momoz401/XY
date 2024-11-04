@@ -29,6 +29,7 @@ from app01.views.daily_price_report_views import daily_price_report
 
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
 from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
+from app01.views.productionwage import get_primary_work_types, get_secondary_work_types, get_base_options
 
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
     upload_sales_record
@@ -80,7 +81,7 @@ urlpatterns = [
 
 
 
-    # 工时管理
+    # 工价管理
     path('production_wage_list/list/', productionwage.production_wage_list),
     path('productionwate/add/undefined/', productionwage.production_wage_list),
     path('productionwate/add/', productionwage.production_wage_add),
@@ -88,11 +89,14 @@ urlpatterns = [
     path('productionwate/<int:nid>/edit/', productionwage.productionwate_edit),
     path('upload/productionwate/', upload.upload_productionwate_modal_form),  # 工时批量上传
     path('get_productionwate/', productionwage.get_productionwate), # ajax获得价格和类型
+    path('get_base_options/', get_base_options, name='get_base_options'), #h 获得基地
     path('get_productionwate_price/', productionwage.get_productionwate_price),  # ajax获得价格和类型
     path('get_Plant_batch_dk/', productionwage.get_Plant_batch_dk),  # ajax获得地块
+    path('get_primary_work_types/', get_primary_work_types, name='get_primary_work_types'), # 获得一级工种
+    path('get_secondary_work_types/', get_secondary_work_types, name='get_secondary_work_types'),# 获得二级工种
 
 
-    # 工价管理
+    # 工时管理
     path('WorkHour/list/', WorkHour.Hour_list),
     path('WorkHour/add/', WorkHour.WorkHour_add),
     path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),
@@ -118,6 +122,7 @@ urlpatterns = [
     path('Plant_batch/<int:nid>/delete/', Plant_batch.Plant_batch_delete),
     path('upload/Plant_batch/', upload.upload_Plant_batch_modal_form),  # 工价批量上传
     # 实现自动补全功能
+    path('employee_autocomplete/', views.employee_autocomplete, name='employee_autocomplete'),
     path('autocomplete', views.autocomplete, name='autocomplete'),
     path('autocomplete_baseinfo/', views.autocomplete_baseinfo, name='autocomplete_baseinfo'),
     path('test/',views.add_multiple_work_hours),

@@ -30,47 +30,92 @@
     </div>
     <script type="text/javascript">
         $(document).ready(function () {
+            // 工人姓名补全
+            $('#id_工人').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "{% url 'employee_autocomplete' %}",
+                        dataType: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.name + " (" + item.birthdate + ")",
+                                    value: item.name  // 仅返回姓名
+                                };
+                            }));
+                        }
+                    });
+                },
+                minLength: 1
+            });
+
 
             // 计算工资函数
             function calculateSalary(prefix) {
-                var quantity = $('#' + prefix + '-数量').val();
-                var wage = $('#' + prefix + '-工价 option:selected').text();
+    var quantity = $('#' + prefix + '-数量').val();
+    var wage = $('#' + prefix + '-工价').val();  // 直接获取工价输入框的值
 
-                // 检查输入是否为数字
-                if ($.isNumeric(quantity) && $.isNumeric(wage)) {
-                    var salary = parseFloat(quantity) * parseFloat(wage);
-                    //alert(salary)
-                    salary=salary.toFixed(2);
-                    // 将结果赋值给工资输入框
-                    $('#' + prefix + '-合计工资').val(salary);
-                } else {
-                    // 如果输入不是数字，则清空工资输入框
-                    $('#' + prefix + '-合计工资').val('');
-                }
-            }
-
+    // 检查输入是否为数字
+    if ($.isNumeric(quantity) && $.isNumeric(wage)) {
+        var salary = parseFloat(quantity) * parseFloat(wage);
+        salary = salary.toFixed(2);  // 格式化小数位
+        // 将结果赋值给工资输入框
+        $('#' + prefix + '-合计工资').val(salary);
+    } else {
+        // 如果输入不是数字，则清空工资输入框
+        $('#' + prefix + '-合计工资').val('');
+    }
+}
 
             function bindEvents(prefix) {
-                $('#' + prefix + '-一级分类').change(function () {
-                    var selectedValue = $(this).find("option:selected").text()
-                    //alert(selectedValue);
+
+                // 基地字段的动态填充
+                $('#' + prefix + '-基地').click(function () {
                     $.ajax({
-                        url: '/get_second_level_categories/',
+                        url: "{% url 'get_base_options' %}",  // 使用Django模板标签来获取URL
                         type: 'GET',
-                        data: {
-                            'id': selectedValue
-                        },
                         success: function (data) {
-                            $('#' + prefix + '-二级分类').empty();
-                            $('#' + prefix + '-二级分类').empty().append($('<option></option>').attr('value', '').text('请选择'));
+                            // 清空并重新填充基地的下拉选项
+                            $('#' + prefix + '-基地').empty().append($('<option></option>').attr('value', '').text('请选择'));
                             $.each(data, function (key, value) {
-                                $('#' + prefix + '-二级分类').append($('<option></option>').attr('value', key).text(value));
+                                $('#' + prefix + '-基地').append($('<option></option>').attr('value', key).text(value));
                             });
                         },
                         error: function (xhr, status, error) {
                             console.log("Ajax请求失败:", error);
                         }
                     });
+                });
+
+                // 批次字段的补全和二级分类自动填充
+                $('#' + prefix + '-批次').blur(function () {
+                    var batchValue = $(this).val();
+
+                    if (batchValue.includes('-')) {
+                        var secondCategory = batchValue.split('-').pop();
+                        $('#' + prefix + '-二级分类').val(secondCategory);  // 自动填充二级分类
+
+                        // 使用二级分类名称查询一级工种
+                        $.ajax({
+                            url: '/get_primary_work_types/',
+                            type: 'GET',
+                            data: {'second_category': secondCategory},
+                            success: function (data) {
+                                $('#' + prefix + '-一级工种').empty().append($('<option>').text('请选择'));
+                                $.each(data, function (key, value) {
+                                    $('#' + prefix + '-一级工种').append($('<option>').attr('value', key).text(value));
+                                });
+                            },
+                            error: function () {
+                                alert('无法获取一级工种，请检查输入。');
+                            }
+                        });
+                    } else {
+                        alert('批次号错误，请重新输入');
+                    }
                 });
 
                 $('#' + prefix + '-二级分类').change(function () {
@@ -96,11 +141,38 @@
                         }
                     });
                 });
+                // JavaScript
+                // 当选择一级工种时，填充二级工种
+                $('#' + prefix + '-一级工种').change(function () {
+                    var primaryWorkTypeName = $(this).find("option:selected").text();
+                    var secondarySelect = $('#' + prefix + '-二级工种');  // 获取当前的二级工种下拉框
 
-                $('#' + prefix + '-工种').change(function () {
-                    var selectedValue_one = $('#' + prefix + '-一级分类 option:selected').text();
-                    var selectedValue_tow = $('#' + prefix + '-二级分类 option:selected').text();
-                    var selectedValue_three = $('#' + prefix + '-工种 option:selected').text();
+                    if (primaryWorkTypeName) {
+                        $.ajax({
+                            url: "{% url 'get_secondary_work_types' %}",
+                            data: {
+                                primary_work_type_name: primaryWorkTypeName  // 传递一级工种名称
+                            },
+                            success: function (data) {
+                                // 清空二级工种下拉框并填充新的选项
+                                secondarySelect.empty().append($('<option></option>').attr('value', '').text('请选择'));
+                                $.each(data, function (index, item) {
+                                    secondarySelect.append($('<option></option>').attr('value', item.id).text(item.job_name));
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.log("Ajax请求失败:", error);
+                            }
+                        });
+                    } else {
+                        secondarySelect.empty().append($('<option></option>').attr('value', '').text('请选择'));
+                    }
+                });
+                // 获取工价
+                $('#' + prefix + '-二级工种').change(function () {
+                    var selectedValue_one = $('#' + prefix + '-二级分类').val();
+                    var selectedValue_tow = $('#' + prefix + '-一级工种 option:selected').text();
+                    var selectedValue_three = $('#' + prefix + '-二级工种 option:selected').text();
                     $.ajax({
                         url: '/get_productionwate_price/',
                         type: 'GET',
@@ -110,10 +182,15 @@
                             'three': selectedValue_three
                         },
                         success: function (data) {
-                            $('#' + prefix + '-工价').empty();
-                            $.each(data, function (key, value) {
-                                $('#' + prefix + '-工价').append($('<option></option>').attr('value', key).text(value));
-                            });
+                            // 打印从服务器返回的数据，方便调试
+                            console.log("AJAX response data:", data); // 调试信息
+                            var price = parseFloat(Object.values(data)[0]);
+
+                            if (price) {
+                                $('#' + prefix + '-工价').val(price); // 填充工价
+                            } else {
+                                console.log("未找到对应的工价");
+                            }
                         },
                         error: function (xhr, status, error) {
                             console.log("Ajax请求失败:", error);
@@ -168,10 +245,6 @@
                     minLength: 2
                 });
 
-                $('#' + prefix + '-基地').autocomplete({
-                    source: "{% url 'autocomplete_baseinfo' %}",
-                    minLength: 1
-                });
 
             }
 
@@ -205,7 +278,7 @@
                 bindEvents('id_form-' + form_idx);
 
                 form_idx++; // 更新索引
-                 updateTotalForms();
+                updateTotalForms();
 
             });
 
@@ -214,7 +287,7 @@
                 updateTotalForms();
             });
 
-            // 测试提交的点击事件  
+            // 测试提交的点击事件
             $('#test').click(function () {
                 var form = $('#dynamic_form');
                 var formData = form.serializeArray();
@@ -235,7 +308,7 @@
 
             });
 
-            // 更新表单项数量  
+            // 更新表单项数量
             function updateTotalForms() {
                 var totalForms = $('#formset_container .formset_item').length;
                 $('#id_form-TOTAL_FORMS').val(totalForms);
