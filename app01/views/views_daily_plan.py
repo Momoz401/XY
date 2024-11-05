@@ -58,13 +58,25 @@ def daily_plan_create(request):
             initial_harvest = plant_date + timedelta(days=growth_cycle)
             final_harvest = initial_harvest + timedelta(days=harvest_cycle)
 
+            # 将种植日期转换为 yymmdd 格式
+            formatted_date = plant_date.strftime('%y%m%d')
+
+            # 更新批次ID，确保批次ID中包含格式化的日期
+            batch_id_parts = batch_id.split('-')
+            if len(batch_id_parts) >= 2:
+                # 替换日期部分
+                batch_id_parts[1] = formatted_date
+                batch_id = '-'.join(batch_id_parts)
+            else:
+                print("批次ID格式不正确")
+                return render(request, 'daily_plan_form.html', {'form': form})
+
             # 保存日计划，确保批次ID不被覆盖
             daily_plan = form.save(commit=False)
-            daily_plan.批次ID = batch_id  # 使用前端传递的批次ID，不再重新生成
+            daily_plan.批次ID = batch_id  # 使用更新后的批次ID
             daily_plan.种植日期 = plant_date
             daily_plan.采收初期 = initial_harvest
             daily_plan.采收末期 = final_harvest
-
 
             daily_plan.save()
 

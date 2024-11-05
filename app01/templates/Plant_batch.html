@@ -77,36 +77,36 @@
                     <tbody>
                     {% for obj in queryset %}
                         <tr>
-                            <td>{{ obj.ID }}</td>
-                            <td>{{ obj.批次ID }}</td>
-                            <td>{{ obj.一级分类 }}</td>
-                            <td>{{ obj.二级分类 }}</td>
-                            <td>{{ obj.基地 }}</td>
-                            <td>{{ obj.种植日期 }}</td>
-                            <td>{{ obj.地块 }}</td>
-                            <td>{{ obj.面积 }}</td>
-                            <td>{{ obj.基地经理 }}</td>
-                            <td>{{ obj.移栽日期 }}</td>
-                            <td>{{ obj.移栽板量 }}</td>
-                            <td>{{ obj.移栽数量 }}</td>
-                            <td>{{ obj.点籽日期 }}</td>
-                            <td>{{ obj.用籽量 }}</td>
-                            <td>{{ obj.备注 }}</td>
-                            <td>{{ obj.生长周期 }}</td>
-                            <td>{{ obj.采收初期 }}</td>
-                            <td>{{ obj.采收末期 }}</td>
-                            <td>{{ obj.采收期 }}</td>
-                            <td>{{ obj.周期批次 }}</td>
-                            <td>{{ obj.总周期天数 }}</td>
-                            <td>{{ obj.销毁面积 }}</td>
-                            <td>{{ obj.销毁备注 }}</td>
-                            <td>{{ obj.总产量 }}</td>
-                            <td>{{ obj.总亩产 }}</td>
-                            <td>{{ obj.正常产量 }}</td>
-                            <td>{{ obj.正常亩产 }}</td>
-                            <td>{{ obj.栽种方式 }}</td>
-                            <td>{{ obj.下批前一天时间 }}</td>
-                            <td>{{ obj.周期 }}</td>
+                            <td>{{ obj.ID|default_if_none:"" }}</td>
+                            <td>{{ obj.批次ID|default_if_none:"" }}</td>
+                            <td>{{ obj.一级分类|default_if_none:"" }}</td>
+                            <td>{{ obj.二级分类|default_if_none:"" }}</td>
+                            <td>{{ obj.基地|default_if_none:"" }}</td>
+                            <td>{{ obj.种植日期|default_if_none:"" }}</td>
+                            <td>{{ obj.地块|default_if_none:"" }}</td>
+                            <td>{{ obj.面积|default_if_none:"" }}</td>
+                            <td>{{ obj.基地经理|default_if_none:"" }}</td>
+                            <td>{{ obj.移栽日期|default_if_none:"" }}</td>
+                            <td>{{ obj.移栽板量|default_if_none:"" }}</td>
+                            <td>{{ obj.移栽数量|default_if_none:"" }}</td>
+                            <td>{{ obj.点籽日期|default_if_none:"" }}</td>
+                            <td>{{ obj.用籽量|default_if_none:"" }}</td>
+                            <td>{{ obj.备注|default_if_none:"" }}</td>
+                            <td>{{ obj.生长周期|default_if_none:"" }}</td>
+                            <td>{{ obj.采收初期|default_if_none:"" }}</td>
+                            <td>{{ obj.采收末期|default_if_none:"" }}</td>
+                            <td>{{ obj.采收期|default_if_none:"" }}</td>
+                            <td>{{ obj.周期批次|default_if_none:"" }}</td>
+                            <td>{{ obj.总周期天数|default_if_none:"" }}</td>
+                            <td>{{ obj.销毁面积|default_if_none:"" }}</td>
+                            <td>{{ obj.销毁备注|default_if_none:"" }}</td>
+                            <td>{{ obj.总产量|default_if_none:"" }}</td>
+                            <td>{{ obj.总亩产|default_if_none:"" }}</td>
+                            <td>{{ obj.正常产量|default_if_none:"" }}</td>
+                            <td>{{ obj.正常亩产|default_if_none:"" }}</td>
+                            <td>{{ obj.栽种方式|default_if_none:"" }}</td>
+                            <td>{{ obj.下批前一天时间|default_if_none:"" }}</td>
+                            <td>{{ obj.周期|default_if_none:"" }}</td>
                             <td>
                                 <a class="btn btn-primary btn-xs" href="/Plant_batch/{{ obj.ID }}/edit/">编辑</a>
                                 <a class="btn btn-danger btn-xs" href="/Plant_batch/{{ obj.ID }}/delete/">删除</a>

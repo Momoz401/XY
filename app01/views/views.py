@@ -656,6 +656,9 @@ def plant_batch_calendar_view(request):
 
     return render(request, 'plant_batch_calendar.html', context)
 # 这里设计一个批次成本汇总数据
+
+
+
 def plant_batch_summary(request):
     start_date = request.GET.get('start_date')
     end_date = request.GET.get('end_date')

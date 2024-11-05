@@ -55,20 +55,20 @@
 
             // 计算工资函数
             function calculateSalary(prefix) {
-    var quantity = $('#' + prefix + '-数量').val();
-    var wage = $('#' + prefix + '-工价').val();  // 直接获取工价输入框的值
+                var quantity = $('#' + prefix + '-数量').val();
+                var wage = $('#' + prefix + '-工价').val();  // 直接获取工价输入框的值
 
-    // 检查输入是否为数字
-    if ($.isNumeric(quantity) && $.isNumeric(wage)) {
-        var salary = parseFloat(quantity) * parseFloat(wage);
-        salary = salary.toFixed(2);  // 格式化小数位
-        // 将结果赋值给工资输入框
-        $('#' + prefix + '-合计工资').val(salary);
-    } else {
-        // 如果输入不是数字，则清空工资输入框
-        $('#' + prefix + '-合计工资').val('');
-    }
-}
+                // 检查输入是否为数字
+                if ($.isNumeric(quantity) && $.isNumeric(wage)) {
+                    var salary = parseFloat(quantity) * parseFloat(wage);
+                    salary = salary.toFixed(2);  // 格式化小数位
+                    // 将结果赋值给工资输入框
+                    $('#' + prefix + '-合计工资').val(salary);
+                } else {
+                    // 如果输入不是数字，则清空工资输入框
+                    $('#' + prefix + '-合计工资').val('');
+                }
+            }
 
             function bindEvents(prefix) {
 
@@ -90,7 +90,7 @@
                     });
                 });
 
-                // 批次字段的补全和二级分类自动填充
+                // 批次字段的补全和一级分类自动填充
                 $('#' + prefix + '-批次').blur(function () {
                     var batchValue = $(this).val();
 
@@ -98,15 +98,14 @@
                         var secondCategory = batchValue.split('-').pop();
                         $('#' + prefix + '-二级分类').val(secondCategory);  // 自动填充二级分类
 
-                        // 使用二级分类名称查询一级工种
+                        // 查询一级工种
                         $.ajax({
                             url: '/get_primary_work_types/',
                             type: 'GET',
-                            data: {'second_category': secondCategory},
                             success: function (data) {
                                 $('#' + prefix + '-一级工种').empty().append($('<option>').text('请选择'));
-                                $.each(data, function (key, value) {
-                                    $('#' + prefix + '-一级工种').append($('<option>').attr('value', key).text(value));
+                                $.each(data, function (index, item) {
+                                    $('#' + prefix + '-一级工种').append($('<option>').attr('value', item.id).text(item.name));
                                 });
                             },
                             error: function () {

@@ -1,6 +1,5 @@
 {% extends 'layout.html' %}
 
-
 {% block content %}
     <div class="container">
         <div style="margin-bottom: 10px" class="clearfix">
@@ -8,7 +7,7 @@
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 新建工价
             </a>
-             <a class="btn btn-success" href="/upload/productionwate/">
+            <a class="btn btn-success" href="/upload/productionwate/">
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
                 新建工价批量导入
             </a>
@@ -26,73 +25,70 @@
                     </div>
                 </form>
             </div>
-
         </div>
+
         <div class="panel panel-default">
-            <!-- Default panel contents -->
             <div class="panel-heading">
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                 工价列表
             </div>
 
-            <!-- Table -->
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>序号</th>
-                    <th>基地</th>
-                    <th>日期</th>
-                    <th>员工</th>
-                    <th>一级分类</th>
-                    <th>二级分类</th>
-                    <th>一级工种</th>
-                    <th>二级工种</th>
-                    <th>工价</th>
-                    <th>数量</th>
-                    <th>工资</th>
-                    <th>工时</th>
-                    <th>批次</th>
-                    <th>地块</th>
-                    <th>备注</th>
-                    <th>操作</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for obj in queryset %}
+            <!-- 包裹表格的 div，设置 overflow-x: auto 实现水平滚动条 -->
+            <div style="overflow-x: auto;">
+                <table class="table table-bordered">
+                    <thead>
                     <tr>
-                        <th>{{ obj.id }}</th>
-                        <th>{{ obj.基地 }}</th>
-                        <th>{{ obj.日期 }}</th>
-                        <td>{{ obj.工人 }}</td>
-                        <td>{{ obj.一级分类 }}</td>
-                        <td>{{ obj.二级分类 }}</td>
-                        <td>{{ obj.一级工种 }}</td>
-                        <td>{{ obj.二级工种 }}</td>
-                        <td>{{ obj.工价 }}</td>
-                        <td>{{ obj.数量 }}</td>
-                        <td>{{ obj.合计工资 }}</td>
-                        <td>{{ obj.工时 }}</td>
-                        <td>{{ obj.批次 }}</td>
-                        <td>{{ obj.地块 }}</td>
-                        <td>{{ obj.备注 }}</td>
-                        <td>
-                            <a class="btn btn-primary btn-xs" href="/productionwate/{{ obj.id }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/productionwate/{{ obj.id }}/delete/">删除</a>
-                        </td>
+                        <th>序号</th>
+                        <th>基地</th>
+                        <th>日期</th>
+                        <th>员工</th>
+                        <th>一级分类</th>
+                        <th>二级分类</th>
+                        <th>一级工种</th>
+                        <th>二级工种</th>
+                        <th>工价</th>
+                        <th>数量</th>
+                        <th>工资</th>
+                        <th>工时</th>
+                        <th>批次</th>
+                        <th>地块</th>
+                        <th>备注</th>
+                        <th>操作</th>
                     </tr>
-                {% endfor %}
-
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for obj in queryset %}
+                        <tr>
+                            <th>{{ obj.id }}</th>
+                            <th>{{ obj.基地 }}</th>
+                            <th>{{ obj.日期 }}</th>
+                            <td>{{ obj.工人 }}</td>
+                            <td>{{ obj.一级分类 }}</td>
+                            <td>{{ obj.二级分类 }}</td>
+                            <td>{{ obj.一级工种 }}</td>
+                            <td>{{ obj.二级工种 }}</td>
+                            <td>{{ obj.工价 }}</td>
+                            <td>{{ obj.数量 }}</td>
+                            <td>{{ obj.合计工资 }}</td>
+                            <td>{{ obj.工时 }}</td>
+                            <td>{{ obj.批次 }}</td>
+                            <td>{{ obj.地块 }}</td>
+                            <td>{{ obj.备注 }}</td>
+                            <td>
+                                <a class="btn btn-primary btn-xs" href="/productionwate/{{ obj.id }}/edit/">编辑</a>
+                                <a class="btn btn-danger btn-xs" href="/productionwate/{{ obj.id }}/delete/">删除</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+
         <div class="clearfix">
             <ul class="pagination">
                 {{ page_string }}
             </ul>
-
         </div>
-
     </div>
-
-
 {% endblock %}
