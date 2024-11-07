@@ -36,6 +36,7 @@
 
 <script>
     $(document).ready(function() {
+        // 初始化 DataTable，提供响应式表格和导出功能
         var table = $('#summary_table').DataTable({
             responsive: true,
             dom: 'Bfrtip',
@@ -44,22 +45,36 @@
             ]
         });
 
+        // 绑定表格行点击事件以展示或隐藏第一层详细信息
         $('#summary_table tbody').on('click', 'tr', function () {
             var batchId = $(this).data('batch-id');
             var tr = $(this);
-            if (tr.next().hasClass('details-row')) {
+
+            // 如果当前点击行下方已经显示了详细信息行，则移除它
+            if (tr.next().hasClass('details-row') && tr.next().data('batch-id') === batchId) {
                 tr.next().remove();
             } else {
+                $('.details-row').remove(); // 移除已有的详细信息行
                 $.get('/production_wage_second_level/', {batch: batchId}, function(response) {
-                    tr.after('<tr class="details-row"><td colspan="2">' + response.html + '</td></tr>');
-                    $('.details-row').find('tr').on('click', function() {
+                    // 插入新的详细信息行
+                    var detailsRow = $('<tr class="details-row" data-batch-id="' + batchId + '"><td colspan="2">' + response.html + '</td></tr>');
+                    tr.after(detailsRow);
+
+                    // 绑定点击事件用于显示第二层详细信息
+                    detailsRow.find('tr').on('click', function(e) {
+                        e.stopPropagation(); // 防止触发父行的点击事件
                         var worker = $(this).data('worker');
                         var trWorker = $(this);
-                        if (trWorker.next().hasClass('details-row-worker')) {
+
+                        // 如果当前行下方已显示第二层详细信息，则移除它
+                        if (trWorker.next().hasClass('details-row-worker') && trWorker.next().data('worker') === worker) {
                             trWorker.next().remove();
                         } else {
+                            $('.details-row-worker').remove(); // 移除现有的第二层详细信息
                             $.get('/production_wage_details/', {worker: worker, batch: batchId}, function(response) {
-                                trWorker.after('<tr class="details-row-worker"><td colspan="2">' + response.html + '</td></tr>');
+                                // 插入新的第二层详细信息行
+                                var workerDetailsRow = $('<tr class="details-row-worker" data-worker="' + worker + '"><td colspan="2">' + response.html + '</td></tr>');
+                                trWorker.after(workerDetailsRow);
                             });
                         }
                     });

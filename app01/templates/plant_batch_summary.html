@@ -21,7 +21,7 @@
         <thead>
             <tr>
                 <th>批次ID</th>
-                <th>移栽日期</th>
+                <th>种植日期</th>
                 <th>一级分类</th>
                 <th>二级分类</th>
                 <th>面积</th>
@@ -32,7 +32,7 @@
             {% for row in summary_data %}
             <tr data-batch-id="{{ row.批次ID }}">
                 <td>{{ row.批次ID }}</td>
-                <td>{{ row.移栽日期 }}</td>
+                <td>{{ row.种植日期 }}</td>
                 <td>{{ row.批次一级分类 }}</td>
                 <td>{{ row.批次二级分类 }}</td>
                 <td>{{ row.地块 }}</td>

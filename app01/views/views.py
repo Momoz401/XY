@@ -681,7 +681,7 @@ def plant_batch_summary(request):
         cursor.execute("""
             SELECT
                 批次ID,
-                移栽日期,
+                种植日期,
                 批次一级分类,
                 批次二级分类,
                 面积,
@@ -689,16 +689,16 @@ def plant_batch_summary(request):
             FROM
                 views_批次计划内成本汇总
             WHERE
-                移栽日期 BETWEEN %s AND %s
+                种植日期 BETWEEN %s AND %s
             GROUP BY
-                批次ID, 移栽日期, 批次一级分类, 批次二级分类, 面积
+                批次ID, 种植日期, 批次一级分类, 批次二级分类, 面积
         """, [start_date, end_date])
         rows = cursor.fetchall()
 
     summary_data = [
         {
             '批次ID': row[0],
-            '移栽日期': row[1],
+            '种植日期': row[1],
             '批次一级分类': row[2],
             '批次二级分类': row[3],
             '地块': row[4],
@@ -723,8 +723,8 @@ def get_batch_details(request):
         cursor.execute("""
             SELECT
                 批次ID,
-                移栽日期,
-                工种,
+                种植日期,
+                二级工种名称,
                 单价,
                 计量系数,
                 计划内成本
@@ -737,7 +737,7 @@ def get_batch_details(request):
 
     # 生成 HTML 内容
     html = '<table class="table table-striped">'
-    html += '<tr><th>批次ID</th><th>移栽日期</th><th>工种</th><th>单价</th><th>计量系数</th><th>计划内成本</th></tr>'
+    html += '<tr><th>批次ID</th><th>种植日期</th><th>二级工种</th><th>单价</th><th>计量系数</th><th>计划内成本</th></tr>'
     for row in details_data:
         html += f'<tr><td>{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td>{row[3]}</td><td>{row[4]}</td><td>{row[5]}</td></tr>'
     html += '</table>'
@@ -809,9 +809,19 @@ def production_wage_details(request):
 
     # 生成 HTML 内容
     html = '<table class="table table-striped">'
-    html += '<tr><th>日期</th><th>工种</th><th>一级分类</th><th>二级分类</th><th>工时</th><th>数量</th><th>工价</th><th>累计工时</th><th>合计工资</th></tr>'
+    html += '<tr><th>日期</th><th>二级工种</th><th>一级分类</th><th>二级分类</th><th>工时</th><th>数量</th><th>工价</th><th>累计工时</th><th>合计工资</th></tr>'
     for row in details:
-        html += f"<tr><td>{row['日期']}</td><td>{row['工种']}</td><td>{row['一级分类']}</td><td>{row['二级分类']}</td><td>{row['工时']:.2f}</td><td>{row['数量']:.2f}</td><td>{row['工价']:.2f}</td><td>{row['累计工时']:.2f}</td><td>{row['合计工资']:.2f}</td></tr>"
+        html += f"<tr>"
+        html += f"<td>{row.get('日期', '')}</td>"
+        html += f"<td>{row.get('二级工种', '')}</td>"
+        html += f"<td>{row.get('一级分类', '')}</td>"
+        html += f"<td>{row.get('二级分类', '')}</td>"
+        html += f"<td>{row.get('工时', 0) if row.get('工时') is not None else 0:.2f}</td>"
+        html += f"<td>{row.get('数量', 0) if row.get('数量') is not None else 0:.2f}</td>"
+        html += f"<td>{row.get('工价', 0) if row.get('工价') is not None else 0:.2f}</td>"
+        html += f"<td>{row.get('累计工时', 0) if row.get('累计工时') is not None else 0:.2f}</td>"
+        html += f"<td>{row.get('合计工资', 0) if row.get('合计工资') is not None else 0:.2f}</td>"
+        html += f"</tr>"
     html += '</table>'
 
     return JsonResponse({'html': html})

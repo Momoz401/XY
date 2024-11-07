@@ -13,7 +13,10 @@ def Hour_list(request):
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["一级分类__contains"] = search_data
+        # 查询一级分类的中文名称对应的ID
+        matching_category_ids = models.JobCategoryInfo.objects.filter(category_name__contains=search_data).values_list('id', flat=True)
+        # 将匹配的ID加入到过滤条件中
+        data_dict["一级分类__in"] = matching_category_ids
 
     queryset = models.BaseInfoWorkHour.objects.filter(**data_dict).order_by("-工种ID")
 
@@ -21,12 +24,10 @@ def Hour_list(request):
 
     context = {
         "search_data": search_data,
-
         "queryset": page_object.page_queryset,  # 分完页的数据
         "page_string": page_object.html()  # 页码
     }
     return render(request, 'workhour.html', context)
-
 
 
 def work_hour_edit(request, nid):
