@@ -29,6 +29,8 @@ from app01.views.daily_price_report_views import daily_price_report
 
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
 from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
+from app01.views.process_alert import process_alert_list, process_alert_create, process_alert_update, \
+    process_alert_delete
 from app01.views.productionwage import get_primary_work_types, get_secondary_work_types, get_base_options
 
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
@@ -320,5 +322,10 @@ urlpatterns = [
     path('fetch_cost_details/', views.fetch_cost_details, name='fetch_cost_details'),
 
 
+    # 流程维护
+    path('process_alerts/', process_alert_list, name='process_alert_list'),
+    path('process_alerts/create/', process_alert_create, name='process_alert_create'),
+    path('process_alerts/update/<int:pk>/', process_alert_update, name='process_alert_update'),
+    path('process_alerts/delete/<int:pk>/', process_alert_delete, name='process_alert_delete'),
 
 ]

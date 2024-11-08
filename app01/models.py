@@ -946,3 +946,15 @@ class BatchCost(models.Model):
     class Meta:
         managed = False
         db_table = 'views_批次计划内成本'
+
+
+class ProcessAlert(models.Model):
+    一级分类 = models.CharField(max_length=100)
+    二级分类 = models.CharField(max_length=100)
+    一级工种 = models.CharField(max_length=100)
+    二级工种 = models.CharField(max_length=100)
+    最小时间 = models.PositiveIntegerField(help_text="最小时间（单位：天）")
+    最大时间 = models.PositiveIntegerField(help_text="最大时间（单位：天）")
+
+    def __str__(self):
+        return f"{self.一级分类} - {self.二级分类} - {self.一级工种} - {self.二级工种}"

@@ -8,7 +8,7 @@ from django import forms
 
 from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage, ExpenseAllocation, DepreciationAllocation, \
     LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord, DailyPriceReport, MonthlyPlan, \
-    BaseInfoBase, DailyPlan, Plant_batch
+    BaseInfoBase, DailyPlan, Plant_batch, ProcessAlert
 from app01.utils.bootstrap import BootStrapModelForm
 
 
@@ -514,3 +514,9 @@ class DailyPlanForm(BootStrapModelForm):
     class Meta:
         model = DailyPlan
         fields = ['基地经理', '地块', '面积', '生长周期', '采收期', '备注']
+
+
+class ProcessAlertForm(forms.ModelForm):
+    class Meta:
+        model = ProcessAlert
+        fields = ['一级分类', '二级分类', '一级工种', '二级工种', '最小时间', '最大时间']

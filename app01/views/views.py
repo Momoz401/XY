@@ -992,9 +992,15 @@ def employee_autocomplete(request):
 # 费用预警的汇总视图
 def cost_alert_summary(request):
     """第一层: 显示批次的总计划内成本和实际成本的比较，包含反馈内容"""
-    start_date = request.GET.get('start_date')
-    end_date = request.GET.get('end_date')
+    # 获取当前月的起始和结束日期
+    from datetime import date, timedelta
+    today = date.today()
+    first_day_of_month = today.replace(day=1)
+    last_day_of_month = (first_day_of_month + timedelta(days=32)).replace(day=1) - timedelta(days=1)
 
+    # 获取用户输入或设置默认值
+    start_date = request.GET.get('start_date', first_day_of_month)
+    end_date = request.GET.get('end_date', last_day_of_month)
     queryset = Plant_batch.objects.all()
 
     if start_date and end_date:
@@ -1032,6 +1038,8 @@ def cost_alert_summary(request):
         'start_date': start_date,
         'end_date': end_date
     })
+
+
 def cost_alert_details(request):
     """第二层: 显示每个批次内的具体工种成本详情"""
     batch_id = request.GET.get('batch_id')
