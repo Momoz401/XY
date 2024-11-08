@@ -9,7 +9,7 @@ from django.views.decorators.http import require_GET
 from app01 import models
 from app01.models import Plant_batch, BaseInfoWorkHour, BaseInfoBase, ExpenseAllocation, DepreciationAllocation, \
     LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, BaseInfoWorkType, SalesRecord, ProductionWage, \
-    V_Profit_Summary, JobCategoryInfo, DailyPriceReport, UserInfo
+    V_Profit_Summary, JobCategoryInfo, DailyPriceReport, UserInfo, CostAlertFeedback, BatchCost
 from app01.utils.form import WorkHourFormSet, ExpenseAllocationForm, DepreciationAllocationForm, LossReportForm, \
     SalespersonForm, VehicleForm, MarketForm, CustomerForm, OutboundRecordForm, SalesRecordForm, \
     ExpenseAllocationModelForm, OutboundUploadForm, JobCategoryInfoModelForm, JobTypeDetailInfoModelForm, \
@@ -17,7 +17,7 @@ from app01.utils.form import WorkHourFormSet, ExpenseAllocationForm, Depreciatio
 from django.db.models.functions import Substr, TruncDate
 from django.utils import timezone
 from datetime import datetime, timedelta
-from django.db.models import Sum, Q
+from django.db.models import Sum, Q, F
 
 from django.http import JsonResponse
 from django.db.models.functions import Substr
@@ -989,3 +989,135 @@ def employee_autocomplete(request):
             return JsonResponse([], safe=False)
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+# 费用预警的汇总视图
+def cost_alert_summary(request):
+    """第一层: 显示批次的总计划内成本和实际成本的比较，包含反馈内容"""
+    start_date = request.GET.get('start_date')
+    end_date = request.GET.get('end_date')
+
+    queryset = Plant_batch.objects.all()
+
+    if start_date and end_date:
+        queryset = queryset.filter(种植日期__range=[start_date, end_date])
+
+    # 手动关联 BatchCost 数据
+    batch_ids = queryset.values_list('批次ID', flat=True)
+    cost_data = BatchCost.objects.filter(批次ID__in=batch_ids).values('批次ID').annotate(
+        total_planned_cost=Sum('计划内成本')
+    )
+
+    cost_dict = {item['批次ID']: item['total_planned_cost'] for item in cost_data}
+
+    summary_data = []
+    for item in queryset:
+        total_planned_cost = cost_dict.get(item.批次ID, 0)
+        total_actual_cost = ProductionWage.objects.filter(批次=item.批次ID).aggregate(total=Sum('合计工资'))[
+                                'total'] or 0
+
+        # 查询反馈内容
+        feedback = CostAlertFeedback.objects.filter(批次ID=item.批次ID).first()
+        feedback_content = feedback.反馈内容 if feedback else ""
+
+        summary_data.append({
+            '批次ID': item.批次ID,
+            '种植日期': item.种植日期,
+            'total_planned_cost': total_planned_cost,
+            'total_actual_cost': total_actual_cost,
+            'cost_exceeded': total_actual_cost > total_planned_cost,
+            'feedback_content': feedback_content  # 添加反馈内容
+        })
+
+    return render(request, 'cost_alert_summary.html', {
+        'summary_data': summary_data,
+        'start_date': start_date,
+        'end_date': end_date
+    })
+def cost_alert_details(request):
+    """第二层: 显示每个批次内的具体工种成本详情"""
+    batch_id = request.GET.get('batch_id')
+    details_data = ProductionWage.objects.filter(批次=batch_id).annotate(
+        planned_cost=F('batchcost__计划内成本')
+    ).values('工种', 'planned_cost', '合计工资')
+
+    html = '<table class="table table-striped">'
+    html += '<tr><th>工种</th><th>计划成本</th><th>实际成本</th><th>超出反馈</th></tr>'
+    for row in details_data:
+        exceeded = row['合计工资'] > row['planned_cost']
+        feedback_button = '<button class="btn btn-warning">反馈</button>' if exceeded else ''
+        html += f"<tr><td>{row['工种']}</td><td>{row['planned_cost']:.2f}</td><td>{row['合计工资']:.2f}</td><td>{feedback_button}</td></tr>"
+    html += '</table>'
+
+    return JsonResponse({'html': html})
+
+
+def cost_alert_feedback(request):
+    """处理超支反馈的视图方法"""
+    if request.method == 'POST':
+        batch_id = request.POST.get('batch_id')
+        work_type = request.POST.get('work_type')
+        feedback_content = request.POST.get('feedback_content', '')
+
+        try:
+            # 使用 update_or_create 方法查找或更新记录
+            feedback, created = CostAlertFeedback.objects.update_or_create(
+                批次ID=batch_id,
+                defaults={'工种': work_type, '反馈内容': feedback_content}
+            )
+
+            if created:
+                message = "反馈已成功提交。"
+            else:
+                message = "反馈已更新。"
+
+            return JsonResponse({"success": True, "message": message})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": f"提交反馈时发生错误: {str(e)}"})
+
+    return JsonResponse({"success": False, "message": "仅支持POST请求。"})
+
+
+def fetch_cost_details(request):
+    batch_id = request.GET.get('batch_id')
+
+    with connection.cursor() as cursor:
+        # 查询计划内成本数据
+        cursor.execute("""
+            SELECT
+                批次ID,
+                种植日期,
+                二级工种名称,
+                计划内成本
+            FROM
+                views_批次计划内成本
+            WHERE
+                批次ID = %s
+        """, [batch_id])
+        details_data = cursor.fetchall()
+
+        # 查询实际成本数据，按批次和二级工种关联
+        cursor.execute("""
+            SELECT
+                二级工种,
+                SUM(合计工资) AS total_actual_cost
+            FROM
+                main.app01_productionwage
+            WHERE
+                批次 = %s
+            GROUP BY 二级工种
+        """, [batch_id])
+        actual_cost_data = cursor.fetchall()
+
+    # 将实际成本数据转换为字典，便于快速查找
+    actual_cost_dict = {row[0]: row[1] for row in actual_cost_data}
+
+    # 生成 HTML 内容
+    html = '<table class="table table-striped">'
+    html += '<tr><th>批次ID</th><th>种植日期</th><th>二级工种</th><th>计划内成本</th><th>实际成本</th><th>差额</th></tr>'
+    for row in details_data:
+        planned_cost = row[3]
+        actual_cost = actual_cost_dict.get(row[2], 0)  # 根据二级工种名称匹配实际成本
+        difference = actual_cost - planned_cost
+        html += f'<tr><td>{row[0]}</td><td>{row[1]}</td><td>{row[2]}</td><td>{planned_cost:.2f}</td><td>{actual_cost:.2f}</td><td>{difference:.2f}</td></tr>'
+    html += '</table>'
+
+    return JsonResponse({'html': html})

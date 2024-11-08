@@ -42,7 +42,7 @@ from app01.views.views import create_expense_allocation, expense_allocation_list
     add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
     outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
     plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details, profit_summary, \
-    daily_price_report_list, daily_price_report_edit, daily_price_report_delete
+    daily_price_report_list, daily_price_report_edit, daily_price_report_delete, cost_alert_summary, cost_alert_feedback
 from app01.views.views_daily_plan import daily_plan_list, daily_plan_create, daily_plan_edit, daily_plan_delete
 
 urlpatterns = [
@@ -312,5 +312,13 @@ urlpatterns = [
     path('monthly_plan_rate/', monthly_plan_rate, name='monthly_plan_rate'), #显示
     path('monthly_plan/download/', monthly_plan_download, name='monthly_plan_download'),  # 下载月度计划
     path('monthly_plan/feedback/<int:plan_id>/', plan_feedback, name='feedback'),  # 未达成反馈
+
+
+    # 费用超支
+    path('cost_alert/', cost_alert_summary, name='cost_alert_summary'),
+    path('cost_alert_feedback/', cost_alert_feedback, name='cost_alert_feedback'),
+    path('fetch_cost_details/', views.fetch_cost_details, name='fetch_cost_details'),
+
+
 
 ]

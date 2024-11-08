@@ -925,3 +925,24 @@ class DailyPlan(models.Model):
 
     def __str__(self):
         return self.批次ID
+
+
+# 费用超支反馈
+class CostAlertFeedback(models.Model):
+    批次ID = models.CharField(max_length=50)
+    工种 = models.CharField(max_length=255, null=True, blank=True)
+    反馈内容 = models.TextField(null=True, blank=True)
+    反馈时间 = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.批次ID} - {self.工种} - 反馈时间: {self.反馈时间}"
+
+class BatchCost(models.Model):
+    批次ID = models.CharField(max_length=50)
+    计划内成本 = models.DecimalField(max_digits=10, decimal_places=2)
+
+    # 其他字段...
+
+    class Meta:
+        managed = False
+        db_table = 'views_批次计划内成本'

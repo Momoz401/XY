@@ -1,0 +1,153 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container">
+    <hr>
+    <form method="get" class="form-inline mb-3">
+        <div class="form-group">
+            <label for="start_date">开始日期:</label>
+            <input type="date" id="start_date" name="start_date" value="{{ start_date }}" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="end_date">结束日期:</label>
+            <input type="date" id="end_date" name="end_date" value="{{ end_date }}" class="form-control">
+        </div>
+        <button type="submit" class="btn btn-primary">查询</button>
+    </form>
+    <hr>
+    <table id="summaryTable" class="table table-striped table-bordered">
+        <thead>
+            <tr>
+                <th>批次ID</th>
+                <th>种植日期</th>
+                <th>总计划内成本</th>
+                <th>总实际成本</th>
+                <th>超支警报</th>
+                <th>超支反馈</th>
+                <th>反馈/修改反馈</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in summary_data %}
+            <tr data-batch-id="{{ row.批次ID }}" class="{% if row.cost_exceeded %}table-danger{% endif %}">
+                <td>{{ row.批次ID }}</td>
+                <td>{{ row.种植日期 }}</td>
+                <td>{{ row.total_planned_cost|floatformat:2 }}</td>
+                <td>{{ row.total_actual_cost|floatformat:2 }}</td>
+                <td>{% if row.cost_exceeded %}超支{% else %}正常{% endif %}</td>
+                <td>{{ row.feedback_content }}</td>
+                <td>
+                    {% if row.feedback %}
+                        <span>反馈内容: {{ row.feedback }}</span>
+                        <button class="btn btn-info feedback-btn" data-batch-id="{{ row.批次ID }}" data-work-type="示例工种">修改反馈</button>
+                    {% elif row.cost_exceeded %}
+                        <button class="btn btn-warning feedback-btn" data-batch-id="{{ row.批次ID }}" data-work-type="示例工种">反馈</button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- 反馈模态框 -->
+<div class="modal fade" id="feedbackModal" tabindex="-1" role="dialog" aria-labelledby="feedbackModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="feedbackModalLabel">提交反馈</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="feedbackForm">
+                    <input type="hidden" id="feedbackBatchId">
+                    <input type="hidden" id="feedbackWorkType">
+                    <div class="form-group">
+                        <label for="feedbackContent">反馈内容</label>
+                        <textarea id="feedbackContent" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="button" class="btn btn-primary" id="submitFeedback">提交</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+<script src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.print.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    var table = $('#summaryTable').DataTable({
+        dom: 'Bfrtip',
+        buttons: ['copy', 'csv', 'excel', 'pdf', 'print']
+    });
+
+    // 使用事件委托绑定反馈按钮的点击事件
+    $('#summaryTable').on('click', '.feedback-btn', function() {
+        var batchId = $(this).data('batch-id');
+        var workType = $(this).data('work-type');
+        $('#feedbackBatchId').val(batchId);
+        $('#feedbackWorkType').val(workType);
+        $('#feedbackModal').modal('show');
+    });
+
+    // 提交反馈
+    $('#submitFeedback').on('click', function() {
+        var batchId = $('#feedbackBatchId').val();
+        var workType = $('#feedbackWorkType').val();
+        var feedbackContent = $('#feedbackContent').val();
+
+        $.ajax({
+            url: '/cost_alert_feedback/',
+            method: 'POST',
+            data: {
+                batch_id: batchId,
+                work_type: workType,
+                feedback_content: feedbackContent,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(response) {
+                alert(response.message);
+                if (response.success) {
+                    $('#feedbackModal').modal('hide');
+                    $('#feedbackContent').val('');
+                    location.reload(); // 重新加载页面以更新反馈内容显示
+                }
+            },
+            error: function() {
+                alert('提交反馈时发生错误，请重试。');
+            }
+        });
+    });
+
+    // 行点击事件用于展示详细信息
+    $('#summaryTable tbody').on('click', 'tr', function() {
+        var batchId = $(this).data('batch-id');
+
+        if ($(this).next().hasClass('child-row')) {
+            $(this).next().remove();
+            return;
+        }
+
+        $.ajax({
+            url: '/fetch_cost_details/',
+            method: 'GET',
+            data: { batch_id: batchId },
+            success: function(data) {
+                var childRow = $('<tr class="child-row"><td colspan="7">' + data.html + '</td></tr>');
+                childRow.insertAfter($('tr[data-batch-id="' + batchId + '"]'));
+            }
+        });
+    });
+});
+</script>
+{% endblock %}
