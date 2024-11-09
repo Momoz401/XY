@@ -136,3 +136,7 @@ def process_alert_delete(request, pk):
     return render(request, 'process_alert_confirm_delete.html', {'alert': alert})
 
 
+
+
+
+
