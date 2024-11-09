@@ -899,7 +899,7 @@ class DailyPriceReport(models.Model):
         verbose_name_plural = "每日价格上报"
 
     def __str__(self):
-        return f"{self.日期} - {self.品种} - {self.市场}"
+        return f"{self.日期} - {self.品种.category_name} - {self.市场.market_name}"  # 假设 category_name 和 market_name 是字段名
 
 class MonthlyPlan(models.Model):
     日期 = models.DateField()

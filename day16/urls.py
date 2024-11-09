@@ -23,6 +23,7 @@ from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
     daily_price_report_views
+from app01.views.DailyPriceReport import get_price_trends, get_available_categories
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
 
 from app01.views.daily_price_report_views import daily_price_report
@@ -330,6 +331,12 @@ urlpatterns = [
     path('process_alerts/delete/<int:pk>/', process_alert_delete, name='process_alert_delete'),
 
     # 流程预警
-    path('process_alerts/overview/', process_alert_overview, name='process_alert_overview')
+    path('process_alerts/overview/', process_alert_overview, name='process_alert_overview'),
+
+
+
+    # 价格走势
+    path('price_trends/', get_price_trends, name='price_trends'),
+    path('get_available_categories/', get_available_categories, name='get_available_categories'),
 
 ]

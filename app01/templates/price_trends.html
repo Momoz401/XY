@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="container">
+        <h2>{{ title }}</h2>
+        <div class="filter-container">
+            <label for="category-select">选择品种:</label>
+            <select id="category-select">
+                <!-- 这里会通过JS动态加载品种 -->
+            </select>
+            <label for="date-filter-select">时间范围:</label>
+            <select id="date-filter-select">
+                <option value="week" {% if date_filter == 'week' %}selected{% endif %}>最近一周</option>
+                <option value="month" {% if date_filter == 'month' %}selected{% endif %}>最近一个月</option>
+                <option value="year" {% if date_filter == 'year' %}selected{% endif %}>最近一年</option>
+            </select>
+            <button id="filter-btn" class="btn btn-primary">应用过滤</button>
+        </div>
+        <canvas id="price-chart" width="800" height="400"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const ctx = document.getElementById('price-chart').getContext('2d');
+            const dates = JSON.parse('{{ dates|safe }}');
+            const prices = JSON.parse('{{ prices|safe }}');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: '价格走势',
+                        data: prices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'category',
+                            title: {
+                                display: true,
+                                text: '日期'
+                            }
+                        },
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: '价格'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 加载可用的品种列表
+            fetch('/get_available_categories/')
+                .then(response => response.json())
+                .then(data => {
+                    const categorySelect = document.getElementById('category-select');
+                    data.forEach(item => {
+                        const option = document.createElement('option');
+                        option.value = item.id;
+                        option.textContent = item.category_name;
+                        if (item.id == '{{ category_id }}') {
+                            option.selected = true;
+                        }
+                        categorySelect.appendChild(option);
+                    });
+                });
+
+            // 处理过滤按钮点击
+            document.getElementById('filter-btn').addEventListener('click', () => {
+                const categoryId = document.getElementById('category-select').value;
+                const dateFilter = document.getElementById('date-filter-select').value;
+                window.location.href = `?category_id=${categoryId}&date_filter=${dateFilter}`;
+            });
+        });
+    </script>
+{% endblock %}
