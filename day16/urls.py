@@ -18,7 +18,8 @@ from django.urls import path, re_path
 from django.views.static import serve
 from django.conf import settings
 
-from app01.mobile.views import mobile_login, mobile_home, mobile_logout, mobile_gongshiluru
+from app01.mobile.views import mobile_login, mobile_home, mobile_logout, mobile_gongshiluru, mobile_outbound_add, \
+     customer_autocomplete, worker_autocomplete, batch_autocomplete
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
@@ -277,8 +278,13 @@ urlpatterns = [
     path('mobile_login/', mobile_login, name='mobile_login'),
     path('mobile/home/', mobile_home, name='mobile_home'),
     path('mobile/logout/', mobile_logout, name='mobile_logout'),
-    # 手机端工时录入
+    # 手机端工价录入
     path('mobile/gongshiluru/', mobile_gongshiluru, name='mobile_gongshiluru'),
+    # 手机端出库录入
+    path('mobile/outbound/add/', mobile_outbound_add, name='mobile_outbound_add'),
+    path('autocomplete/customer/', customer_autocomplete, name='customer_autocomplete'),
+    path('autocomplete/worker/', worker_autocomplete, name='worker_autocomplete'),
+    path('autocomplete/batch/', batch_autocomplete, name='batch_autocomplete'),
 
     # 分类相关的 URL 路由
     path('job_category/list/', views.job_category_list, name='job_category_list'),

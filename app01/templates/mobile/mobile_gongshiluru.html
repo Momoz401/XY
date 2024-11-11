@@ -6,41 +6,270 @@
     <title>工时录入</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- jQuery UI CSS -->
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
+    <!-- jQuery UI JS -->
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
 <body>
     <div class="container mt-5">
         <h4 class="text-center">工时录入</h4>
-        <form method="post">
+        <form method="post" id="mobile_form" action="">
             {% csrf_token %}
             <div class="mb-3">
                 {{ fixed_form.as_p }}
             </div>
             <div class="mb-3">
-                {{ formset.as_p }}
+                {{ formset.management_form }}
+                <div id="formset_container">
+                    {% for form in formset %}
+                        <div class="mb-3 formset_item">
+                            {{ form.as_p }}
+                        </div>
+                    {% endfor %}
+                </div>
             </div>
-            <button type="submit" class="btn btn-primary w-100">提交</button>
+            <button type="submit" class="btn btn-success w-100">保存提交</button>
         </form>
     </div>
 
-    <script>
-        $(document).ready(function() {
-            // 当一级分类改变时，更新二级分类
-            $('#id_一级分类').change(function() {
-                var 一级分类ID = $(this).val();
-                $.ajax({
-                    url: '/get_secondary_category/',  // 需要在后端实现这个URL
-                    data: {
-                        '一级分类ID': 一级分类ID
-                    },
-                    success: function(data) {
-                        var 二级分类Select = $('#id_二级分类');
-                        二级分类Select.empty();
-                        $.each(data, function(key, value) {
-                            二级分类Select.append($('<option></option>').attr('value', key).text(value));
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+         $('#mobile_form').submit(function (e) {
+                    e.preventDefault();  // 阻止默认表单提交
+
+                    var formData = $(this).serialize();
+                    $.ajax({
+                        url: '',
+                        type: 'post',
+                        data: formData,
+                        success: function (response) {
+                            if (response.success) {
+                                alert(response.message);
+                                window.location.href = '/mobile/home/';  // 跳转到主页
+                            } else {
+                                alert('录入失败，请检查表单信息。');
+                            }
+                        },
+                        error: function () {
+                            alert('提交失败，请稍后重试。');
+                        }
+                    });
+                });
+
+
+            // 工人姓名补全
+            $('#id_工人').autocomplete({
+                source: function (request, response) {
+                    $.ajax({
+                        url: "{% url 'employee_autocomplete' %}",
+                        dataType: "json",
+                        data: {
+                            term: request.term
+                        },
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                return {
+                                    label: item.name + " (" + item.birthdate + ")",
+                                    value: item.name
+                                };
+                            }));
+                        }
+                    });
+                },
+                minLength: 1
+            });
+
+
+            // 计算工资函数
+            function calculateSalary(prefix) {
+                var quantity = $('#' + prefix + '-数量').val();
+                var wage = $('#' + prefix + '-工价').val();
+                if ($.isNumeric(quantity) && $.isNumeric(wage)) {
+                    var salary = parseFloat(quantity) * parseFloat(wage);
+                    salary = salary.toFixed(2);
+                    $('#' + prefix + '-合计工资').val(salary);
+                } else {
+                    $('#' + prefix + '-合计工资').val('');
+                }
+            }
+
+            function bindEvents(prefix) {
+                $('#' + prefix + '-基地').click(function () {
+                    $.ajax({
+                        url: "{% url 'get_base_options' %}",
+                        type: 'GET',
+                        success: function (data) {
+                            $('#' + prefix + '-基地').empty().append($('<option></option>').attr('value', '').text('请选择'));
+                            $.each(data, function (key, value) {
+                                $('#' + prefix + '-基地').append($('<option></option>').attr('value', key).text(value));
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Ajax请求失败:", error);
+                        }
+                    });
+                });
+
+                $('#' + prefix + '-批次').blur(function () {
+                    var batchValue = $(this).val();
+                    if (batchValue.includes('-')) {
+                        var secondCategory = batchValue.split('-').pop();
+                        $('#' + prefix + '-二级分类').val(secondCategory);
+                        $.ajax({
+                            url: '/get_primary_work_types/',
+                            type: 'GET',
+                            success: function (data) {
+                                $('#' + prefix + '-一级工种').empty().append($('<option>').text('请选择'));
+                                $.each(data, function (index, item) {
+                                    $('#' + prefix + '-一级工种').append($('<option>').attr('value', item.id).text(item.name));
+                                });
+                            },
+                            error: function () {
+                                alert('无法获取一级工种，请检查输入。');
+                            }
                         });
+                    } else {
+                        alert('批次号错误，请重新输入');
                     }
                 });
-            });
+
+                $('#' + prefix + '-二级分类').change(function () {
+                    var selectedValue_one = $('#' + prefix + '-一级分类 option:selected').text();
+                    var selectedValue_tow = $('#' + prefix + '-二级分类 option:selected').text();
+                    $.ajax({
+                        url: '/get_productionwate/',
+                        type: 'GET',
+                        data: {
+                            'one': selectedValue_one,
+                            'tow': selectedValue_tow
+                        },
+                        success: function (data) {
+                            $('#' + prefix + '-工种').empty().append($('<option></option>').attr('value', '').text('请选择'));
+                            $.each(data, function (key, value) {
+                                $('#' + prefix + '-工种').append($('<option></option>').attr('value', key).text(value));
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Ajax请求失败:", error);
+                        }
+                    });
+                });
+
+                $('#' + prefix + '-一级工种').change(function () {
+                    var primaryWorkTypeName = $(this).find("option:selected").text();
+                    var secondarySelect = $('#' + prefix + '-二级工种');
+                    if (primaryWorkTypeName) {
+                        $.ajax({
+                            url: "{% url 'get_secondary_work_types' %}",
+                            data: {
+                                primary_work_type_name: primaryWorkTypeName
+                            },
+                            success: function (data) {
+                                secondarySelect.empty().append($('<option></option>').attr('value', '').text('请选择'));
+                                $.each(data, function (index, item) {
+                                    secondarySelect.append($('<option></option>').attr('value', item.id).text(item.job_name));
+                                });
+                            },
+                            error: function (xhr, status, error) {
+                                console.log("Ajax请求失败:", error);
+                            }
+                        });
+                    } else {
+                        secondarySelect.empty().append($('<option></option>').attr('value', '').text('请选择'));
+                    }
+                });
+
+                $('#' + prefix + '-数量').change(function () {
+                    calculateSalary(prefix);
+                });
+
+                $('#' + prefix + '-批次').autocomplete({
+                    source: function (request, response) {
+                        var baseId = $('#' + prefix + '-基地').val();  // 动态获取 base_id 值
+                        // alert(baseId);
+                        var url = "{% url 'autocomplete'  %}";
+
+                        $.ajax({
+                            url: url,
+                            dataType: "json",
+                            data: {
+                                term: request.term,
+                                baseId: $('#' + prefix + '-基地').val(),
+                                // extraParam2: anotherJavaScriptVariable
+                            },
+                            success: function (data) {
+                                //alert(data);
+                                response(data);
+                            },
+
+                        });
+                    },
+                    minLength: 2
+                });
+
+                   // 获取工价
+                $('#' + prefix + '-二级工种').change(function () {
+                    var selectedValue_one = $('#' + prefix + '-二级分类').val();
+                    var selectedValue_tow = $('#' + prefix + '-一级工种 option:selected').text();
+                    var selectedValue_three = $('#' + prefix + '-二级工种 option:selected').text();
+                    $.ajax({
+                        url: '/get_productionwate_price/',
+                        type: 'GET',
+                        data: {
+                            'one': selectedValue_one,
+                            'tow': selectedValue_tow,
+                            'three': selectedValue_three
+                        },
+                        success: function (data) {
+                            // 打印从服务器返回的数据，方便调试
+                            console.log("AJAX response data:", data); // 调试信息
+                            var price = parseFloat(Object.values(data)[0]);
+
+                            if (price) {
+                                $('#' + prefix + '-工价').val(price); // 填充工价
+                            } else {
+                                console.log("未找到对应的工价");
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Ajax请求失败:", error);
+                        }
+                    });
+                });
+
+
+                  // 获取地块
+                $('#' + prefix + '-数量').change(function () {
+                    calculateSalary(prefix);
+                    var pc = $('#' + prefix + '-批次').val();
+                    //alert(pc);
+
+                    $.ajax({
+                        url: '/get_Plant_batch_dk/',
+                        type: 'GET',
+                        data: {
+                            'one': pc,
+                        },
+                        success: function (data) {
+                            $('#' + prefix + '-地块').empty();
+                            $.each(data, function (key, value) {
+                                $('#' + prefix + '-地块').append($('<option></option>').attr('value', key).text(value));
+                            });
+                        },
+                        error: function (xhr, status, error) {
+                            console.log("Ajax请求失败:", error);
+                        }
+                    });
+                });
+
+
+            }
+
+
+            // 初始绑定事件
+            bindEvents('id_form-0');
         });
     </script>
 </body>

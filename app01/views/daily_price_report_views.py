@@ -26,7 +26,7 @@ def daily_price_report(request):
                         市场=market,
                         defaults={'价格': price}
                     )
-        return redirect('/daily_price_report/')
+        return redirect('/daily_price_report/list/')
 
     return render(request, 'daily_price_report.html', {
         'markets': markets,

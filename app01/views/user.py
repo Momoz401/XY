@@ -10,7 +10,7 @@ def user_list(request):
 
     queryset = models.UserInfo.objects.all()
 
-    page_object = Pagination(request, queryset, page_size=2)
+    page_object = Pagination(request, queryset, page_size=20)
     context = {
         "queryset": page_object.page_queryset,
         "page_string": page_object.html(),

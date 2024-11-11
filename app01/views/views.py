@@ -63,12 +63,6 @@ def autocomplete_baseinfo(request):
 from django.shortcuts import render, redirect
 
 
-
-
-
-
-
-
 def add_multiple_work_hours(request):
     if request.method == 'POST':
         formset = WorkHourFormSet(request.POST)
@@ -138,8 +132,6 @@ def expense_allocation_edit(request, nid):
 def expense_allocation_delete(request, nid):
     ExpenseAllocation.objects.filter(id=nid).delete()
     return redirect('/expense_allocation/list/')
-
-
 
 
 def depreciation_allocation_list(request):
