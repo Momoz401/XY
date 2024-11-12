@@ -151,7 +151,7 @@ class baseInfoModelForm(BootStrapModelForm):
 class workHourModelForm(BootStrapModelForm):
     class Meta:
         model = BaseInfoWorkHour
-        fields = ['工种ID', '一级分类', '一级工种', '一级工种', '二级工种', '单价', '单位', '备注', '默认计入成本']
+        fields = ['工种ID', '一级分类', '二级分类', '一级工种', '二级工种', '单价', '单位', '备注', '默认计入成本']
 
     def clean(self):
         cleaned_data = super().clean()
