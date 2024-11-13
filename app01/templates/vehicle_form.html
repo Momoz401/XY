@@ -13,6 +13,7 @@
                         <div class="form-group">
                             <label>{{ field.label }}</label>
                             {{ field }}
+                            <!-- 显示字段错误信息 -->
                             <span style="color: red;">{{ field.errors.0 }}</span>
                         </div>
                     {% endfor %}

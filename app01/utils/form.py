@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from app01 import models
@@ -445,6 +446,32 @@ class VehicleForm(BootStrapModelForm):
     class Meta:
         model = Vehicle
         fields = "__all__"
+
+    def clean_身份证号码(self):
+        """
+        自定义身份证号码验证，检查是否为18位数字。
+        """
+        身份证号码 = self.cleaned_data.get('身份证号码')
+
+        # 如果提供了身份证号码，进行格式验证
+        if 身份证号码:
+            if len(身份证号码) != 18 or not 身份证号码.isdigit():
+                raise forms.ValidationError("身份证号码必须是18位数字。")
+
+        return 身份证号码
+
+    def clean_电话(self):
+        """
+        自定义手机号码验证，检查是否为11位数字。
+        """
+        电话 = self.cleaned_data.get('电话')
+
+        # 如果提供了手机号码，进行格式验证
+        if 电话:
+            if not re.match(r'^\d{11}$', 电话):
+                raise forms.ValidationError("请输入有效的11位手机号码。")
+
+        return 电话
 
 
 class MarketForm(BootStrapModelForm):

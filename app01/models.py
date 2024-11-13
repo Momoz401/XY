@@ -722,23 +722,6 @@ class Salesperson(models.Model):
 
     def __str__(self):
         return self.姓名
-
-class Vehicle(models.Model):
-    车牌 = models.CharField(max_length=50, unique=True, verbose_name="车牌")
-    司机 = models.CharField(max_length=255, verbose_name="司机")
-    电话 = models.CharField(max_length=20, verbose_name="电话")
-    型号 = models.CharField(max_length=255, verbose_name="型号")
-    颜色 = models.CharField(max_length=255, verbose_name="颜色")
-    类型 = models.CharField(max_length=255, verbose_name="类型")
-    备注 = models.TextField(verbose_name="备注", null=True, blank=True)
-
-    class Meta:
-        verbose_name = "车辆管理"
-        verbose_name_plural = "车辆管理"
-
-    def __str__(self):
-        return self.车牌
-
 from django.db import models
 
 class Market(models.Model):
@@ -753,6 +736,29 @@ class Market(models.Model):
 
     def __str__(self):
         return self.市场名称
+
+
+class Vehicle(models.Model):
+    车牌 = models.CharField(max_length=50, unique=True, verbose_name="车牌")
+    司机 = models.CharField(max_length=255, verbose_name="司机")
+    电话 = models.CharField(max_length=20, verbose_name="电话")
+    型号 = models.CharField(max_length=255, verbose_name="型号")
+    颜色 = models.CharField(max_length=255, verbose_name="颜色")
+    类型 = models.CharField(max_length=255, verbose_name="类型")
+    备注 = models.TextField(verbose_name="备注", null=True, blank=True)
+    身份证号码 = models.CharField(max_length=18, verbose_name="身份证号码", null=True, blank=True)
+    市场分类 = models.ForeignKey(Market, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="市场分类")
+
+    class Meta:
+        verbose_name = "车辆管理"
+        verbose_name_plural = "车辆管理"
+
+    def __str__(self):
+        return self.车牌
+
+
+
+
 
 class Customer(models.Model):
     客户名称 = models.CharField(max_length=255, verbose_name="客户名称")
