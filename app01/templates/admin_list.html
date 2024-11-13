@@ -34,25 +34,25 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>用户名</th>
-                    <th>密码</th>
-                    <th>重置密码</th>
-                    <th>操作</th>
+                    <th style="text-align: center">ID</th>
+                    <th style="text-align: center">用户名</th>
+                    <th style="text-align: center">密码</th>
+                    <th style="text-align: center">重置密码</th>
+                    <th style="text-align: center">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
-                        <th>{{ obj.id }}</th>
-                        <td>{{ obj.username }}</td>
-                        <td>*******</td>
-                        <td>
-                            <a href="/admin/{{ obj.id }}/reset/">重置密码</a>
+                        <th  style="text-align: center">{{ obj.id }}</th>
+                        <td style="text-align: center">{{ obj.username }}</td>
+                        <td style="text-align: center">*******</td>
+                        <td style="text-align: center">
+                            <a href="/admin/{{ obj.id }}/reset/" >重置密码</a>
                         </td>
-                        <td>
-                            <a class="btn btn-primary btn-xs" href="/admin/{{ obj.id }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/admin/{{ obj.id }}/delete/">删除</a>
+                        <td style="text-align: center">
+                            <a class="btn btn-primary btn-xs" href="/admin/{{ obj.id }}/edit/" >编辑</a>
+                            <a class="btn btn-danger btn-xs" href="/admin/{{ obj.id }}/delete/" >删除</a>
                         </td>
                     </tr>
                 {% endfor %}

@@ -11,7 +11,7 @@
             <div style="float: right;width: 300px;">
                 <form method="get">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search for..."
+                        <input type="text" name="q" class="form-control" placeholder="请输入市场名称进行查询..."
                                value="{{ search_data }}">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">
@@ -31,25 +31,24 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>市场名称</th>
-                    <th>地区</th>
-                    <th>地址</th>
-                    <th>联系人</th>
-                    <th>插入时间</th>
-                    <th>操作</th>
+                    <th style="text-align: center;">ID</th>
+                    <th style="text-align: center;">市场名称</th>
+                    <th style="text-align: center;">地区</th>
+                    <th style="text-align: center;">地址</th>
+                    <th style="text-align: center;">联系人</th>
+                    <th style="text-align: center;">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
-                        <td>{{ obj.id }}</td>
-                        <td>{{ obj.市场名称 }}</td>
-                        <td>{{ obj.地区 }}</td>
-                        <td>{{ obj.地址 }}</td>
-                        <td>{{ obj.联系人 }}</td>
-                        <td>{{ obj.插入时间 }}</td>
-                        <td>
+                        <td style="text-align: center;">{{ obj.id }}</td>
+                        <td style="text-align: center;">{{ obj.市场名称 }}</td>
+                        <td style="text-align: center;">{{ obj.地区 }}</td>
+                        <td style="text-align: center;">{{ obj.地址 }}</td>
+                        <td style="text-align: center;">{{ obj.联系人 }}</td>
+
+                        <td style="text-align: center;">
                             <a class="btn btn-primary btn-xs" href="{% url 'market_edit' obj.id %}">编辑</a>
                             <a class="btn btn-danger btn-xs" href="{% url 'market_delete' obj.id %}">删除</a>
                         </td>

@@ -19,7 +19,7 @@ from django.views.static import serve
 from django.conf import settings
 
 from app01.mobile.views import mobile_login, mobile_home, mobile_logout, mobile_gongshiluru, mobile_outbound_add, \
-     customer_autocomplete, worker_autocomplete, batch_autocomplete
+    customer_autocomplete, worker_autocomplete, batch_autocomplete
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
@@ -36,30 +36,27 @@ from app01.views.process_alert import process_alert_list, process_alert_create, 
 from app01.views.process_alert_over import process_alert_overview
 from app01.views.productionwage import get_primary_work_types, get_secondary_work_types, get_base_options
 from app01.views.sales import salesperson_list, salesperson_add, salesperson_edit, salesperson_delete
-
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
     upload_sales_record
 from app01.views.views import create_expense_allocation, expense_allocation_list, expense_allocation_add, \
     expense_allocation_edit, expense_allocation_delete, depreciation_allocation_list, depreciation_allocation_add, \
     depreciation_allocation_edit, depreciation_allocation_delete, loss_report_list, loss_report_add, loss_report_edit, \
     loss_report_delete, get_plant_batch_dk, loss_report_autocomplete, \
-     market_list, \
-    market_add, market_edit, market_delete, customer_list, customer_add, customer_edit, customer_delete, \
     add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
     outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
     plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details, profit_summary, \
     daily_price_report_list, daily_price_report_edit, daily_price_report_delete, cost_alert_summary, cost_alert_feedback
 from app01.views.views_daily_plan import daily_plan_list, daily_plan_create, daily_plan_edit, daily_plan_delete
 from app01.views.vihicle import vehicle_list, vehicle_add, vehicle_edit, vehicle_delete
+from app01.views.market import *
+from app01.views.customer import *
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
 
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}, name='media'),
 
-
     path('tt/', chart.tt),
-
 
     # 部门管理路由
     path('depart/list/', depart.depart_list),  # 部门列表页面
@@ -94,12 +91,26 @@ urlpatterns = [
     path('order/detail/', order.order_detail),  # 获取指定ID的计量对照详细信息
     path('order/edit/', order.order_edit),  # 编辑计量对照条目
 
-    # 车辆
-    path('vehicle/list/', vehicle_list, name='vehicle_list'),
-    path('vehicle/add/', vehicle_add, name='vehicle_add'),
-    path('vehicle/<int:nid>/edit/', vehicle_edit, name='vehicle_edit'),
-    path('vehicle/<int:nid>/delete/', vehicle_delete, name='vehicle_delete'),
+    # 车辆管理相关路由
+    # 车辆列表页：显示所有车辆信息
+    path('vehicle/list/', vehicle_list, name='vehicle_list'),  # 显示车辆列表，支持查询和分页
+    # 新建车辆：跳转到车辆信息添加页面
+    path('vehicle/add/', vehicle_add, name='vehicle_add'),  # 提供一个表单来添加新车辆
+    # 编辑车辆：根据车辆ID编辑指定车辆信息
+    path('vehicle/<int:nid>/edit/', vehicle_edit, name='vehicle_edit'),  # 根据车辆ID编辑车辆信息
+    # 删除车辆：根据车辆ID删除指定的车辆
+    path('vehicle/<int:nid>/delete/', vehicle_delete, name='vehicle_delete'),  # 根据车辆ID删除车辆信息
 
+    # 市场管理
+    path('market/list/', market_list, name='market_list'),  # 显示市场信息列表
+    path('market/add/', market_add, name='market_add'),  # 添加市场信息
+    path('market/<int:nid>/edit/', market_edit, name='market_edit'),  # 编辑市场信息
+    path('market/<int:nid>/delete/', market_delete, name='market_delete'),  # 删除市场信息
+    # 客户
+    path('customer/list/', customer_list, name='customer_list'),
+    path('customer/add/', customer_add, name='customer_add'),
+    path('customer/<int:nid>/edit/', customer_edit, name='customer_edit'),
+    path('customer/<int:nid>/delete/', customer_delete, name='customer_delete'),
 
     # 工种管理
     path('BaseInfoWorkType/list/', worktype.work_type_list),
@@ -113,8 +124,6 @@ urlpatterns = [
     path('BaseInfo/<int:nid>/edit/', baseinfo.BaseInfo_edit),  # 编辑指定ID的基地信息
     path('BaseInfo/<int:nid>/delete/', baseinfo.BaseInfo_delete),  # 删除指定ID的基地信息
 
-
-
     # 工价管理
     path('production_wage_list/list/', productionwage.production_wage_list),
     path('productionwate/add/undefined/', productionwage.production_wage_list),
@@ -122,17 +131,16 @@ urlpatterns = [
     path('productionwate/<int:nid>/delete/', productionwage.production_wage_delete),
     path('productionwate/<int:nid>/edit/', productionwage.productionwate_edit),
     path('upload/productionwate/', upload.upload_productionwate_modal_form),  # 工时批量上传
-    path('get_productionwate/', productionwage.get_productionwate), # ajax获得价格和类型
-    path('get_base_options/', get_base_options, name='get_base_options'), #h 获得基地
+    path('get_productionwate/', productionwage.get_productionwate),  # ajax获得价格和类型
+    path('get_base_options/', get_base_options, name='get_base_options'),  # h 获得基地
     path('get_productionwate_price/', productionwage.get_productionwate_price),  # ajax获得价格和类型
     path('get_Plant_batch_dk/', productionwage.get_Plant_batch_dk),  # ajax获得地块
-    path('get_primary_work_types/', get_primary_work_types, name='get_primary_work_types'), # 获得一级工种
-    path('get_secondary_work_types/', get_secondary_work_types, name='get_secondary_work_types'),# 获得二级工种
+    path('get_primary_work_types/', get_primary_work_types, name='get_primary_work_types'),  # 获得一级工种
+    path('get_secondary_work_types/', get_secondary_work_types, name='get_secondary_work_types'),  # 获得二级工种
 
-
-
+    # 功能性路由
     # 获取二级分类和工种的 Ajax 请求 URL
-    path('get_second_level_categories/',get_second_level_categories,
+    path('get_second_level_categories/', get_second_level_categories,
          name='get_second_level_categories'),
     path('get_second_level_jobs/', get_second_level_jobs, name='get_second_level_jobs'),
 
@@ -153,9 +161,9 @@ urlpatterns = [
     path('employee_autocomplete/', views.employee_autocomplete, name='employee_autocomplete'),
     path('autocomplete', views.autocomplete, name='autocomplete'),
     path('autocomplete_baseinfo/', views.autocomplete_baseinfo, name='autocomplete_baseinfo'),
-    path('test/',views.add_multiple_work_hours),
+    path('test/', views.add_multiple_work_hours),
     # 月度计划
-    path('PlanPlantBatch/list/',planplantbatch.planplantbatch_list),
+    path('PlanPlantBatch/list/', planplantbatch.planplantbatch_list),
     # 靓号管理
     path('pretty/list/', pretty.pretty_list),
     path('pretty/add/', pretty.pretty_add),
@@ -182,18 +190,20 @@ urlpatterns = [
     path('report/get_tables_date/', report.data_table_view, name="data_table_view"),
     # 散工工资
     path('report_salary_temp_by_daily/list', report.report_salary_temp_by_daily),  # 工资明细表
-    path('report_salary_temp_by_daily/get_tables_date/', report.report_salary_temp_by_daily_data_table_view, name="report_salary_temp_by_daily"),
+    path('report_salary_temp_by_daily/get_tables_date/', report.report_salary_temp_by_daily_data_table_view,
+         name="report_salary_temp_by_daily"),
     # 工资花名册
     path('report_salary_by_plople/list/', report.report_salary_by_plople),
-    path('report_salary_by_plople/get_tables_date/', report.report_salary_by_plople_data_table_view, name="report_salary_by_plople"), # 获取工资花名册
+    path('report_salary_by_plople/get_tables_date/', report.report_salary_by_plople_data_table_view,
+         name="report_salary_by_plople"),  # 获取工资花名册
     # 每日工资表
-    path('report_salary_by_daily/list/', report.report_salary_by_daily),# 每日工资表
-    path('report_salary_by_daily/get_tables_date/', report.report_salary_by_daily_data_table_view,name="report_salary_by_daily"),
+    path('report_salary_by_daily/list/', report.report_salary_by_daily),  # 每日工资表
+    path('report_salary_by_daily/get_tables_date/', report.report_salary_by_daily_data_table_view,
+         name="report_salary_by_daily"),
     # 每日工时
     path('report_workhour_by_daily/list/', report.report_workhour_by_daily),  # 每日工时
-    path('report_workhour_by_daily/get_tables_date/', report.report_workhour_by_daily_data_table_view,name="report_workhour_by_daily"),
-
-
+    path('report_workhour_by_daily/get_tables_date/', report.report_workhour_by_daily_data_table_view,
+         name="report_workhour_by_daily"),
 
     # 数据统计
     path('chart/list/', chart.chart_list),
@@ -205,7 +215,7 @@ urlpatterns = [
     # 上传文件
     path('upload/list/', upload.upload_list),
     path('upload/form/', upload.upload_form),
-    #path('upload/modal/form/', upload.upload_modal_form),
+    # path('upload/modal/form/', upload.upload_modal_form),
 
     # 城市列表
     path('city/list/', city.city_list),
@@ -220,7 +230,8 @@ urlpatterns = [
     path('depreciation_allocation/list/', depreciation_allocation_list, name='depreciation_allocation_list'),
     path('depreciation_allocation/add/', depreciation_allocation_add, name='depreciation_allocation_add'),
     path('depreciation_allocation/<int:nid>/edit/', depreciation_allocation_edit, name='depreciation_allocation_edit'),
-    path('depreciation_allocation/<int:nid>/delete/', depreciation_allocation_delete,name='depreciation_allocation_delete'),
+    path('depreciation_allocation/<int:nid>/delete/', depreciation_allocation_delete,
+         name='depreciation_allocation_delete'),
     # 报损
     path('loss_report/list/', loss_report_list, name='loss_report_list'),
     path('loss_report/add/', loss_report_add, name='loss_report_add'),
@@ -229,17 +240,6 @@ urlpatterns = [
     path('loss_report_autocomplete/', loss_report_autocomplete, name='loss_report_autocomplete'),
     path('get_plant_batch_dk/', get_plant_batch_dk, name='get_plant_batch_dk'),
 
-
-    # 市场
-    path('market/list/', market_list, name='market_list'),
-    path('market/add/', market_add, name='market_add'),
-    path('market/<int:nid>/edit/', market_edit, name='market_edit'),
-    path('market/<int:nid>/delete/', market_delete, name='market_delete'),
-    # 客户
-    path('customer/list/', customer_list, name='customer_list'),
-    path('customer/add/', customer_add, name='customer_add'),
-    path('customer/<int:nid>/edit/', customer_edit, name='customer_edit'),
-    path('customer/<int:nid>/delete/', customer_delete, name='customer_delete'),
     # 出库
     path('outbound/list/', outbound_list, name='outbound_list'),
     path('outbound/add/', outbound_add, name='outbound_add'),
@@ -248,7 +248,8 @@ urlpatterns = [
     path('upload/outbound/', outbound_upload, name='outbound_upload'),
     path('get_sales_records/', get_sales_records, name='get_sales_records'),
     path('add_sale_form/', add_sale_form, name='add_sale_form'),
-    path('fetch_unique_second_level_categories/', fetch_unique_second_level_categories, name='fetch_unique_second_level_categories'),
+    path('fetch_unique_second_level_categories/', fetch_unique_second_level_categories,
+         name='fetch_unique_second_level_categories'),
     path('sales_record/add/<int:outbound_id>/', sales_record_add, name='sales_record_add'),
     path('sales_record/edit/<int:pk>/', sales_record_edit, name='sales_record_edit'),
     path('sales_record/delete/<int:pk>/', sales_record_delete, name='sales_record_delete'),
@@ -268,13 +269,12 @@ urlpatterns = [
     path('plant_batch_summary/', plant_batch_summary, name='plant_batch_summary'),
     path('get_batch_details/', views.get_batch_details, name='get_batch_details'),
 
-    #工价汇总
+    # 工价汇总
     path('production_wage_summary/', production_wage_summary, name='production_wage_summary'),
     path('production_wage_second_level/', production_wage_second_level, name='production_wage_second_level'),
     path('production_wage_details/', production_wage_details, name='production_wage_details'),
 
-
-    #折旧分摊表
+    # 折旧分摊表
     path('expense_allocation/list/', expense_allocation_list, name='expense_allocation_list'),
     path('expense_allocation/add/', expense_allocation_add, name='expense_allocation_add'),
     path('expense_allocation/<int:nid>/edit/', expense_allocation_edit, name='expense_allocation_edit'),
@@ -283,7 +283,6 @@ urlpatterns = [
 
     # 利润
     path('profit_summary/', profit_summary, name='profit_summary_list'),
-
 
     path('mobile_login/', mobile_login, name='mobile_login'),
     path('mobile/home/', mobile_home, name='mobile_home'),
@@ -309,11 +308,10 @@ urlpatterns = [
     # 根据二级分类获取父工种
 
     # 每日价格录入相关的 URL 路由
-    path('daily_price_report/add/',daily_price_report, name='daily_price_report_add'),
+    path('daily_price_report/add/', daily_price_report, name='daily_price_report_add'),
     path('daily_price_report/list/', daily_price_report_list, name='daily_price_report_list'),
     path('daily_price_report/<int:pk>/edit/', daily_price_report_edit, name='daily_price_report_edit'),
     path('daily_price_report/<int:pk>/delete/', daily_price_report_delete, name='daily_price_report_delete'),
-
 
     # 月度计划
     path('monthly_plan/', monthly_plan_list, name='monthly_plan_list'),
@@ -327,18 +325,15 @@ urlpatterns = [
     path('daily_plan/<str:pk>/edit/', daily_plan_edit, name='daily_plan_edit'),
     path('daily_plan/delete/<str:batch_id>/', daily_plan_delete, name='daily_plan_delete'),
 
-
     # 月度计划实现
-    path('monthly_plan_rate/', monthly_plan_rate, name='monthly_plan_rate'), #显示
+    path('monthly_plan_rate/', monthly_plan_rate, name='monthly_plan_rate'),  # 显示
     path('monthly_plan/download/', monthly_plan_download, name='monthly_plan_download'),  # 下载月度计划
     path('monthly_plan/feedback/<int:plan_id>/', plan_feedback, name='feedback'),  # 未达成反馈
-
 
     # 费用超支
     path('cost_alert/', cost_alert_summary, name='cost_alert_summary'),
     path('cost_alert_feedback/', cost_alert_feedback, name='cost_alert_feedback'),
     path('fetch_cost_details/', views.fetch_cost_details, name='fetch_cost_details'),
-
 
     # 流程维护
     path('process_alerts/', process_alert_list, name='process_alert_list'),
@@ -348,8 +343,6 @@ urlpatterns = [
 
     # 流程预警
     path('process_alerts/overview/', process_alert_overview, name='process_alert_overview'),
-
-
 
     # 价格走势
     path('price_trends/', get_price_trends, name='price_trends'),

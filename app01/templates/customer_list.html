@@ -29,47 +29,47 @@
                 客户信息列表
             </div>
 
-            <div class="table-responsive"> <!-- 添加一个新的包含div -->
+            <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
                     <tr>
-                        <th>ID</th>
-                        <th>客户名称</th>
-                        <th>联系人</th>
-                        <th>联系电话</th>
-                        <th>邮箱</th>
-                        <th>地址</th>
-                        <th>销售地区</th>
-                        <th>客户类型</th>
-                        <th>公司名称</th>
-                        <th>公司网站</th>
-                        <th>公司地址</th>
-                        <th>行业</th>
-                        <th>备注</th>
-                        <th>创建时间</th>
-                        <th>更新时间</th>
-                        <th>操作</th>
+                        <th style="text-align: center;">ID</th>
+                        <th style="text-align: center;">客户名称</th>
+                        <th style="text-align: center;">联系人</th>
+                        <th style="text-align: center;">联系电话</th>
+                        <th style="text-align: center;">邮箱</th>
+                        <th style="text-align: center;">地址</th>
+                        <th style="text-align: center;">销售地区</th>
+                        <th style="text-align: center;">客户类型</th>
+                        <th style="text-align: center;">公司名称</th>
+                        <th style="text-align: center;">公司网站</th>
+                        <th style="text-align: center;">公司地址</th>
+                        <th style="text-align: center;">行业</th>
+                        <th style="text-align: center;">备注</th>
+                        <th style="text-align: center;">创建时间</th>
+                        <th style="text-align: center;">更新时间</th>
+                        <th style="text-align: center;">操作</th>
                     </tr>
                     </thead>
                     <tbody>
                     {% for obj in queryset %}
                         <tr>
-                            <td>{{ obj.id }}</td>
-                            <td>{{ obj.客户名称 }}</td>
-                            <td>{{ obj.联系人 }}</td>
-                            <td>{{ obj.联系电话 }}</td>
-                            <td>{{ obj.邮箱 }}</td>
-                            <td>{{ obj.地址 }}</td>
-                            <td>{{ obj.销售地区 }}</td>
-                            <td>{{ obj.客户类型 }}</td>
-                            <td>{{ obj.公司名称 }}</td>
-                            <td>{{ obj.公司网站 }}</td>
-                            <td>{{ obj.公司地址 }}</td>
-                            <td>{{ obj.行业 }}</td>
-                            <td>{{ obj.备注 }}</td>
-                            <td>{{ obj.创建时间 }}</td>
-                            <td>{{ obj.更新时间 }}</td>
-                            <td>
+                            <td style="text-align: center;">{{ obj.id }}</td>
+                            <td style="text-align: center;">{{ obj.客户名称 }}</td>
+                            <td style="text-align: center;">{{ obj.联系人 }}</td>
+                            <td style="text-align: center;">{{ obj.联系电话 }}</td>
+                            <td style="text-align: center;">{{ obj.邮箱 }}</td>
+                            <td style="text-align: center;">{{ obj.地址 }}</td>
+                            <td style="text-align: center;">{{ obj.销售地区 }}</td>
+                            <td style="text-align: center;">{{ obj.客户类型 }}</td>
+                            <td style="text-align: center;">{{ obj.公司名称 }}</td>
+                            <td style="text-align: center;">{{ obj.公司网站 }}</td>
+                            <td style="text-align: center;">{{ obj.公司地址 }}</td>
+                            <td style="text-align: center;">{{ obj.行业 }}</td>
+                            <td style="text-align: center;">{{ obj.备注 }}</td>
+                            <td style="text-align: center;">{{ obj.创建时间 }}</td>
+                            <td style="text-align: center;">{{ obj.更新时间 }}</td>
+                            <td style="text-align: center;">
                                 <a class="btn btn-primary btn-xs" href="{% url 'customer_edit' obj.id %}">编辑</a>
                                 <a class="btn btn-danger btn-xs" href="{% url 'customer_delete' obj.id %}">删除</a>
                             </td>
@@ -85,6 +85,7 @@
             </ul>
         </div>
     </div>
+
     <style>
     .table-responsive {
         width: 100%;
@@ -97,7 +98,6 @@
     th, td {
         border: 1px solid #ddd;
         padding: 8px;
-        text-align: left;
         white-space: nowrap; /* 防止换行 */
     }
     th {
