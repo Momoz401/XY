@@ -43,10 +43,7 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="form-group">
-                        <label for="id_plot">地块</label>
-                        <input type="text" class="form-control" name="地块" value="{{ form.地块.value }}">
-                    </div>
+
                     <button type="submit" class="btn btn-primary">保存</button>
                     <a href="{% url 'monthly_plan_list' %}" class="btn btn-secondary">取消</a>
                 </form>

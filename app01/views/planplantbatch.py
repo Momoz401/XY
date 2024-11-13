@@ -5,7 +5,7 @@ from app01.utils.pagination import Pagination
 from app01.utils.form import PrettyEditModelForm, workHourModelForm
 
 def planplantbatch_list(request):
-    """ 工时列表 """
+    """ 月度计划列表 """
 
     data_dict = {}
     search_data = request.GET.get('q', "")

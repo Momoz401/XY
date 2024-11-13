@@ -101,6 +101,10 @@ urlpatterns = [
     # 删除车辆：根据车辆ID删除指定的车辆
     path('vehicle/<int:nid>/delete/', vehicle_delete, name='vehicle_delete'),  # 根据车辆ID删除车辆信息
 
+    # 月度计划
+    path('PlanPlantBatch/list/', planplantbatch.planplantbatch_list),
+
+
     # 市场管理
     path('market/list/', market_list, name='market_list'),  # 显示市场信息列表
     path('market/add/', market_add, name='market_add'),  # 添加市场信息
@@ -111,6 +115,12 @@ urlpatterns = [
     path('customer/add/', customer_add, name='customer_add'),
     path('customer/<int:nid>/edit/', customer_edit, name='customer_edit'),
     path('customer/<int:nid>/delete/', customer_delete, name='customer_delete'),
+
+    # 月度计划
+    path('monthly_plan/', monthly_plan_list, name='monthly_plan_list'),
+    path('monthly_plan/add/', monthly_plan_create, name='monthly_plan_create'),
+    path('monthly_plan/edit/<int:pk>/', monthly_plan_edit, name='monthly_plan_edit'),
+    path('monthly_plan/delete/<int:pk>/', monthly_plan_delete, name='monthly_plan_delete'),
 
     # 工种管理
     path('BaseInfoWorkType/list/', worktype.work_type_list),
@@ -162,8 +172,7 @@ urlpatterns = [
     path('autocomplete', views.autocomplete, name='autocomplete'),
     path('autocomplete_baseinfo/', views.autocomplete_baseinfo, name='autocomplete_baseinfo'),
     path('test/', views.add_multiple_work_hours),
-    # 月度计划
-    path('PlanPlantBatch/list/', planplantbatch.planplantbatch_list),
+
     # 靓号管理
     path('pretty/list/', pretty.pretty_list),
     path('pretty/add/', pretty.pretty_add),
@@ -313,11 +322,7 @@ urlpatterns = [
     path('daily_price_report/<int:pk>/edit/', daily_price_report_edit, name='daily_price_report_edit'),
     path('daily_price_report/<int:pk>/delete/', daily_price_report_delete, name='daily_price_report_delete'),
 
-    # 月度计划
-    path('monthly_plan/', monthly_plan_list, name='monthly_plan_list'),
-    path('monthly_plan/add/', monthly_plan_create, name='monthly_plan_create'),
-    path('monthly_plan/edit/<int:pk>/', monthly_plan_edit, name='monthly_plan_edit'),
-    path('monthly_plan/delete/<int:pk>/', monthly_plan_delete, name='monthly_plan_delete'),
+
 
     # ri度计划
     path('daily_plan/', daily_plan_list, name='daily_plan_list'),

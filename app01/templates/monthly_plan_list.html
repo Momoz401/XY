@@ -46,7 +46,7 @@
                             <th>面积</th>
                             <th>周期</th>
                             <th>基地</th>
-                            <th>地块</th>
+
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -59,7 +59,7 @@
                                 <td>{{ plan.面积 }}</td>
                                 <td>{{ plan.周期 }}</td>
                                 <td>{{ plan.基地 }}</td>  <!-- 显示基地 -->
-                                <td>{{ plan.地块 }}</td>
+
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="{% url 'monthly_plan_edit' plan.id %}">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="{% url 'monthly_plan_delete' plan.id %}">删除</a>

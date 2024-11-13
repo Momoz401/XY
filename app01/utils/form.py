@@ -569,7 +569,7 @@ class DailyPriceReportForm(BootStrapModelForm):
 class MonthlyPlanForm(BootStrapModelForm):
     class Meta:
         model = MonthlyPlan
-        fields = ['日期', '二级分类', '面积', '周期', '基地', '地块']
+        fields = ['日期', '二级分类', '面积', '周期', '基地']
 
 
 class DailyPlanForm(BootStrapModelForm):
