@@ -1,16 +1,18 @@
 from datetime import datetime
 
-from django.forms import CharField
 from app01 import models
-from django.core.validators import RegexValidator
+
 from django.core.exceptions import ValidationError
-from django import forms
+
 
 from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage, ExpenseAllocation, DepreciationAllocation, \
     LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord, DailyPriceReport, MonthlyPlan, \
-    BaseInfoBase, DailyPlan, Plant_batch, ProcessAlert
+    BaseInfoBase, DailyPlan, Plant_batch, ProcessAlert, UserInfo
 from app01.utils.bootstrap import BootStrapModelForm
-
+from django.core.validators import RegexValidator
+from django import forms
+from app01.utils.bootstrap import BootStrapForm
+from app01.utils.encrypt import md5
 
 class UserModelForm(BootStrapModelForm):
     name = forms.CharField(
@@ -19,14 +21,29 @@ class UserModelForm(BootStrapModelForm):
         widget=forms.TextInput(attrs={"class": "form-control"})
     )
 
+    phone = forms.CharField(
+        label="手机号码",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        validators=[
+            # 校验手机号是否为11位数字
+            RegexValidator(r'^\d{11}$', '手机号必须是11位数字')
+        ]
+    )
+
+    id_card = forms.CharField(
+        label="身份证号码",
+        widget=forms.TextInput(attrs={"class": "form-control"}),
+        required=False,
+        validators=[
+            # 校验身份证号码的格式
+            RegexValidator(r'^\d{15}|\d{18}$', '身份证号码必须是15或18位数字')
+        ]
+    )
+
     class Meta:
-        model = models.UserInfo
-        fields = ["name", "password", "age", "salary", "create_time", "gender", "depart", "phone", "bank_account"]
+        model = UserInfo
+        fields = ["name", "password", "age", "salary", "create_time", "gender", "depart", "phone", "bank_account", "id_card"]
 
-
-from django import forms
-from app01.utils.bootstrap import BootStrapForm
-from app01.utils.encrypt import md5
 
 
 class MobileLoginForm(BootStrapForm):

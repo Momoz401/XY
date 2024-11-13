@@ -5,21 +5,19 @@
         <div style="margin-bottom: 10px">
             <input type="button" value="新建计量" class="btn btn-success" data-toggle="modal" data-target="#myModal">
 
-             <div style="float: right;width: 300px;">
+            <div style="float: right;width: 300px;">
                 <form method="get">
                     <div class="input-group">
                         <input type="text" name="q" class="form-control" placeholder="输入品类进行查询"
                                value="{{ search_data }}">
                         <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">
-                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                        </button>
-                      </span>
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
                     </div>
                 </form>
             </div>
-
-
         </div>
 
         <!-- 订单列表 -->
@@ -34,31 +32,30 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>ID</th>
-                    <th>维护日期</th>
-                    <th>一级分类</th>
-                    <th>数量</th>
-                    <th>一级工种</th>
-                    <th>操作员</th>
-                    <th>操作</th>
+                    <th style="text-align: center;">ID</th>
+                    <th style="text-align: center;">维护日期</th>
+                    <th style="text-align: center;">一级分类</th>
+                    <th style="text-align: center;">数量</th>
+                    <th style="text-align: center;">一级工种</th>
+                    <th style="text-align: center;">操作员</th>
+                    <th style="text-align: center;">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr uid="{{ obj.id }}">
-                        <th>{{ obj.id }}</th>
-                        <td>{{ obj.oid }}</td>
-                        <td>{{ obj.title }}</td>
-                        <td>{{ obj.price }}</td>
-                        <td>{{ obj.get_status_display }}</td>
-                        <td>{{ obj.admin.username }}</td>
-                        <td>
+                        <td style="text-align: center;">{{ obj.id }}</td>
+                        <td style="text-align: center;">{{ obj.oid }}</td>
+                        <td style="text-align: center;">{{ obj.title }}</td>
+                        <td style="text-align: center;">{{ obj.price }}</td>
+                        <td style="text-align: center;">{{ obj.get_status_display }}</td>
+                        <td style="text-align: center;">{{ obj.admin.username }}</td>
+                        <td style="text-align: center;">
                             <input uid="{{ obj.id }}" type="button" class="btn btn-primary btn-xs btn-edit" value="编辑">
                             <input uid="{{ obj.id }}" class="btn btn-danger btn-xs btn-delete" type="button" value="删除">
                         </td>
                     </tr>
                 {% endfor %}
-
                 </tbody>
             </table>
         </div>
@@ -67,8 +64,6 @@
         <ul class="pagination">
             {{ page_string }}
         </ul>
-
-
     </div>
 
     <!-- 新建/编辑 订单（对话框） -->
@@ -81,12 +76,7 @@
                     <h4 class="modal-title" id="myModalLabel">新建</h4>
                 </div>
 
-                <div style="float: right;width: 300px;">
-
-            </div>
-
                 <div class="modal-body">
-
                     <form id="formAdd">
                         <div class="clearfix">
                             {% for field in form %}
@@ -100,7 +90,6 @@
                             {% endfor %}
                         </div>
                     </form>
-
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
@@ -113,7 +102,6 @@
     <!-- 删除（对话框） -->
     <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog" role="document">
-
             <div class="alert alert-danger alert-dismissible fade in" role="alert">
                 <h4>是否确定删除？</h4>
                 <p style="margin: 10px 0;"> 删除后，所有关联的相关数据都会被删除。</p>
@@ -122,13 +110,9 @@
                     <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
                 </p>
             </div>
-
         </div>
     </div>
-
 {% endblock %}
-
-
 {% block js %}
     <script type="text/javascript">
         var DELETE_ID;

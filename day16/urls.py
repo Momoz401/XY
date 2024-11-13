@@ -35,20 +35,22 @@ from app01.views.process_alert import process_alert_list, process_alert_create, 
     process_alert_delete
 from app01.views.process_alert_over import process_alert_overview
 from app01.views.productionwage import get_primary_work_types, get_secondary_work_types, get_base_options
+from app01.views.sales import salesperson_list, salesperson_add, salesperson_edit, salesperson_delete
 
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
     upload_sales_record
 from app01.views.views import create_expense_allocation, expense_allocation_list, expense_allocation_add, \
     expense_allocation_edit, expense_allocation_delete, depreciation_allocation_list, depreciation_allocation_add, \
     depreciation_allocation_edit, depreciation_allocation_delete, loss_report_list, loss_report_add, loss_report_edit, \
-    loss_report_delete, get_plant_batch_dk, loss_report_autocomplete, salesperson_list, salesperson_add, \
-    salesperson_edit, salesperson_delete, vehicle_list, vehicle_add, vehicle_edit, vehicle_delete, market_list, \
+    loss_report_delete, get_plant_batch_dk, loss_report_autocomplete, \
+     market_list, \
     market_add, market_edit, market_delete, customer_list, customer_add, customer_edit, customer_delete, \
     add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
     outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
     plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details, profit_summary, \
     daily_price_report_list, daily_price_report_edit, daily_price_report_delete, cost_alert_summary, cost_alert_feedback
 from app01.views.views_daily_plan import daily_plan_list, daily_plan_create, daily_plan_edit, daily_plan_delete
+from app01.views.vihicle import vehicle_list, vehicle_add, vehicle_edit, vehicle_delete
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -57,19 +59,47 @@ urlpatterns = [
 
 
     path('tt/', chart.tt),
-    # 部门管理
-    path('depart/list/', depart.depart_list),
-    path('depart/add/', depart.depart_add),
-    path('depart/delete/', depart.depart_delete),
-    path('depart/<int:nid>/edit/', depart.depart_edit),
-    path('depart/multi/', depart.depart_multi),
 
-    # 用户管理
-    path('user/list/', user.user_list),
-    path('user/add/', user.user_add),
-    path('user/model/form/add/', user.user_model_form_add),
-    path('user/<int:nid>/edit/', user.user_edit),
-    path('user/<int:nid>/delete/', user.user_delete),
+
+    # 部门管理路由
+    path('depart/list/', depart.depart_list),  # 部门列表页面
+    path('depart/add/', depart.depart_add),  # 新增部门页面
+    path('depart/delete/', depart.depart_delete),  # 删除部门
+    path('depart/<int:nid>/edit/', depart.depart_edit),  # 编辑部门，基于部门ID
+    path('depart/multi/', depart.depart_multi),  # 批量上传部门信息
+
+    # 用户管理路由
+    path('user/list/', user.user_list),  # 显示用户列表页面
+    path('user/model/form/add/', user.user_model_form_add),  # 添加新用户（使用ModelForm）
+    path('user/<int:nid>/edit/', user.user_edit),  # 编辑指定用户信息（通过用户ID）
+    path('user/<int:nid>/delete/', user.user_delete),  # 删除指定用户（通过用户ID）
+
+    # 销售人员路由配置
+    path('salesperson/list/', salesperson_list, name='salesperson_list'),  # 销售人员信息列表页面
+    path('salesperson/add/', salesperson_add, name='salesperson_add'),  # 添加销售人员信息页面
+    path('salesperson/<int:nid>/edit/', salesperson_edit, name='salesperson_edit'),  # 编辑销售人员信息页面
+    path('salesperson/<int:nid>/delete/', salesperson_delete, name='salesperson_delete'),  # 删除销售人员信息功能
+
+    # 工时管理
+    path('WorkHour/list/', WorkHour.Hour_list),  # 工时列表视图
+    path('WorkHour/add/', WorkHour.WorkHour_add),  # 添加新工种工时视图
+    path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),  # 编辑指定工种工时视图
+    path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),  # 删除指定工种工时视图
+    path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工价批量上传视图
+
+    # 计量对照管理
+    path('order/list/', order.order_list),  # 计量对照列表页面
+    path('order/add/', order.order_add),  # 添加新的计量对照条目
+    path('order/delete/', order.order_delete),  # 删除计量对照条目
+    path('order/detail/', order.order_detail),  # 获取指定ID的计量对照详细信息
+    path('order/edit/', order.order_edit),  # 编辑计量对照条目
+
+    # 车辆
+    path('vehicle/list/', vehicle_list, name='vehicle_list'),
+    path('vehicle/add/', vehicle_add, name='vehicle_add'),
+    path('vehicle/<int:nid>/edit/', vehicle_edit, name='vehicle_edit'),
+    path('vehicle/<int:nid>/delete/', vehicle_delete, name='vehicle_delete'),
+
 
     # 工种管理
     path('BaseInfoWorkType/list/', worktype.work_type_list),
@@ -77,12 +107,11 @@ urlpatterns = [
     path('BaseInfoWorkType/<int:nid>/edit/', worktype.work_type_edit),
     path('BaseInfoWorkType/<int:nid>/delete/', worktype.work_type_delete),
 
-
-    # 基地管理
-    path('BaseInfo/list/', baseinfo.BaseInfo_list),
-    path('BaseInfo/add/', baseinfo.BaseInfo_add),
-    path('BaseInfo/<int:nid>/edit/',baseinfo.BaseInfo_edit),
-    path('BaseInfo/<int:nid>/delete/', baseinfo.BaseInfo_delete),
+    # 基地管理URL配置
+    path('BaseInfo/list/', baseinfo.BaseInfo_list),  # 显示基地列表页面
+    path('BaseInfo/add/', baseinfo.BaseInfo_add),  # 添加新的基地信息
+    path('BaseInfo/<int:nid>/edit/', baseinfo.BaseInfo_edit),  # 编辑指定ID的基地信息
+    path('BaseInfo/<int:nid>/delete/', baseinfo.BaseInfo_delete),  # 删除指定ID的基地信息
 
 
 
@@ -101,12 +130,6 @@ urlpatterns = [
     path('get_secondary_work_types/', get_secondary_work_types, name='get_secondary_work_types'),# 获得二级工种
 
 
-    # 工时管理
-    path('WorkHour/list/', WorkHour.Hour_list),
-    path('WorkHour/add/', WorkHour.WorkHour_add),
-    path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),
-    path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),
-    path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工价批量上传
 
     # 获取二级分类和工种的 Ajax 请求 URL
     path('get_second_level_categories/',get_second_level_categories,
@@ -170,12 +193,7 @@ urlpatterns = [
     path('report_workhour_by_daily/list/', report.report_workhour_by_daily),  # 每日工时
     path('report_workhour_by_daily/get_tables_date/', report.report_workhour_by_daily_data_table_view,name="report_workhour_by_daily"),
 
-    # 对照管理
-    path('order/list/', order.order_list),
-    path('order/add/', order.order_add),
-    path('order/delete/', order.order_delete),
-    path('order/detail/', order.order_detail),
-    path('order/edit/', order.order_edit),
+
 
     # 数据统计
     path('chart/list/', chart.chart_list),
@@ -210,16 +228,8 @@ urlpatterns = [
     path('loss_report/<int:nid>/delete/', loss_report_delete, name='loss_report_delete'),
     path('loss_report_autocomplete/', loss_report_autocomplete, name='loss_report_autocomplete'),
     path('get_plant_batch_dk/', get_plant_batch_dk, name='get_plant_batch_dk'),
-    # 销售
-    path('salesperson/list/', salesperson_list, name='salesperson_list'),
-    path('salesperson/add/', salesperson_add, name='salesperson_add'),
-    path('salesperson/<int:nid>/edit/', salesperson_edit, name='salesperson_edit'),
-    path('salesperson/<int:nid>/delete/', salesperson_delete, name='salesperson_delete'),
-    # 车辆
-    path('vehicle/list/', vehicle_list, name='vehicle_list'),
-    path('vehicle/add/', vehicle_add, name='vehicle_add'),
-    path('vehicle/<int:nid>/edit/', vehicle_edit, name='vehicle_edit'),
-    path('vehicle/<int:nid>/delete/', vehicle_delete, name='vehicle_delete'),
+
+
     # 市场
     path('market/list/', market_list, name='market_list'),
     path('market/add/', market_add, name='market_add'),

@@ -8,11 +8,10 @@
                 新建销售人员信息
             </a>
 
-            <div style="float: right;width: 300px;">
+            <div style="float: right; width: 300px;">
                 <form method="get">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search for..."
-                               value="{{ search_data }}">
+                        <input type="text" name="q" class="form-control" placeholder="搜索姓名或电话" value="{{ search_data }}">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">
                                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -28,24 +27,24 @@
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                 销售人员信息列表
             </div>
-            <table class="table table-bordered">
-                <thead>
+            <table class="table table-bordered table-hover">
+                <thead class="text-center">
                 <tr>
-                    <th>ID</th>
-                    <th>姓名</th>
-                    <th>所属公司</th>
-                    <th>电话</th>
-                    <th>操作</th>
+                    <th class="text-center">ID</th>
+                    <th class="text-center">姓名</th>
+                    <th class="text-center">所属公司</th>
+                    <th class="text-center">电话</th>
+                    <th class="text-center">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
-                        <td>{{ obj.id }}</td>
-                        <td>{{ obj.姓名 }}</td>
-                        <td>{{ obj.所属公司 }}</td>
-                        <td>{{ obj.电话 }}</td>
-                        <td>
+                        <td class="text-center">{{ obj.id }}</td>
+                        <td class="text-center">{{ obj.姓名 }}</td>
+                        <td class="text-center">{{ obj.所属公司 }}</td>
+                        <td class="text-center">{{ obj.电话 }}</td>
+                        <td class="text-center">
                             <a class="btn btn-primary btn-xs" href="{% url 'salesperson_edit' obj.id %}">编辑</a>
                             <a class="btn btn-danger btn-xs" href="{% url 'salesperson_delete' obj.id %}">删除</a>
                         </td>

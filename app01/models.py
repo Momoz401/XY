@@ -34,7 +34,8 @@ class UserInfo(models.Model):
     age = models.IntegerField(verbose_name="年龄")
     salary = models.DecimalField(verbose_name="工资", max_digits=10, decimal_places=2, default=0, null=True, blank=True)
     create_time = models.DateField(verbose_name="入职时间", null=True, blank=True)
-    depart = models.ForeignKey(verbose_name="部门", to="Department", to_field="id", on_delete=models.CASCADE, null=True, blank=True)
+    depart = models.ForeignKey(verbose_name="部门", to="Department", to_field="id", on_delete=models.CASCADE, null=True,
+                               blank=True)
 
     gender_choices = (
         (1, "男"),
@@ -43,6 +44,7 @@ class UserInfo(models.Model):
     gender = models.SmallIntegerField(verbose_name="性别", choices=gender_choices, null=True, blank=True)
     phone = models.CharField(verbose_name="手机号码", max_length=20, null=True, blank=True)
     bank_account = models.CharField(verbose_name="银行卡号", max_length=64, null=True, blank=True)
+    id_card = models.CharField(verbose_name="身份证号码", max_length=18, null=True, blank=True)
 
     def __str__(self):
         return self.name

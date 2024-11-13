@@ -1,89 +1,77 @@
+
+from django.db.models import Q
 from django.shortcuts import render, redirect
 from app01 import models
-
+from app01.models import UserInfo
 from app01.utils.pagination import Pagination
-from app01.utils.form import UserModelForm, PrettyModelForm, PrettyEditModelForm
+from app01.utils.form import UserModelForm
 
 
 def user_list(request):
-    """ 用户管理 """
+    """
+    用户管理列表视图
+    处理用户查询和分页显示
+    """
+    query = request.GET.get('q', '')  # 获取查询字符串
+    queryset = UserInfo.objects.all()
 
-    queryset = models.UserInfo.objects.all()
+    if query:
+        # 根据姓名或手机号码进行过滤查询
+        queryset = queryset.filter(Q(name__icontains=query) | Q(phone__icontains=query))
 
+    # 使用自定义的Pagination工具类进行分页
     page_object = Pagination(request, queryset, page_size=20)
+
     context = {
-        "queryset": page_object.page_queryset,
-        "page_string": page_object.html(),
+        "search_data": page_object,
+        "queryset": page_object.page_queryset,  # 分页后的数据
+        "page_string": page_object.html()  # 页码HTML字符串
     }
     return render(request, 'user_list.html', context)
 
 
-def user_add(request):
-    """ 添加用户（原始方式） """
-
-    if request.method == "GET":
-        context = {
-            'gender_choices': models.UserInfo.gender_choices,
-            "depart_list": models.Department.objects.all()
-        }
-        return render(request, 'user_add.html', context)
-
-    # 获取用户提交的数据
-    user = request.POST.get('user')
-    pwd = request.POST.get('pwd')
-    age = request.POST.get('age')
-    account = request.POST.get('ac')
-    ctime = request.POST.get('ctime')
-    gender = request.POST.get('gd')
-    depart_id = request.POST.get('dp')
-
-    # 添加到数据库中
-    models.UserInfo.objects.create(name=user, password=pwd, age=age,
-                                   account=account, create_time=ctime,
-                                   gender=gender, depart_id=depart_id)
-
-    # 返回到用户列表页面
-    return redirect("/user/list/")
-
 
 def user_model_form_add(request):
-    """ 添加用户（ModelForm版本）"""
+    """
+    添加用户视图（使用ModelForm）
+    通过ModelForm实现数据验证和保存
+    """
     if request.method == "GET":
         form = UserModelForm()
         return render(request, 'user_model_form_add.html', {"form": form})
 
-    # 用户POST提交数据，数据校验。
+    # 处理POST请求的表单验证和保存
     form = UserModelForm(data=request.POST)
     if form.is_valid():
-        # 如果数据合法，保存到数据库
-        # {'name': '123', 'password': '123', 'age': 11, 'account': Decimal('0'), 'create_time': datetime.datetime(2011, 11, 11, 0, 0, tzinfo=<UTC>), 'gender': 1, 'depart': <Department: IT运维部门>}
-        # print(form.cleaned_data)
-        # models.UserInfo.objects.create(..)
-        form.save()
+        form.save()  # 如果验证成功，保存数据
         return redirect('/user/list/')
 
-    # 校验失败（在页面上显示错误信息）
+    # 如果验证失败，重新返回表单页面并显示错误信息
     return render(request, 'user_model_form_add.html', {"form": form})
 
 
 def user_edit(request, nid):
-    """ 编辑用户 """
-    row_object = models.UserInfo.objects.filter(id=nid).first()
+    """
+    编辑用户视图
+    通过ModelForm实现数据回填和保存
+    """
+    row_object = models.UserInfo.objects.filter(id=nid).first()  # 获取用户实例
 
     if request.method == "GET":
-        # 根据ID去数据库获取要编辑的那一行数据（对象）
-        form = UserModelForm(instance=row_object)
+        form = UserModelForm(instance=row_object)  # 将实例传递给ModelForm用于回填
         return render(request, 'user_edit.html', {'form': form})
 
-    form = UserModelForm(data=request.POST, instance=row_object)
+    form = UserModelForm(data=request.POST, instance=row_object)  # 绑定提交的数据
     if form.is_valid():
-        # 默认保存的是用户输入的所有数据，如果想要再用户输入以外增加一点值
-        # form.instance.字段名 = 值
-        form.save()
+        form.save()  # 保存更新后的数据
         return redirect('/user/list/')
     return render(request, 'user_edit.html', {"form": form})
 
 
 def user_delete(request, nid):
+    """
+    删除用户视图
+    根据用户ID删除对应的记录
+    """
     models.UserInfo.objects.filter(id=nid).delete()
     return redirect('/user/list/')

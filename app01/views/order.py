@@ -1,5 +1,4 @@
 import json
-import random
 from datetime import datetime
 
 from django.db.models import Count
@@ -14,57 +13,60 @@ from app01.utils.pagination import Pagination
 
 
 class OrderModelForm(BootStrapModelForm):
+    """
+    对照模型表单，支持对照管理的表单输入
+    """
     class Meta:
         model = models.Order
-        # fields = "__all__"
-        # fields = [""]
-        exclude = ["oid", 'admin']
+        exclude = ["oid", 'admin']  # 排除自动生成的字段
 
 
 def order_list(request):
+    """
+    对照列表展示，支持搜索和分页功能
+    """
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["title"] = search_data
+        data_dict["title__icontains"] = search_data  # 模糊匹配对照标题
     queryset = models.Order.objects.filter(**data_dict)
     page_object = Pagination(request, queryset)
 
-    form = OrderModelForm()
+    form = OrderModelForm()  # 创建空表单实例，用于添加新对照
 
     context = {
         'form': form,
-        "queryset": page_object.page_queryset,  # 分完页的数据
-        "page_string": page_object.html()  # 生成页码
+        "queryset": page_object.page_queryset,  # 分页后的对照数据
+        "page_string": page_object.html()  # 页码显示
     }
 
     return render(request, 'order_list.html', context)
 
 
-
-
-
 @csrf_exempt
 def order_add(request):
-    """ 新建订单（Ajax请求）"""
+    """
+    添加新对照，支持Ajax请求，生成对照号并关联管理员
+    """
     form = OrderModelForm(data=request.POST)
     if form.is_valid():
-        # 订单号：额外增加一些不是用户输入的值（自己计算出来）
+        # 自动生成对照号，格式为当前日期
         form.instance.oid = datetime.now().strftime("%Y%m%d")
 
-        # 固定设置管理员ID，去哪里获取？
+        # 固定关联管理员ID，从session中获取
         form.instance.admin_id = request.session["info"]["id"]
 
-        # 保存到数据库中
-        form.save()
+        form.save()  # 保存对照
         return JsonResponse({"status": True})
     return JsonResponse({"status": False, 'error': form.errors})
 
 
 def order_delete(request):
-    """ 删除订单 """
+    """
+    删除对照，根据对照ID执行删除操作
+    """
     uid = request.GET.get('uid')
-    exists = models.Order.objects.filter(id=uid).exists()
-    if not exists:
+    if not models.Order.objects.filter(id=uid).exists():
         return JsonResponse({"status": False, 'error': "删除失败，数据不存在。"})
 
     models.Order.objects.filter(id=uid).delete()
@@ -72,43 +74,25 @@ def order_delete(request):
 
 
 def order_detail(request):
-    """ 根据ID获取订单详细 """
-    # 方式1
     """
-    uid = request.GET.get("uid")
-    row_object = models.Order.objects.filter(id=uid).first()
-    if not row_object:
-        return JsonResponse({"status": False, 'error': "数据不存在。"})
-
-    # 从数据库中获取到一个对象 row_object
-    result = {
-        "status": True,
-        "data": {
-            "title": row_object.title,
-            "price": row_object.price,
-            "status": row_object.status,
-        }
-    }
-    return JsonResponse(result)
+    获取对照详情信息，返回对照的具体数据
     """
-
-    # 方式2
     uid = request.GET.get("uid")
     row_dict = models.Order.objects.filter(id=uid).values("title", 'price', 'status').first()
     if not row_dict:
         return JsonResponse({"status": False, 'error': "数据不存在。"})
 
-    # 从数据库中获取到一个对象 row_object
-    result = {
+    return JsonResponse({
         "status": True,
         "data": row_dict
-    }
-    return JsonResponse(result)
+    })
 
 
 @csrf_exempt
 def order_edit(request):
-    """ 编辑订单 """
+    """
+    编辑对照信息，通过Ajax请求更新数据
+    """
     uid = request.GET.get("uid")
     row_object = models.Order.objects.filter(id=uid).first()
     if not row_object:
@@ -116,7 +100,7 @@ def order_edit(request):
 
     form = OrderModelForm(data=request.POST, instance=row_object)
     if form.is_valid():
-        form.save()
+        form.save()  # 保存更新后的对照数据
         return JsonResponse({"status": True})
 
     return JsonResponse({"status": False, 'error': form.errors})

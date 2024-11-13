@@ -11,7 +11,7 @@
             <div style="float: right;width: 300px;">
                 <form method="get">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="Search for..."
+                        <input type="text" name="q" class="form-control" placeholder="搜索用户基地名称"
                                value="{{ search_data }}">
                         <span class="input-group-btn">
                         <button class="btn btn-default" type="submit">
@@ -21,53 +21,49 @@
                     </div>
                 </form>
             </div>
-
         </div>
         <div class="panel panel-default">
             <!-- Default panel contents -->
-            <div class="panel-heading">
+            <div class="panel-heading ">
                 <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
                 基地列表
             </div>
 
             <!-- Table -->
-            <table class="table table-bordered">
-                <thead>
-                <tr>
-                    <th>ID</th>
-
-                    <th>基地</th>
-                         <th>代号</th>
-                    <th>基地经理</th>
-                    <th>面积</th>
-                    <th>操作</th>
-
-                </tr>
-                </thead>
-                <tbody>
-                {% for obj in queryset %}
+            <div class="table-responsive">
+                <table class="table table-bordered text-center">
+                    <thead>
                     <tr>
-                        <th>{{ obj.ID}}</th>
-                        <td>{{ obj.基地 }}</td>
-                         <td>{{ obj.代号 }}</td>
-                        <td>{{ obj.基地经理 }}</td>
-                          <td>{{ obj.面积 }}</td>
-                        <td>
-                            <a class="btn btn-primary btn-xs" href="/BaseInfo/{{ obj.ID}}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/BaseInfo/{{ obj.ID }}/delete/">删除</a>
-                        </td>
+                        <th style="text-align: center;">ID</th>
+                        <th style="text-align: center;">基地</th>
+                        <th style="text-align: center;">代号</th>
+                        <th style="text-align: center;">基地经理</th>
+                        <th style="text-align: center;">面积</th>
+                        <th style="text-align: center;">操作</th>
                     </tr>
-                {% endfor %}
-
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                    {% for obj in queryset %}
+                        <tr>
+                            <td style="text-align: center;">{{ obj.ID }}</td>
+                            <td style="text-align: center;">{{ obj.基地 }}</td>
+                            <td style="text-align: center;">{{ obj.代号 }}</td>
+                            <td style="text-align: center;">{{ obj.基地经理 }}</td>
+                            <td style="text-align: center;">{{ obj.面积 }}</td>
+                            <td style="text-align: center;">
+                                <a class="btn btn-primary btn-xs" href="/BaseInfo/{{ obj.ID }}/edit/">编辑</a>
+                                <a class="btn btn-danger btn-xs" href="/BaseInfo/{{ obj.ID }}/delete/">删除</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         <div class="clearfix">
             <ul class="pagination">
                 {{ page_string }}
             </ul>
-
         </div>
-
     </div>
 {% endblock %}

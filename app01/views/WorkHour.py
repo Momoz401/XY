@@ -2,14 +2,14 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from app01 import models
 from app01.models import BaseInfoWorkHour, BaseInfoWorkType, JobCategoryInfo, JobTypeDetailInfo
-
 from app01.utils.pagination import Pagination
 from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Edit_ModelForm
 
-
 def Hour_list(request):
-    """ 工时列表 """
-
+    """
+    显示工时列表并支持一级分类搜索过滤。
+    如果存在查询参数，将根据一级分类的名称搜索对应的ID并筛选数据。
+    """
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
@@ -19,8 +19,7 @@ def Hour_list(request):
         data_dict["一级分类__in"] = matching_category_ids
 
     queryset = models.BaseInfoWorkHour.objects.filter(**data_dict).order_by("-工种ID")
-
-    page_object = Pagination(request, queryset)
+    page_object = Pagination(request, queryset, page_size=15)
 
     context = {
         "search_data": search_data,
@@ -29,9 +28,11 @@ def Hour_list(request):
     }
     return render(request, 'workhour.html', context)
 
-
 def work_hour_edit(request, nid):
-    """ 编辑工时 """
+    """
+    编辑工时信息。
+    通过工种ID获取要编辑的记录并加载表单进行编辑。
+    """
     row_object = models.BaseInfoWorkHour.objects.filter(工种ID=nid).first()
 
     if request.method == "GET":
@@ -45,14 +46,19 @@ def work_hour_edit(request, nid):
 
     return render(request, 'workhour.html', {"form": form})
 
-
 def work_hour_delete(request, nid):
+    """
+    删除工时记录。
+    根据指定的工种ID删除相应的记录。
+    """
     models.BaseInfoWorkHour.objects.filter(工种ID=nid).delete()
     return redirect('/WorkHour/list/')
 
-
 def WorkHour_add(request):
-    """ 添加工种 """
+    """
+    添加工时信息。
+    如果是GET请求，加载空表单。如果是POST请求，验证并保存数据。
+    """
     if request.method == "GET":
         form = workHourModelForm()
         return render(request, 'workhour_add.html', {"form": form})
@@ -76,7 +82,10 @@ def WorkHour_add(request):
     return render(request, 'workhour_add.html', {"form": form})
 
 def get_second_level_categories(request):
-    """ 根据一级分类动态加载二级分类 """
+    """
+    根据一级分类动态加载二级分类。
+    通过AJAX请求接收一级分类ID并返回匹配的二级分类列表。
+    """
     if request.method == 'GET':
         level_one_id = request.GET.get('id', None)
         if level_one_id:
@@ -91,9 +100,11 @@ def get_second_level_categories(request):
             return JsonResponse({'error': '一级分类 ID 缺失'}, status=400)
     return JsonResponse({'error': '无效请求'}, status=400)
 
-
 def get_second_level_jobs(request):
-    """ 根据一级工种动态加载二级工种 """
+    """
+    根据一级工种动态加载二级工种。
+    通过AJAX请求接收一级工种ID并返回匹配的二级工种列表。
+    """
     if request.method == 'GET':
         level_one_job_id = request.GET.get('id', None)
         if level_one_job_id:

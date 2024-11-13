@@ -18,10 +18,10 @@
                         <input type="text" name="q" class="form-control" placeholder="请输入一级分类查询..."
                                value="{{ search_data }}">
                         <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">
-                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                        </button>
-                      </span>
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
                     </div>
                 </form>
             </div>
@@ -37,31 +37,31 @@
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>工种ID</th>
-                    <th>一级分类</th>
-                    <th>二级分类</th>
-                    <th>一级工种</th>
-                    <th>二级工种</th>
-                    <th>单价</th>
-                    <th>单位</th>
-                    <th>默认计入成本</th>
-                    <th>备注</th>
-                    <th>操作</th>
+                    <th style="text-align: center;">工种ID</th>
+                    <th style="text-align: center;">一级分类</th>
+                    <th style="text-align: center;">二级分类</th>
+                    <th style="text-align: center;">一级工种</th>
+                    <th style="text-align: center;">二级工种</th>
+                    <th style="text-align: center;">单价</th>
+                    <th style="text-align: center;">单位</th>
+                    <th style="text-align: center;">默认计入成本</th>
+                    <th style="text-align: center;">备注</th>
+                    <th style="text-align: center;">操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
-                        <td>{{ obj.工种ID }}</td>
-                        <td>{{ obj.一级分类.category_name }}</td>
-                        <td>{% if obj.二级分类 %}{{ obj.二级分类.category_name }}{% else %}无{% endif %}</td>
-                        <td>{{ obj.一级工种.job_name }}</td>
-                        <td>{% if obj.二级工种 %}{{ obj.二级工种.job_name }}{% else %}无{% endif %}</td>
-                        <td>{{ obj.单价 }}</td>
-                        <td>{{ obj.单位 }}</td>
-                        <td>{{ obj.默认计入成本 }}</td>
-                        <td>{{ obj.备注 }}</td>
-                        <td>
+                        <td style="text-align: center;">{{ obj.工种ID }}</td>
+                        <td style="text-align: center;">{{ obj.一级分类.category_name }}</td>
+                        <td style="text-align: center;">{% if obj.二级分类 %}{{ obj.二级分类.category_name }}{% else %}无{% endif %}</td>
+                        <td style="text-align: center;">{{ obj.一级工种.job_name }}</td>
+                        <td style="text-align: center;">{% if obj.二级工种 %}{{ obj.二级工种.job_name }}{% else %}无{% endif %}</td>
+                        <td style="text-align: center;">{{ obj.单价 }}</td>
+                        <td style="text-align: center;">{{ obj.单位 }}</td>
+                        <td style="text-align: center;">{{ obj.默认计入成本 }}</td>
+                        <td style="text-align: center;">{% if obj.备注 and obj.备注 != "nan" %}{{ obj.备注 }}{% else %}{% endif %}</td>
+                        <td style="text-align: center;">
                             <a class="btn btn-primary btn-xs" href="/WorkHour/{{ obj.工种ID }}/edit/">编辑</a>
                             <a class="btn btn-danger btn-xs" href="/WorkHour/{{ obj.工种ID }}/delete/">删除</a>
                         </td>
