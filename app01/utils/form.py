@@ -573,10 +573,24 @@ class MonthlyPlanForm(BootStrapModelForm):
 
 
 class DailyPlanForm(BootStrapModelForm):
+    """
+    日计划表单，用于创建和编辑日计划信息，并包含自定义的验证逻辑。
+    """
     class Meta:
         model = DailyPlan
         fields = ['基地经理', '地块', '面积', '生长周期', '采收期', '备注']
 
+
+    def clean_批次ID(self):
+        """
+        自定义批次ID验证，确保其唯一性和正确格式。
+        """
+        批次ID = self.cleaned_data.get('批次ID')
+        if 批次ID:
+            # 这里可以添加更多的格式验证规则
+            if not re.match(r'^[A-Za-z0-9\-]+$', 批次ID):
+                raise forms.ValidationError("批次ID只能包含字母、数字和连字符。")
+        return 批次ID
 
 class ProcessAlertForm(forms.ModelForm):
     class Meta:

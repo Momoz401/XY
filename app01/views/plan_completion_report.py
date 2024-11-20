@@ -88,7 +88,7 @@ def monthly_plan_download(request):
     # 写入表格数据
     for plan in monthly_plans:
         # 获取二级分类名称
-        category_name = plan.一级工种.category_name
+        category_name = plan.二级分类.category_name
 
         # 按月份和二级分类查询日计划完成情况
         daily_plans = DailyPlan.objects.filter(

@@ -761,24 +761,73 @@ class Vehicle(models.Model):
 
 
 class Customer(models.Model):
+    """
+    客户管理模型，用于存储客户相关的信息。
+    """
+    # 基本信息
     客户名称 = models.CharField(max_length=255, verbose_name="客户名称")
     联系人 = models.CharField(max_length=255, verbose_name="联系人")
     联系电话 = models.CharField(max_length=20, verbose_name="联系电话")
     邮箱 = models.EmailField(verbose_name="邮箱", null=True, blank=True)
     地址 = models.CharField(max_length=255, verbose_name="地址", null=True, blank=True)
     销售地区 = models.CharField(max_length=255, verbose_name="销售地区")
-    客户类型 = models.CharField(max_length=50, verbose_name="客户类型", choices=[('个人', '个人'), ('企业', '企业')])
+    客户类型 = models.CharField(
+        max_length=50,
+        verbose_name="客户类型",
+        choices=[('个人', '个人'), ('企业', '企业')]
+    )
     公司名称 = models.CharField(max_length=255, verbose_name="公司名称", null=True, blank=True)
     公司网站 = models.URLField(verbose_name="公司网站", null=True, blank=True)
     公司地址 = models.CharField(max_length=255, verbose_name="公司地址", null=True, blank=True)
     行业 = models.CharField(max_length=255, verbose_name="行业", null=True, blank=True)
     备注 = models.TextField(verbose_name="备注", null=True, blank=True)
+
+    # 新增字段
+    是否新客户 = models.CharField(
+        max_length=10,
+        verbose_name="是否新客户",
+        choices=[('新客户', '新客户'), ('老客户', '老客户')],
+        default='新客户'
+    )
+    主要销售地区 = models.CharField(
+        max_length=255,
+        verbose_name="主要销售地区",
+        null=True,
+        blank=True
+    )
+    主要销售品种 = models.CharField(
+        max_length=255,
+        verbose_name="主要销售品种",
+        null=True,
+        blank=True
+    )
+    客户流失时间 = models.DateField(
+        verbose_name="客户流失时间",
+        null=True,
+        blank=True
+    )
+    客户流失原因 = models.TextField(
+        verbose_name="客户流失原因",
+        null=True,
+        blank=True
+    )
+
+    # 外键字段
+    市场分类 = models.ForeignKey(
+        Market,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        verbose_name="市场分类"
+    )
+
+    # 时间戳
     创建时间 = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
     更新时间 = models.DateTimeField(auto_now=True, verbose_name="更新时间")
 
     class Meta:
-        verbose_name = "客户信息"
-        verbose_name_plural = "客户信息"
+        verbose_name = "客户管理"
+        verbose_name_plural = "客户管理"
 
     def __str__(self):
         return self.客户名称

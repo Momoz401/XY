@@ -3,30 +3,34 @@ from app01.models import Customer
 from app01.utils.form import CustomerForm
 from app01.utils.pagination import Pagination
 
+
 def customer_list(request):
     """
-    客户信息列表视图，用于展示客户信息，并支持通过客户名称进行模糊搜索。
+    客户信息列表视图，用于展示客户信息，并支持通过客户名称进行模糊搜索和分页显示。
     """
     data_dict = {}
 
-    # 获取搜索数据
+    # 获取搜索关键词
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["客户名称__icontains"] = search_data  # 如果有搜索关键词，则根据客户名称进行过滤
+        data_dict["客户名称__icontains"] = search_data  # 根据客户名称进行模糊过滤
 
-    # 获取客户数据，按照ID降序排序
+    # 获取客户数据，按ID降序排序
     queryset = Customer.objects.filter(**data_dict).order_by("-id")
 
-    # 使用自定义分页工具进行分页
+    # 使用自定义分页类进行分页
     page_object = Pagination(request, queryset)
 
-    # 渲染模板并传递分页后的数据
+    # 构建上下文数据
     context = {
         "search_data": search_data,  # 搜索关键词，用于回显
         "queryset": page_object.page_queryset,  # 分页后的客户数据
         "page_string": page_object.html()  # 页码HTML
     }
+
+    # 渲染模板并传递上下文
     return render(request, 'customer_list.html', context)
+
 
 def customer_add(request):
     """
@@ -45,6 +49,7 @@ def customer_add(request):
 
     # 如果表单无效，重新渲染页面并显示错误信息
     return render(request, 'customer_form.html', {"form": form, "title": "新建客户信息"})
+
 
 def customer_edit(request, nid):
     """
@@ -66,6 +71,7 @@ def customer_edit(request, nid):
 
     # 如果表单无效，重新渲染页面并显示错误信息
     return render(request, 'customer_form.html', {"form": form, "title": "编辑客户信息"})
+
 
 def customer_delete(request, nid):
     """

@@ -58,6 +58,8 @@ urlpatterns = [
 
     path('tt/', chart.tt),
 
+
+    # 菜单第一部分
     # 部门管理路由
     path('depart/list/', depart.depart_list),  # 部门列表页面
     path('depart/add/', depart.depart_add),  # 新增部门页面
@@ -116,11 +118,25 @@ urlpatterns = [
     path('customer/<int:nid>/edit/', customer_edit, name='customer_edit'),
     path('customer/<int:nid>/delete/', customer_delete, name='customer_delete'),
 
+
+
+    # 菜单第二部分
     # 月度计划
     path('monthly_plan/', monthly_plan_list, name='monthly_plan_list'),
     path('monthly_plan/add/', monthly_plan_create, name='monthly_plan_create'),
     path('monthly_plan/edit/<int:pk>/', monthly_plan_edit, name='monthly_plan_edit'),
     path('monthly_plan/delete/<int:pk>/', monthly_plan_delete, name='monthly_plan_delete'),
+
+    # 日度计划
+    path('daily_plan/', daily_plan_list, name='daily_plan_list'),
+    path('daily_plan/add/', daily_plan_create, name='daily_plan_create'),
+    path('daily_plan/<str:pk>/edit/', daily_plan_edit, name='daily_plan_edit'),
+    path('daily_plan/delete/<str:batch_id>/', daily_plan_delete, name='daily_plan_delete'),
+
+    # 月度计划实现
+    path('monthly_plan_rate/', monthly_plan_rate, name='monthly_plan_rate'),  # 显示
+    path('monthly_plan/download/', monthly_plan_download, name='monthly_plan_download'),  # 下载月度计划
+    path('monthly_plan/feedback/<int:plan_id>/', plan_feedback, name='feedback'),  # 未达成反馈
 
     # 工种管理
     path('BaseInfoWorkType/list/', worktype.work_type_list),
@@ -324,16 +340,7 @@ urlpatterns = [
 
 
 
-    # ri度计划
-    path('daily_plan/', daily_plan_list, name='daily_plan_list'),
-    path('daily_plan/add/', daily_plan_create, name='daily_plan_create'),
-    path('daily_plan/<str:pk>/edit/', daily_plan_edit, name='daily_plan_edit'),
-    path('daily_plan/delete/<str:batch_id>/', daily_plan_delete, name='daily_plan_delete'),
 
-    # 月度计划实现
-    path('monthly_plan_rate/', monthly_plan_rate, name='monthly_plan_rate'),  # 显示
-    path('monthly_plan/download/', monthly_plan_download, name='monthly_plan_download'),  # 下载月度计划
-    path('monthly_plan/feedback/<int:plan_id>/', plan_feedback, name='feedback'),  # 未达成反馈
 
     # 费用超支
     path('cost_alert/', cost_alert_summary, name='cost_alert_summary'),
