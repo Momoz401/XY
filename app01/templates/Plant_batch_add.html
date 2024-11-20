@@ -56,16 +56,70 @@
                         </select>
                     </div>
 
+                    <!-- 栽种方式选择 -->
+                    <div class="form-group">
+                        <label for="id_planting_method">栽种方式</label>
+                        <select class="form-control" name="栽种方式" id="id_planting_method" required>
+                            <option value="">请选择栽种方式</option>
+                            <option value="移栽">移栽</option>
+                            <option value="点籽">点籽</option>
+                        </select>
+                    </div>
+
+                    <!-- 移栽相关字段（初始隐藏） -->
+                    <div id="移栽字段" style="display:none;">
+                        <div class="form-group">
+                            <label for="id_transplant_date">移栽日期</label>
+                            <input type="date" class="form-control" name="移栽日期" id="id_transplant_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_transplant_board">移栽板量</label>
+                            <input type="number" class="form-control" name="移栽板量" id="id_transplant_board">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_transplant_quantity">移栽数量</label>
+                            <input type="number" class="form-control" name="移栽数量" id="id_transplant_quantity">
+                        </div>
+                    </div>
+
+                    <!-- 点籽相关字段（初始隐藏） -->
+                    <div id="点籽字段" style="display:none;">
+                        <div class="form-group">
+                            <label for="id_seeding_date">点籽日期</label>
+                            <input type="date" class="form-control" name="点籽日期" id="id_seeding_date">
+                        </div>
+                        <div class="form-group">
+                            <label for="id_seeding_quantity">用籽量</label>
+                            <input type="number" class="form-control" name="用籽量" id="id_seeding_quantity">
+                        </div>
+                    </div>
+
+                    <!-- 生长周期 -->
+                    <div class="form-group">
+                        <label for="id_growth_cycle">生长周期（天）</label>
+                        <input type="number" class="form-control" name="生长周期" id="id_growth_cycle" required>
+                    </div>
+
+                    <!-- 采收期 -->
+                    <div class="form-group">
+                        <label for="id_harvest_period">采收期（天）</label>
+                        <input type="number" class="form-control" name="采收期" id="id_harvest_period" required>
+                    </div>
+
+                    <!-- 采收初期和采收末期（自动计算） -->
+                    <div class="form-group">
+                        <label for="id_harvest_start">采收初期</label>
+                        <input type="date" class="form-control" name="采收初期" id="id_harvest_start" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label for="id_harvest_end">采收末期</label>
+                        <input type="date" class="form-control" name="采收末期" id="id_harvest_end" readonly>
+                    </div>
+
                     <!-- 自动生成批次ID -->
                     <div class="form-group">
                         <label for="id_batch_id">批次ID</label>
                         <input type="text" class="form-control" name="批次ID" id="id_batch_id" readonly>
-                    </div>
-
-                    <!-- 备注 -->
-                    <div class="form-group">
-                        <label for="id_notes">备注</label>
-                        <textarea class="form-control" name="备注" id="id_notes"></textarea>
                     </div>
 
                     <button type="submit" class="btn btn-primary">保存</button>
@@ -94,6 +148,40 @@
             if (plantDate && base && category) {
                 const batchID = base + '-' + plantDate + '-' + category;
                 document.getElementById('id_batch_id').value = batchID;
+            }
+        }
+
+        // 当选择栽种方式时，动态显示相应字段
+        document.getElementById("id_planting_method").addEventListener("change", function() {
+            var selected = this.value;
+            if (selected === "移栽") {
+                document.getElementById("移栽字段").style.display = "block";
+                document.getElementById("点籽字段").style.display = "none";
+            } else if (selected === "点籽") {
+                document.getElementById("点籽字段").style.display = "block";
+                document.getElementById("移栽字段").style.display = "none";
+            } else {
+                document.getElementById("移栽字段").style.display = "none";
+                document.getElementById("点籽字段").style.display = "none";
+            }
+        });
+
+        // 自动计算采收初期和采收末期
+        document.getElementById("id_growth_cycle").addEventListener("input", calculateDates);
+        document.getElementById("id_harvest_period").addEventListener("input", calculateDates);
+
+        function calculateDates() {
+            var plantingDate = document.querySelector('input[name="种植日期"]').value;
+            var growthCycle = parseInt(document.getElementById("id_growth_cycle").value);
+            var harvestPeriod = parseInt(document.getElementById("id_harvest_period").value);
+
+            if (plantingDate && growthCycle && harvestPeriod) {
+                var plantingDateObj = new Date(plantingDate);
+                var harvestStartDate = new Date(plantingDateObj.getTime() + growthCycle * 24 * 60 * 60 * 1000);
+                var harvestEndDate = new Date(harvestStartDate.getTime() + harvestPeriod * 24 * 60 * 60 * 1000);
+
+                document.getElementById("id_harvest_start").value = harvestStartDate.toISOString().split('T')[0];
+                document.getElementById("id_harvest_end").value = harvestEndDate.toISOString().split('T')[0];
             }
         }
     </script>

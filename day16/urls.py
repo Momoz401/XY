@@ -25,12 +25,14 @@ from app01.views import depart, user, pretty, admin, account, task, order, chart
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
     daily_price_report_views
 from app01.views.DailyPriceReport import get_price_trends, get_available_categories
+from app01.views.Plant_batch import export_plant_batches
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
 
 from app01.views.daily_price_report_views import daily_price_report
 
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
 from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
+from app01.views.plant_batch_calendar import plant_batch_calendar_view
 from app01.views.process_alert import process_alert_list, process_alert_create, process_alert_update, \
     process_alert_delete
 from app01.views.process_alert_over import process_alert_overview
@@ -84,7 +86,7 @@ urlpatterns = [
     path('WorkHour/add/', WorkHour.WorkHour_add),  # 添加新工种工时视图
     path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),  # 编辑指定工种工时视图
     path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),  # 删除指定工种工时视图
-    path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工价批量上传视图
+    path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工时批量上传视图
 
     # 计量对照管理
     path('order/list/', order.order_list),  # 计量对照列表页面
@@ -112,31 +114,61 @@ urlpatterns = [
     path('market/add/', market_add, name='market_add'),  # 添加市场信息
     path('market/<int:nid>/edit/', market_edit, name='market_edit'),  # 编辑市场信息
     path('market/<int:nid>/delete/', market_delete, name='market_delete'),  # 删除市场信息
-    # 客户
+    # 客户管理相关的路径配置
+    # 显示客户信息列表页面
     path('customer/list/', customer_list, name='customer_list'),
+    # 添加新客户的页面
     path('customer/add/', customer_add, name='customer_add'),
+    # 编辑现有客户信息的页面，基于客户ID
     path('customer/<int:nid>/edit/', customer_edit, name='customer_edit'),
+    # 删除客户信息的操作路径，基于客户ID
     path('customer/<int:nid>/delete/', customer_delete, name='customer_delete'),
 
 
-
     # 菜单第二部分
-    # 月度计划
+    # 月度计划管理相关路径配置
+    # 显示月度计划列表页面
     path('monthly_plan/', monthly_plan_list, name='monthly_plan_list'),
+    # 创建新的月度计划的页面
     path('monthly_plan/add/', monthly_plan_create, name='monthly_plan_create'),
+    # 编辑现有月度计划的页面，基于计划ID
     path('monthly_plan/edit/<int:pk>/', monthly_plan_edit, name='monthly_plan_edit'),
+    # 删除月度计划的操作路径，基于计划ID
     path('monthly_plan/delete/<int:pk>/', monthly_plan_delete, name='monthly_plan_delete'),
-
-    # 日度计划
+    # 日度计划管理相关路径配置
+    # 显示日度计划列表页面
     path('daily_plan/', daily_plan_list, name='daily_plan_list'),
+    # 创建新的日度计划的页面
     path('daily_plan/add/', daily_plan_create, name='daily_plan_create'),
+    # 编辑现有日度计划的页面，基于批次ID（字符串类型）
     path('daily_plan/<str:pk>/edit/', daily_plan_edit, name='daily_plan_edit'),
+    # 删除日度计划的操作路径，基于批次ID（字符串类型）
     path('daily_plan/delete/<str:batch_id>/', daily_plan_delete, name='daily_plan_delete'),
+    # 月度计划的额外功能路径配置
+    # 显示月度计划达成率
+    path('monthly_plan_rate/', monthly_plan_rate, name='monthly_plan_rate'),
+    # 下载月度计划的功能
+    path('monthly_plan/download/', monthly_plan_download, name='monthly_plan_download'),
+    # 针对未达成的月度计划的反馈操作路径，基于计划ID
+    path('monthly_plan/feedback/<int:plan_id>/', plan_feedback, name='feedback'),
 
-    # 月度计划实现
-    path('monthly_plan_rate/', monthly_plan_rate, name='monthly_plan_rate'),  # 显示
-    path('monthly_plan/download/', monthly_plan_download, name='monthly_plan_download'),  # 下载月度计划
-    path('monthly_plan/feedback/<int:plan_id>/', plan_feedback, name='feedback'),  # 未达成反馈
+
+
+    # 菜单第三部分
+    # 批次管理相关路径配置
+    # 显示批次表列表页面
+    path('Plant_batch/list/', Plant_batch.Plant_batch_list),
+    path('Plant_batch/export/', export_plant_batches, name='export_plant_batches'),
+    # 创建新的批次记录的页面
+    path('Plant_batch/add/', Plant_batch.Plant_batch_add),
+    # 编辑现有批次记录的页面，基于批次ID
+    path('Plant_batch/<int:nid>/edit/', Plant_batch.Plant_batch_edit),
+    # 删除批次记录的操作路径，基于批次ID
+    path('Plant_batch/<int:nid>/delete/', Plant_batch.Plant_batch_delete),
+    # 工价批量上传功能
+    path('upload/Plant_batch/', upload.upload_Plant_batch_modal_form),
+    # 日历视图显示种植批次
+    path('Plant_batch/calendar/', plant_batch_calendar_view, name='plant_batch_calendar_view'),
 
     # 工种管理
     path('BaseInfoWorkType/list/', worktype.work_type_list),
@@ -150,7 +182,7 @@ urlpatterns = [
     path('BaseInfo/<int:nid>/edit/', baseinfo.BaseInfo_edit),  # 编辑指定ID的基地信息
     path('BaseInfo/<int:nid>/delete/', baseinfo.BaseInfo_delete),  # 删除指定ID的基地信息
 
-    # 工价管理
+    # 工时管理
     path('production_wage_list/list/', productionwage.production_wage_list),
     path('productionwate/add/undefined/', productionwage.production_wage_list),
     path('productionwate/add/', productionwage.production_wage_add),
@@ -177,12 +209,7 @@ urlpatterns = [
     path('Agricureture/<int:nid>/delete/', agriculturecost.agriculture_cost_delete),
     path('upload/agriculturecost/', upload.upload_agriculturecost_modal_form),  # 工价批量上传
 
-    # 批次表管理
-    path('Plant_batch/list/', Plant_batch.Plant_batch_list),
-    path('Plant_batch/add/', Plant_batch.Plant_batch_add),
-    path('Plant_batch/<int:nid>/edit/', Plant_batch.Plant_batch_edit),
-    path('Plant_batch/<int:nid>/delete/', Plant_batch.Plant_batch_delete),
-    path('upload/Plant_batch/', upload.upload_Plant_batch_modal_form),  # 工价批量上传
+
     # 实现自动补全功能
     path('employee_autocomplete/', views.employee_autocomplete, name='employee_autocomplete'),
     path('autocomplete', views.autocomplete, name='autocomplete'),
@@ -287,8 +314,7 @@ urlpatterns = [
     path('sales_record/management/<int:pk>/delete/', views.sales_record_management_delete,
          name='sales_record_management_delete'),
     path('upload/sales_record/', upload_sales_record, name='upload_sales_record'),
-    # 日历显示种植批次
-    path('Plant_batch/calendar/', views.plant_batch_calendar_view, name='plant_batch_calendar_view'),
+
 
     # 显示计划内成本汇总
     path('plant_batch_summary/', plant_batch_summary, name='plant_batch_summary'),

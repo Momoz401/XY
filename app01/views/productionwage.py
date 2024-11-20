@@ -1,3 +1,4 @@
+from django.db.models import Sum, Min, Max
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import render, redirect
 from app01 import models
@@ -97,6 +98,60 @@ def production_wage_add(request):
                     except JobTypeDetailInfo.DoesNotExist:
                         print(f"二级工种 ID '{secondary_work_id}' 不存在")
                 instance.save()
+
+                # 更新批次表
+                batch = Plant_batch.objects.filter(批次ID=instance.批次).first()
+                if batch:
+                    # 对应的工种名称（如“除草”）与批次表字段映射
+                    工种字段映射 = {
+                        '打地': ('打地开始时间', '打地结束时间', '打地数量', '打地周期'),
+                        '移栽': ('移栽开始时间', '移栽结束时间', '移栽数量', '移栽周期'),
+                        '除草': ('除草开始时间', '除草结束时间', '除草数量', '除草周期'),
+                        '采收': ('采收开始时间', '采收结束时间', '采收数量', '采收周期'),
+                        '清棚': ('清棚开始时间', '清棚结束时间', '清棚数量', '清棚周期'),
+                        '点籽': ('点籽开始时间', '点籽结束时间', '点籽数量', '点籽周期'),
+                        '间菜': ('间菜开始时间', '间菜结束时间', '间菜数量', '间菜周期'),
+                        '吹生菜': ('吹生菜开始时间', '吹生菜结束时间', '吹生菜数量', '吹生菜周期'),
+                        '施肥': ('施肥开始时间', '施肥结束时间', '施肥数量', '施肥周期'),
+                    }
+
+                    工种名称 = instance.一级工种  # 获取工种名称（如“除草”）
+
+                    if 工种名称 in 工种字段映射:
+                        开始时间字段, 结束时间字段, 数量字段, 周期字段 = 工种字段映射[工种名称]
+
+                        # 汇总数量 - 计算所有相关记录的数量总和
+                        total_quantity = \
+                        ProductionWage.objects.filter(批次=instance.批次, 一级工种=instance.一级工种).aggregate(
+                            total_quantity=Sum('数量'))['total_quantity']
+
+                        # 计算最小的开始时间和最大的结束时间
+                        start_time = \
+                        ProductionWage.objects.filter(批次=instance.批次, 一级工种=instance.一级工种).aggregate(
+                            min_start_time=Min('日期'))['min_start_time']
+                        end_time = \
+                        ProductionWage.objects.filter(批次=instance.批次, 一级工种=instance.一级工种).aggregate(
+                            max_end_time=Max('日期'))['max_end_time']
+
+                        # 计算周期（最大结束时间 - 最小开始时间，单位：天）
+                        if start_time and end_time:
+                            period = (end_time - start_time).days
+                        else:
+                            period = 0
+
+                        # 更新批次表中的数据
+                        if start_time:
+                            setattr(batch, 开始时间字段, start_time)
+                        if end_time:
+                            setattr(batch, 结束时间字段, end_time)
+                        if total_quantity:
+                            setattr(batch, 数量字段, total_quantity)
+                        if period:
+                            setattr(batch, 周期字段, period)
+
+                        # 保存更新后的批次数据
+                        batch.save()
+
             formset.save_m2m()
             return redirect('/production_wage_list/list')
         else:

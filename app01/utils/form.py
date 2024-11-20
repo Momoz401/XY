@@ -302,7 +302,11 @@ class agriculture_cost_Edit_ModelForm(BootStrapModelForm):
 class PlantBatchCreateForm(BootStrapModelForm):
     class Meta:
         model = Plant_batch
-        fields = ['批次ID', '种植日期', '基地', '基地经理', '地块', '面积', '备注']  # 只显示需要的字段
+        fields = [
+            '批次ID', '种植日期', '基地', '基地经理', '地块', '面积', '二级分类', '栽种方式',
+            '移栽日期', '移栽板量', '移栽数量', '点籽日期', '用籽量', '生长周期', '采收期',
+            '备注', '采收初期', '采收末期'
+        ]
 
 
 # 编辑时显示所有字段

@@ -16,6 +16,11 @@
                 <span class="glyphicon glyphicon-download" aria-hidden="true"></span>
                 下载模板
             </a>
+            <!-- 导出按钮 -->
+            <a class="btn btn-warning" href="/Plant_batch/export/">
+                <span class="glyphicon glyphicon-export" aria-hidden="true"></span>
+                导出数据
+            </a>
 
             <div style="float: right; width: 300px;">
                 <form method="get">
@@ -46,10 +51,10 @@
                         <th>一级分类</th>
                         <th>二级分类</th>
                         <th>基地</th>
-                        <th>种植日期</th>
                         <th>地块</th>
                         <th>面积</th>
                         <th>基地经理</th>
+                        <th>种植日期</th>
                         <th>移栽日期</th>
                         <th>移栽板量</th>
                         <th>移栽数量</th>
@@ -64,13 +69,49 @@
                         <th>总周期天数</th>
                         <th>销毁面积</th>
                         <th>销毁备注</th>
-                        <th>总产量</th>
-                        <th>总亩产</th>
                         <th>正常产量</th>
                         <th>正常亩产</th>
+                        <th>总产量</th>
+                        <th>总亩产</th>
                         <th>栽种方式</th>
                         <th>下批前一天时间</th>
                         <th>周期</th>
+                        <th>打地开始时间</th>
+                        <th>打地结束时间</th>
+                        <th>打地周期</th>
+                        <th>打地数量</th>
+                        <th>移栽开始时间</th>
+                        <th>移栽结束时间</th>
+                        <th>移栽周期</th>
+                        <th>移栽数量</th>
+                        <th>除草开始时间</th>
+                        <th>除草结束时间</th>
+                        <th>除草周期</th>
+                        <th>除草数量</th>
+                        <th>采收开始时间</th>
+                        <th>采收结束时间</th>
+                        <th>采收周期</th>
+                        <th>采收数量</th>
+                        <th>清棚开始时间</th>
+                        <th>清棚结束时间</th>
+                        <th>清棚周期</th>
+                        <th>清棚数量</th>
+                        <th>点籽开始时间</th>
+                        <th>点籽结束时间</th>
+                        <th>点籽周期</th>
+                        <th>点籽数量</th>
+                        <th>间菜开始时间</th>
+                        <th>间菜结束时间</th>
+                        <th>间菜周期</th>
+                        <th>间菜数量</th>
+                        <th>吹生菜开始时间</th>
+                        <th>吹生菜结束时间</th>
+                        <th>吹生菜周期</th>
+                        <th>吹生菜数量</th>
+                        <th>施肥开始时间</th>
+                        <th>施肥结束时间</th>
+                        <th>施肥周期</th>
+                        <th>施肥数量</th>
                         <th>操作</th>
                     </tr>
                     </thead>
@@ -82,10 +123,10 @@
                             <td>{{ obj.一级分类|default_if_none:"" }}</td>
                             <td>{{ obj.二级分类|default_if_none:"" }}</td>
                             <td>{{ obj.基地|default_if_none:"" }}</td>
-                            <td>{{ obj.种植日期|default_if_none:"" }}</td>
                             <td>{{ obj.地块|default_if_none:"" }}</td>
                             <td>{{ obj.面积|default_if_none:"" }}</td>
                             <td>{{ obj.基地经理|default_if_none:"" }}</td>
+                            <td>{{ obj.种植日期|default_if_none:"" }}</td>
                             <td>{{ obj.移栽日期|default_if_none:"" }}</td>
                             <td>{{ obj.移栽板量|default_if_none:"" }}</td>
                             <td>{{ obj.移栽数量|default_if_none:"" }}</td>
@@ -100,13 +141,49 @@
                             <td>{{ obj.总周期天数|default_if_none:"" }}</td>
                             <td>{{ obj.销毁面积|default_if_none:"" }}</td>
                             <td>{{ obj.销毁备注|default_if_none:"" }}</td>
-                            <td>{{ obj.总产量|default_if_none:"" }}</td>
-                            <td>{{ obj.总亩产|default_if_none:"" }}</td>
                             <td>{{ obj.正常产量|default_if_none:"" }}</td>
                             <td>{{ obj.正常亩产|default_if_none:"" }}</td>
+                            <td>{{ obj.总产量|default_if_none:"" }}</td>
+                            <td>{{ obj.总亩产|default_if_none:"" }}</td>
                             <td>{{ obj.栽种方式|default_if_none:"" }}</td>
                             <td>{{ obj.下批前一天时间|default_if_none:"" }}</td>
                             <td>{{ obj.周期|default_if_none:"" }}</td>
+                            <td>{{ obj.打地开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.打地结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.打地周期|default_if_none:"" }}</td>
+                            <td>{{ obj.打地数量|default_if_none:"" }}</td>
+                            <td>{{ obj.移栽开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.移栽结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.移栽周期|default_if_none:"" }}</td>
+                            <td>{{ obj.移栽数量|default_if_none:"" }}</td>
+                            <td>{{ obj.除草开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.除草结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.除草周期|default_if_none:"" }}</td>
+                            <td>{{ obj.除草数量|default_if_none:"" }}</td>
+                            <td>{{ obj.采收开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.采收结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.采收周期|default_if_none:"" }}</td>
+                            <td>{{ obj.采收数量|default_if_none:"" }}</td>
+                            <td>{{ obj.清棚开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.清棚结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.清棚周期|default_if_none:"" }}</td>
+                            <td>{{ obj.清棚数量|default_if_none:"" }}</td>
+                            <td>{{ obj.点籽开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.点籽结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.点籽周期|default_if_none:"" }}</td>
+                            <td>{{ obj.点籽数量|default_if_none:"" }}</td>
+                            <td>{{ obj.间菜开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.间菜结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.间菜周期|default_if_none:"" }}</td>
+                            <td>{{ obj.间菜数量|default_if_none:"" }}</td>
+                            <td>{{ obj.吹生菜开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.吹生菜结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.吹生菜周期|default_if_none:"" }}</td>
+                            <td>{{ obj.吹生菜数量|default_if_none:"" }}</td>
+                            <td>{{ obj.施肥开始时间|default_if_none:"" }}</td>
+                            <td>{{ obj.施肥结束时间|default_if_none:"" }}</td>
+                            <td>{{ obj.施肥周期|default_if_none:"" }}</td>
+                            <td>{{ obj.施肥数量|default_if_none:"" }}</td>
                             <td>
                                 <a class="btn btn-primary btn-xs" href="/Plant_batch/{{ obj.ID }}/edit/">编辑</a>
                                 <a class="btn btn-danger btn-xs" href="/Plant_batch/{{ obj.ID }}/delete/">删除</a>
