@@ -471,7 +471,6 @@ class Plant_batch(models.Model):
     面积 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     基地经理 = models.CharField(max_length=255, null=True, blank=True)
     种植日期 = models.DateField(default=timezone.now, null=True, blank=True)  # 默认值为当天日期
-    移栽日期 = models.DateField(null=True, blank=True)
     移栽板量 = models.FloatField(null=True, blank=True)
     移栽数量 = models.FloatField(null=True, blank=True)
     点籽日期 = models.DateField(null=True, blank=True)
@@ -550,8 +549,6 @@ class Plant_batch(models.Model):
             self.批次ID = f"{base_code}-{plant_date_str}-{category_name}"
 
         # 同步相关字段的值，不改变原来的逻辑
-        if self.移栽日期:
-            self.移栽开始时间 = self.移栽日期
         if self.移栽数量:
             self.移栽数量 = self.移栽数量
         if self.点籽日期:
@@ -763,6 +760,8 @@ class LossReport(models.Model):
     报损类型 = models.CharField(max_length=50, choices=[('地内报损', '地内报损'), ('销售报损', '销售报损')], verbose_name="报损类型")
     报损数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="报损数量")
     报损单位 = models.CharField(max_length=50, verbose_name="报损单位")
+    报损面积 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 新增报损面积
+    备注 = models.TextField(null=True, blank=True)
 
     class Meta:
         verbose_name = "报损"

@@ -1,30 +1,102 @@
 {% extends 'layout.html' %}
 {% load static %}
+
 {% block content %}
-<div class="container">
-    <h2>批次日历视图</h2>
-    <div id="calendar"></div>
-</div>
+    <div class="container">
 
-<!-- 本地加载的 CSS 文件 -->
-<link href="{% static 'fullcalendar/main.min.css' %}" rel="stylesheet" />
+        <!-- 筛选条件 -->
+        <form method="get" class="form-inline mb-3">
+            <div class="form-group mr-2">
+                <input type="text" class="form-control" name="批次ID" id="id_batch_id" placeholder="输入批次ID" value="{{ request.GET.batch_id }}">
+            </div>
+            <div class="form-group mr-2">
+                <select class="form-control" name="二级分类" id="id_second_category">
+                    <option value="">选择二级分类</option>
+                    {% for category in job_categories %}
+                        <option value="{{ category.category_name }}" {% if category.category_name == request.GET.second_category %}selected{% endif %}>{{ category.category_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">筛选</button>
+        </form>
+    <hr>
+        <!-- 工种选择按钮 -->
+        <div class="mb-3">
+            <button class="btn btn-info work-filter" data-work-name="移栽">移栽</button>
+            <button class="btn btn-info work-filter" data-work-name="点籽">点籽</button>
+            <button class="btn btn-info work-filter" data-work-name="采收">采收</button>
+            <button class="btn btn-info work-filter" data-work-name="施肥">施肥</button>
+            <button class="btn btn-info work-filter" data-work-name="打地">打地</button>
+            <button class="btn btn-info work-filter" data-work-name="清棚">清棚</button>
+            <button class="btn btn-info work-filter" data-work-name="间菜">间菜</button>
+            <button class="btn btn-info work-filter" data-work-name="吹生菜">吹生菜</button>
+            <button class="btn btn-info work-filter" data-work-name="除草">除草</button>
+        </div>
+   <hr>
+        <div id="calendar"></div>
+    </div>
 
-<!-- 本地加载的 JS 文件 -->
-<script src="{% static 'fullcalendar/main.min.js' %}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        var calendarEl = document.getElementById('calendar');
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            events: {{ events|safe }},
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth,timeGridWeek,timeGridDay'
-            },
-            locale: 'zh-cn'
+    <!-- 本地加载的 CSS 文件 -->
+    <link href="{% static 'fullcalendar/main.min.css' %}" rel="stylesheet" />
+
+    <!-- 本地加载的 JS 文件 -->
+    <script src="{% static 'fullcalendar/main.min.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: {{ events|safe }},
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                locale: 'zh-cn',
+                eventDidMount: function(info) {
+                    // 每次渲染后做一些额外操作，例如添加背景颜色
+                    var workName = info.event.extendedProps.work_name;
+                    var workColor = info.event.extendedProps.color;
+                    info.el.style.backgroundColor = workColor;
+                },
+                eventClick: function(info) {
+                    // 点击事件后删除对应的工种时间
+                    var workName = info.event.extendedProps.work_name;
+                    if (confirm("是否删除此事件？")) {
+                        info.event.remove();
+                    }
+                }
+            });
+            calendar.render();
+
+            // 按钮点击逻辑，控制事件的显示/隐藏
+            var workVisibility = {
+                '移栽': true,
+                '点籽': true,
+                '采收': true,
+                '施肥': true,
+                '打地': true,
+                '清棚': true,
+                '间菜': true,
+                '吹生菜': true,
+                '除草': true
+            };
+
+            document.querySelectorAll('.work-filter').forEach(function(button) {
+                button.addEventListener('click', function() {
+                    var workName = button.getAttribute('data-work-name');
+                    workVisibility[workName] = !workVisibility[workName];  // 切换显示/隐藏状态
+                    button.classList.toggle('btn-danger', !workVisibility[workName]);  // 改变按钮样式
+                    button.classList.toggle('btn-info', workVisibility[workName]);  // 改变按钮样式
+
+                    // 刷新日历显示
+                    calendar.getEvents().forEach(function(event) {
+                        if (event.extendedProps.work_name === workName) {
+                            event.setProp('display', workVisibility[workName] ? 'auto' : 'none'); // 显示或隐藏事件
+                        }
+                    });
+                });
+            });
         });
-        calendar.render();
-    });
-</script>
+    </script>
 {% endblock %}

@@ -39,7 +39,11 @@
                     <th>报损类型</th>
                     <th>报损数量</th>
                     <th>报损单位</th>
+                        <th>备注</th>
+                    <th>报损面积</th>
                     <th>操作</th>
+
+
                 </tr>
                 </thead>
                 <tbody>
@@ -53,6 +57,8 @@
                         <td>{{ obj.报损类型 }}</td>
                         <td>{{ obj.报损数量 }}</td>
                         <td>{{ obj.报损单位 }}</td>
+                        <td>{{ obj.备注 }}</td>
+                        <td>{{ obj.报损面积 }}</td>
                         <td>
                             <a class="btn btn-primary btn-xs" href="/loss_report/{{ obj.id }}/edit/">编辑</a>
                             <a class="btn btn-danger btn-xs" href="/loss_report/{{ obj.id }}/delete/">删除</a>

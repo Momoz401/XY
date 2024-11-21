@@ -182,52 +182,6 @@ def depreciation_allocation_delete(request, nid):
     return redirect('/depreciation_allocation/list/')
 
 
-def loss_report_list(request):
-    """报损列表"""
-    data_dict = {}
-    search_data = request.GET.get('q', "")
-    if search_data:
-        data_dict["报损人__icontains"] = search_data
-
-    queryset = LossReport.objects.filter(**data_dict).order_by("-id")
-    page_object = Pagination(request, queryset)
-
-    context = {
-        "search_data": search_data,
-        "queryset": page_object.page_queryset,  # 分页后的数据
-        "page_string": page_object.html()  # 页码
-    }
-    return render(request, 'loss_report_list.html', context)
-
-def loss_report_add(request):
-    """添加报损"""
-    if request.method == "GET":
-        form = LossReportForm()
-        return render(request, 'loss_report_form.html', {"form": form})
-
-    form = LossReportForm(data=request.POST)
-    if form.is_valid():
-        form.save()
-        return redirect('/loss_report/list/')
-    return render(request, 'loss_report_form.html', {"form": form})
-
-def loss_report_edit(request, nid):
-    """编辑报损"""
-    row_object = get_object_or_404(LossReport, id=nid)
-
-    if request.method == "GET":
-        form = LossReportForm(instance=row_object)
-        return render(request, 'loss_report_form.html', {"form": form})
-
-    form = LossReportForm(data=request.POST, instance=row_object)
-    if form.is_valid():
-        form.save()
-        return redirect('/loss_report/list/')
-    return render(request, 'loss_report_form.html', {"form": form})
-
-def loss_report_delete(request, nid):
-    LossReport.objects.filter(id=nid).delete()
-    return redirect('/loss_report/list/')
 
 
 def get_plant_batch_dk(request):

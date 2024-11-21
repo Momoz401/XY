@@ -29,6 +29,7 @@ from app01.views.Plant_batch import export_plant_batches
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
 
 from app01.views.daily_price_report_views import daily_price_report
+from app01.views.loss import loss_report_list, loss_report_add, loss_report_edit, loss_report_delete
 
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
 from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
@@ -42,8 +43,8 @@ from app01.views.upload import upload_depreciation_excel, upload_expense_allocat
     upload_sales_record
 from app01.views.views import create_expense_allocation, expense_allocation_list, expense_allocation_add, \
     expense_allocation_edit, expense_allocation_delete, depreciation_allocation_list, depreciation_allocation_add, \
-    depreciation_allocation_edit, depreciation_allocation_delete, loss_report_list, loss_report_add, loss_report_edit, \
-    loss_report_delete, get_plant_batch_dk, loss_report_autocomplete, \
+    depreciation_allocation_edit, depreciation_allocation_delete,  \
+    get_plant_batch_dk, loss_report_autocomplete, \
     add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
     outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
     plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details, profit_summary, \
@@ -81,12 +82,12 @@ urlpatterns = [
     path('salesperson/<int:nid>/edit/', salesperson_edit, name='salesperson_edit'),  # 编辑销售人员信息页面
     path('salesperson/<int:nid>/delete/', salesperson_delete, name='salesperson_delete'),  # 删除销售人员信息功能
 
-    # 工时管理
-    path('WorkHour/list/', WorkHour.Hour_list),  # 工时列表视图
-    path('WorkHour/add/', WorkHour.WorkHour_add),  # 添加新工种工时视图
-    path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),  # 编辑指定工种工时视图
-    path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),  # 删除指定工种工时视图
-    path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工时批量上传视图
+    # 工价管理
+    path('WorkHour/list/', WorkHour.Hour_list),  # 工价列表视图
+    path('WorkHour/add/', WorkHour.WorkHour_add),  # 添加新工种工价视图
+    path('WorkHour/<int:nid>/edit/', WorkHour.work_hour_edit),  # 编辑指定工种工价视图
+    path('WorkHour/<int:nid>/delete/', WorkHour.work_hour_delete),  # 删除指定工种工价视图
+    path('upload/WorkHour/', upload.upload_workhour_modal_form),  # 工价批量上传视图
 
     # 计量对照管理
     path('order/list/', order.order_list),  # 计量对照列表页面

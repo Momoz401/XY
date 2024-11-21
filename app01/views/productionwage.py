@@ -102,7 +102,8 @@ def production_wage_add(request):
                 # 更新批次表
                 batch = Plant_batch.objects.filter(批次ID=instance.批次).first()
                 if batch:
-                    # 对应的工种名称（如“除草”）与批次表字段映射
+                    工种名称 = instance.一级工种  # 获取工种名称（如“除草”）
+
                     工种字段映射 = {
                         '打地': ('打地开始时间', '打地结束时间', '打地数量', '打地周期'),
                         '移栽': ('移栽开始时间', '移栽结束时间', '移栽数量', '移栽周期'),
@@ -114,8 +115,6 @@ def production_wage_add(request):
                         '吹生菜': ('吹生菜开始时间', '吹生菜结束时间', '吹生菜数量', '吹生菜周期'),
                         '施肥': ('施肥开始时间', '施肥结束时间', '施肥数量', '施肥周期'),
                     }
-
-                    工种名称 = instance.一级工种  # 获取工种名称（如“除草”）
 
                     if 工种名称 in 工种字段映射:
                         开始时间字段, 结束时间字段, 数量字段, 周期字段 = 工种字段映射[工种名称]
@@ -149,7 +148,20 @@ def production_wage_add(request):
                         if period:
                             setattr(batch, 周期字段, period)
 
-                        # 保存更新后的批次数据
+                        # 计算总产量、总亩产
+                        if instance.一级工种 == "采收":
+                            total_yield = ProductionWage.objects.filter(批次=instance.批次, 一级工种="采收").aggregate(
+                                total_yield=Sum('数量'))['total_yield']
+                            batch.总产量 = total_yield if total_yield else 0
+                            batch.总亩产 = batch.总产量 / (batch.面积 or 1)  # 总亩产 = 总产量 / 面积
+
+                        # 计算总周期天数（采收末期 - 种植日期）
+                        if start_time and end_time:
+                            batch.总周期天数 = (end_time - start_time).days
+
+                        # 填充批次周期（例如：240401-240525）
+                        batch.周期批次 = f"{start_time.strftime('%y%m%d')}-{end_time.strftime('%y%m%d')}"
+
                         batch.save()
 
             formset.save_m2m()
