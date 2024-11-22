@@ -3,86 +3,127 @@
 
 {% block content %}
 <div class="container">
-    <h2>{{ title }}</h2>
+    <h2 style="text-align: center;">{{ title }}</h2>
 
-    <!-- 筛选表单 -->
-    <form method="get" id="filterForm">
-        <div class="form-group">
-            <label for="category_id">选择二级分类:</label>
-            <select name="category_id" id="category_id" class="form-control" onchange="document.getElementById('filterForm').submit();">
-                <option value="">全部</option>
-                {% for category in available_categories %}
-                    <option value="{{ category.id }}" {% if category.id == selected_category %}selected{% endif %}>
-                        {{ category.category_name }}
-                    </option>
-                {% endfor %}
-            </select>
-        </div>
+    <!-- 筛选框 -->
+    <div style="text-align: center; margin: 20px 0;">
+        <label for="category">选择品种：</label>
+        <select id="category" name="category" class="form-control d-inline-block" style="width: auto;">
+            <option value="">全部</option>
+            {% for category in available_categories %}
+            <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>
+                {{ category.category_name }}
+            </option>
+            {% endfor %}
+        </select>
 
-        <div class="form-group">
-            <label for="date_filter">选择时间范围:</label>
-            <select name="date_filter" id="date_filter" class="form-control" onchange="document.getElementById('filterForm').submit();">
-                <option value="week" {% if date_filter == 'week' %}selected{% endif %}>最近一周</option>
-                <option value="month" {% if date_filter == 'month' %}selected{% endif %}>最近一个月</option>
-                <option value="year" {% if date_filter == 'year' %}selected{% endif %}>最近一年</option>
-            </select>
-        </div>
-    </form>
+        <label for="date_filter">选择时间范围：</label>
+        <select id="date_filter" name="date_filter" class="form-control d-inline-block" style="width: auto;">
+            <option value="week" {% if date_filter == "week" %}selected{% endif %}>最近一周</option>
+            <option value="month" {% if date_filter == "month" %}selected{% endif %}>最近一个月</option>
+            <option value="year" {% if date_filter == "year" %}selected{% endif %}>最近一年</option>
+        </select>
 
-    <!-- 图表显示部分 -->
-    <canvas id="priceChart"></canvas>
+        <button id="filterButton" class="btn btn-primary">筛选</button>
+    </div>
+
+    <!-- 图表容器 -->
+    <div id="chartContainer"></div>
 </div>
 
 <script src="{% static 'js/chart.js' %}"></script>
 <script>
-    var ctx = document.getElementById('priceChart').getContext('2d');
-    var marketData = {{ market_data|safe }};
-    var datasets = [];
+    // 初始化市场数据
+    let marketData = JSON.parse('{{ market_data|escapejs }}');
 
-    for (var marketName in marketData) {
-        var dates = marketData[marketName].dates;
-        var prices = marketData[marketName].prices;
+    // 渲染图表函数
+    function renderCharts(data) {
+        const chartContainer = document.getElementById("chartContainer");
+        chartContainer.innerHTML = ""; // 清空图表容器
 
-        datasets.push({
-            label: marketName,
-            data: prices,
-            borderColor: getRandomColor(),
-            fill: false,
-            tension: 0.1
-        });
-    }
+        // 遍历市场数据，动态创建图表
+        for (const [marketName, marketDetails] of Object.entries(data)) {
+            const canvasId = `chart_${marketName.replace(/\s+/g, '_')}`;
 
-    var priceChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: marketData[Object.keys(marketData)[0]].dates,
-            datasets: datasets
-        },
-        options: {
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: '日期'
-                    }
+            // 创建图表容器
+            const wrapper = document.createElement("div");
+            wrapper.className = "chart-wrapper mb-5";
+
+            // 添加标题
+            const title = document.createElement("h3");
+            title.className = "text-center";
+            title.innerText = marketName;
+            wrapper.appendChild(title);
+
+            // 创建 canvas 元素
+            const canvas = document.createElement("canvas");
+            canvas.id = canvasId;
+            wrapper.appendChild(canvas);
+
+            // 将容器添加到页面
+            chartContainer.appendChild(wrapper);
+
+            // 使用 Chart.js 渲染图表
+            new Chart(canvas.getContext("2d"), {
+                type: "line",
+                data: {
+                    labels: marketDetails.dates,
+                    datasets: [
+                        {
+                            label: `${marketName} 的价格趋势`,
+                            data: marketDetails.prices,
+                            borderColor: "rgba(75, 192, 192, 1)",
+                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                            borderWidth: 2,
+                            tension: 0.4
+                        }
+                    ]
                 },
-                y: {
-                    title: {
-                        display: true,
-                        text: '价格'
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: "top"
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: "日期"
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: "价格 (元)"
+                            },
+                            beginAtZero: true
+                        }
                     }
                 }
-            }
+            });
         }
-    });
-
-    function getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
     }
+
+    // 初始渲染图表
+    renderCharts(marketData);
+
+    // 筛选按钮点击事件
+    document.getElementById("filterButton").addEventListener("click", () => {
+        const category = document.getElementById("category").value;
+        const dateFilter = document.getElementById("date_filter").value;
+
+        // 通过 Ajax 向后端发送请求
+        fetch(`/price_trends/?category_id=${category}&date_filter=${dateFilter}`)
+            .then(response => response.json())
+            .then(responseData => {
+                // 更新市场数据并重新渲染图表
+                marketData = responseData.market_data;
+                renderCharts(marketData);
+            })
+            .catch(error => console.error("Error fetching data:", error));
+    });
 </script>
 {% endblock %}
