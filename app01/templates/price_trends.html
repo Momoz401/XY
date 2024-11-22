@@ -33,7 +33,7 @@
     <canvas id="priceChart"></canvas>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/chart.js' %}"></script>
 <script>
     var ctx = document.getElementById('priceChart').getContext('2d');
     var marketData = {{ market_data|safe }};

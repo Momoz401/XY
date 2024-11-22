@@ -171,6 +171,11 @@ urlpatterns = [
     # 日历视图显示种植批次
     path('Plant_batch/calendar/', plant_batch_calendar_view, name='plant_batch_calendar_view'),
 
+
+
+
+
+
     # 工种管理
     path('BaseInfoWorkType/list/', worktype.work_type_list),
     path('BaseInfoWorkType/add/', worktype.work_type_add),
