@@ -24,7 +24,7 @@ from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
     daily_price_report_views
-from app01.views.DailyPriceReport import get_price_trends, get_available_categories
+from app01.views.DailyPriceReport import get_price_trends, get_available_categories, get_price_trends_data
 from app01.views.Plant_batch import export_plant_batches
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
 
@@ -390,6 +390,7 @@ urlpatterns = [
 
     # 价格走势
     path('price_trends/', get_price_trends, name='price_trends'),
-    path('get_available_categories/', get_available_categories, name='get_available_categories'),
+    path('api/price_trends_data/', get_price_trends_data, name='price_trends_data'),  # 新增的数据接口
+    path('api/available_categories/', get_available_categories, name='available_categories'),
 
 ]

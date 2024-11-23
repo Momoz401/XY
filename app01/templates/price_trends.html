@@ -1,3 +1,5 @@
+<!-- templates/price_trends.html -->
+
 {% extends 'layout.html' %}
 {% load static %}
 
@@ -31,15 +33,27 @@
     <div id="chartContainer"></div>
 </div>
 
-<script src="{% static 'js/chart.js' %}"></script>
+<!-- 引入 Chart.js 库 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
     // 初始化市场数据
     let marketData = JSON.parse('{{ market_data|escapejs }}');
 
     // 渲染图表函数
     function renderCharts(data) {
+        console.log("Rendering charts with data:", data);  // 添加日志
         const chartContainer = document.getElementById("chartContainer");
         chartContainer.innerHTML = ""; // 清空图表容器
+
+        // 检查是否有数据
+        if (Object.keys(data).length === 0) {
+            const noDataMessage = document.createElement("p");
+            noDataMessage.innerText = "暂无数据";
+            noDataMessage.style.textAlign = "center";
+            chartContainer.appendChild(noDataMessage);
+            return;
+        }
 
         // 遍历市场数据，动态创建图表
         for (const [marketName, marketDetails] of Object.entries(data)) {
@@ -115,15 +129,40 @@
         const category = document.getElementById("category").value;
         const dateFilter = document.getElementById("date_filter").value;
 
+        console.log(`Selected category: ${category}, dateFilter: ${dateFilter}`);  // 添加日志
+
+        // 构建 API 请求的 URL
+        const url = `/api/price_trends_data/?category_id=${category}&date_filter=${dateFilter}`;
+
         // 通过 Ajax 向后端发送请求
-        fetch(`/price_trends/?category_id=${category}&date_filter=${dateFilter}`)
-            .then(response => response.json())
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'  // 标识为 AJAX 请求
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(responseData => {
+                console.log("Received market_data:", responseData.market_data);  // 添加日志
+
+                if (responseData.error) {
+                    console.error("Error from server:", responseData.error);
+                    alert("获取数据失败，请稍后再试。");
+                    return;
+                }
+
                 // 更新市场数据并重新渲染图表
                 marketData = responseData.market_data;
                 renderCharts(marketData);
             })
-            .catch(error => console.error("Error fetching data:", error));
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                alert("发生错误，请检查控制台日志。");
+            });
     });
 </script>
 {% endblock %}
