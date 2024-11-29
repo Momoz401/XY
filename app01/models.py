@@ -45,6 +45,8 @@ class UserInfo(models.Model):
     phone = models.CharField(verbose_name="手机号码", max_length=20, null=True, blank=True)
     bank_account = models.CharField(verbose_name="银行卡号", max_length=64, null=True, blank=True)
     id_card = models.CharField(verbose_name="身份证号码", max_length=18, null=True, blank=True)
+    # 新增开户行信息字段
+    bank_name = models.CharField(verbose_name="开户行信息", max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -447,7 +449,6 @@ class SalesSummary(models.Model):
 class Agriculture_cost(models.Model):
     ID = models.AutoField(primary_key=True)
     日期 = models.DateField(null=True, blank=True)
-    二级工种 = models.CharField(max_length=255, null=True)
     数量 = models.FloatField(null=True, blank=True)
     农资种类 = models.CharField(max_length=255, null=True)
     名称 = models.CharField(max_length=255, null=True)
@@ -1021,23 +1022,34 @@ class DailyPriceReport(models.Model):
 class MonthlyPlan(models.Model):
     日期 = models.DateField()
     二级分类 = models.ForeignKey(JobCategoryInfo, on_delete=models.CASCADE)
-    面积 = models.DecimalField(max_digits=10, decimal_places=2)
-    周期 = models.IntegerField()
-    基地 = models.CharField(max_length=255)
-    地块 = models.CharField(max_length=255)
-   # 添加反馈字段
-    未达成反馈 = models.TextField(verbose_name="未达成反馈", null=True, blank=True)
+    面积 = models.DecimalField(max_digits=10, decimal_places=2)  # 面积单位：亩
+    周期 = models.IntegerField()  # 周期单位：天
+    每天种植单位亩 = models.DecimalField(max_digits=10, decimal_places=2,default=0)  # 每天种植单位亩
+    每天产量单位吨 = models.DecimalField(max_digits=10, decimal_places=2,default=0)  # 每天产量单位吨
+    五天种植单位亩 = models.DecimalField(max_digits=10, decimal_places=2,default=0)  # 5天种植单位亩
+    盘数 = models.IntegerField(default=0)  # 盘数
+    每天数量单位框 = models.IntegerField(default=0)  # 每天数量单位框
+    未达成反馈 = models.TextField(verbose_name="未达成反馈", null=True, blank=True)  # 添加反馈字段
+    备注 = models.TextField(null=True, blank=True)  # 备注字段
+
+    def __str__(self):
+        return f"月度计划 {self.日期} - {self.二级分类}"
 # 日计划
 class DailyPlan(models.Model):
     批次ID = models.CharField(max_length=100, primary_key=True, verbose_name="批次 ID")
-    基地经理 = models.CharField(max_length=255, verbose_name="基地经理")
+    业主 = models.CharField(max_length=255, verbose_name="业主",default='未知')  # 修改字段名称为 业主
     地块 = models.CharField(max_length=255, verbose_name="地块")
     面积 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="面积")
     种植日期 = models.DateField(verbose_name="种植日期")
-    生长周期 = models.IntegerField(verbose_name="生长周期", help_text="单位为天")
-    采收期 = models.IntegerField(verbose_name="采收期", help_text="单位为天")
-    采收初期 = models.DateField(verbose_name="采收初期", null=True, blank=True)
-    采收末期 = models.DateField(verbose_name="采收末期", null=True, blank=True)
+    上批批次 = models.CharField(max_length=100, verbose_name="上批批次", null=True, blank=True)  # 上批批次字段
+    下批种植日期 = models.DateField(verbose_name="下批种植日期", null=True, blank=True)  # 下批种植日期字段
+    播种方式 = models.CharField(
+        max_length=10,
+        choices=[('移栽', '移栽'), ('点籽', '点籽')],
+        default='移栽',
+        verbose_name="播种方式"
+    )
+
     备注 = models.TextField(verbose_name="备注", null=True, blank=True)
 
     def __str__(self):

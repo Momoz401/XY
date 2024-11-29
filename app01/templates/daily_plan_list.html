@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <div class="container">
+    <div class="container-fluid">
         <div style="margin-bottom: 10px" class="clearfix">
             <a class="btn btn-success" href="{% url 'daily_plan_create' %}">
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
@@ -33,11 +33,12 @@
                         <tr>
                             <th>批次ID</th>
                             <th>种植日期</th>
-                            <th>基地经理</th>
+                            <th>业主</th>  <!-- 修改为业主 -->
                             <th>地块</th>
                             <th>面积</th>
-                            <th>采收初期</th>
-                            <th>采收末期</th>
+                            <th>上批批次</th>  <!-- 新增上批批次 -->
+                            <th>下批种植日期</th>  <!-- 新增下批种植日期 -->
+                            <th>播种方式</th>  <!-- 新增播种方式 -->
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -46,11 +47,12 @@
                             <tr>
                                 <td>{{ plan.批次ID }}</td>
                                 <td>{{ plan.种植日期 }}</td>
-                                <td>{{ plan.基地经理 }}</td>
+                                <td>{{ plan.业主 }}</td>  <!-- 修改为业主 -->
                                 <td>{{ plan.地块 }}</td>
                                 <td>{{ plan.面积 }}</td>
-                                <td>{{ plan.采收初期 }}</td>
-                                <td>{{ plan.采收末期 }}</td>
+                                <td>{{ plan.上批批次 }}</td>  <!-- 显示上批批次 -->
+                                <td>{{ plan.下批种植日期 }}</td>  <!-- 显示下批种植日期 -->
+                                <td>{{ plan.播种方式 }}</td>  <!-- 显示播种方式 -->
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="{% url 'daily_plan_edit' plan.批次ID %}">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="{% url 'daily_plan_delete' plan.批次ID %}">删除</a>
@@ -58,7 +60,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="8">没有找到相关的日计划数据</td>
+                                <td colspan="9">没有找到相关的日计划数据</td>
                             </tr>
                         {% endfor %}
                     </tbody>

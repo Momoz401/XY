@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <div class="container">
+    <div class="container-fluid">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">新建</h3>
@@ -70,6 +70,8 @@
                 }
             }
 
+
+
             function bindEvents(prefix) {
 
                 // 基地字段的动态填充
@@ -113,7 +115,7 @@
                             }
                         });
                     } else {
-                        alert('批次号错误，请重新输入');
+                        // 啥都不要提示 alert('批次号错误，请重新输入');
                     }
                 });
 
@@ -198,6 +200,19 @@
                 });
                 // 获取地块
                 $('#' + prefix + '-数量').change(function () {
+
+                    var quantity = $(this).val();
+                    // 使用正则表达式匹配数字*数字的格式
+                    var regex = /^(\d+)\*(\d+)$/;  // 匹配 "数字*数字" 格式
+                    var match = quantity.match(regex);
+
+                    // 如果匹配成功
+                    if (match) {
+                        var result = parseInt(match[1]) * parseInt(match[2]);  // 计算结果
+                        $('#' + prefix + '-数量').val(result);  // 更新为计算后的结果
+                    }
+
+
                     calculateSalary(prefix);
                     var pc = $('#' + prefix + '-批次').val();
                     //alert(pc);

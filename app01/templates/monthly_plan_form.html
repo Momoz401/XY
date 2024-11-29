@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
+
 {% block content %}
-    <div class="container">
+    <div class="container-fluid">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">{% if form.instance.pk %}编辑{% else %}新建{% endif %}月度计划</h3>
@@ -8,11 +9,22 @@
             <div class="panel-body">
                 <form method="post">
                     {% csrf_token %}
+
+                    <!-- 日期字段 -->
                     <div class="form-group">
                         <label for="id_date">日期</label>
                         <input type="month" class="form-control" name="日期" required
                                value="{{ form.日期.value|default_if_none:'' }}">
+                        {% if form.日期.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.日期.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
+
+                    <!-- 二级分类字段 -->
                     <div class="form-group">
                         <label for="id_category">二级分类</label>
                         <select class="form-control" name="二级分类" id="id_category">
@@ -23,27 +35,120 @@
                                 </option>
                             {% endfor %}
                         </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="id_area">面积</label>
-                        <input type="number" class="form-control" name="面积" step="0.01" value="{{ form.面积.value }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="id_cycle">周期</label>
-                        <input type="number" class="form-control" name="周期" value="{{ form.周期.value }}">
-                    </div>
-                    <div class="form-group">
-                        <label for="id_base">基地名称</label>
-                        <select class="form-control" name="基地" id="id_base" required>
-                            <option value="" selected>请选择基地</option>
-                            {% for base in bases %}
-                                <option value="{{ base.ID }}">
-                                    {{ base.基地 }}  <!-- 显示基地名称 -->
-                                </option>
-                            {% endfor %}
-                        </select>
+                        {% if form.二级分类.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.二级分类.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
 
+                    <!-- 面积字段 -->
+                    <div class="form-group">
+                        <label for="id_area">面积 (亩)</label>
+                        <input type="number" class="form-control" name="面积" step="0.01" value="{{ form.面积.value }}">
+                        {% if form.面积.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.面积.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 周期字段 -->
+                    <div class="form-group">
+                        <label for="id_cycle">周期 (天)</label>
+                        <input type="number" class="form-control" name="周期" value="{{ form.周期.value }}">
+                        {% if form.周期.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.周期.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 每天种植单位字段 -->
+                    <div class="form-group">
+                        <label for="id_daily_planting">每天种植单位 (亩)</label>
+                        <input type="number" class="form-control" name="每天种植单位亩" step="0.01" value="{{ form.每天种植单位亩.value }}">
+                        {% if form.每天种植单位亩.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.每天种植单位亩.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 每天产量单位字段 -->
+                    <div class="form-group">
+                        <label for="id_daily_yield">每天产量单位 (吨)</label>
+                        <input type="number" class="form-control" name="每天产量单位吨" step="0.01" value="{{ form.每天产量单位吨.value }}">
+                        {% if form.每天产量单位吨.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.每天产量单位吨.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 5天种植单位字段 -->
+                    <div class="form-group">
+                        <label for="id_five_day_planting">5天种植单位 (亩)</label>
+                        <input type="number" class="form-control" name="五天种植单位亩" step="0.01" value="{{ form.五天种植单位亩.value }}">
+                        {% if form.五天种植单位亩.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.五天种植单位亩.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 盘数字段 -->
+                    <div class="form-group">
+                        <label for="id_boxes">盘数</label>
+                        <input type="number" class="form-control" name="盘数" value="{{ form.盘数.value }}">
+                        {% if form.盘数.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.盘数.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 每天数量单位框 -->
+                    <div class="form-group">
+                        <label for="id_daily_quantity">每天数量单位 (框)</label>
+                        <input type="number" class="form-control" name="每天数量单位框" value="{{ form.每天数量单位框.value }}">
+                        {% if form.每天数量单位框.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.每天数量单位框.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 备注字段 -->
+                    <div class="form-group">
+                        <label for="id_notes">备注</label>
+                        <textarea class="form-control" name="备注" rows="3">{{ form.备注.value }}</textarea>
+                        {% if form.备注.errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.备注.errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- 提交和取消按钮 -->
                     <button type="submit" class="btn btn-primary">保存</button>
                     <a href="{% url 'monthly_plan_list' %}" class="btn btn-secondary">取消</a>
                 </form>

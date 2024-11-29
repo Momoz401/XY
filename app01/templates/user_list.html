@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <div class="container">
+    <div class="container-fluid">
         <div style="margin-bottom: 10px" class="clearfix">
             <a class="btn btn-success" href="/user/model/form/add/">
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
@@ -38,6 +38,7 @@
                     <th class="text-center">身份证号</th>
                     <th class="text-center">手机号码</th>
                     <th class="text-center">银行卡号</th>
+                    <th class="text-center">开户行信息</th>
                     <th class="text-center">入职时间</th>
                     <th class="text-center">性别</th>
                     <th class="text-center">所属部门</th>
@@ -55,6 +56,7 @@
                         <td class="text-center">{{ obj.id_card }}</td>
                         <td class="text-center">{{ obj.phone }}</td>
                         <td class="text-center">{{ obj.bank_account }}</td>
+                        <td class="text-center">{{ obj.bank_name }}</td>
                         <td class="text-center">{{ obj.create_time|date:"Y-m-d" }}</td>
                         <td class="text-center">{{ obj.get_gender_display }}</td>
                         <td class="text-center">{{ obj.depart.title|default:"暂无部门" }}</td>

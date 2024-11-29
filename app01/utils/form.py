@@ -43,7 +43,7 @@ class UserModelForm(BootStrapModelForm):
 
     class Meta:
         model = UserInfo
-        fields = ["name", "password", "age", "salary", "create_time", "gender", "depart", "phone", "bank_account", "id_card"]
+        fields = ["name", "password", "age", "salary", "create_time", "gender", "depart", "phone", "bank_account", "id_card","bank_name"]
 
 
 
@@ -278,7 +278,7 @@ class agriculture_cost_ModelForm(BootStrapModelForm):
         model = models.Agriculture_cost
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['日期', '二级工种', '数量', '农资种类', '名称', '单价', '金额', '批次', '地块']
+        fields = ['日期',  '农资种类', '名称', '单价', '数量', '金额', '批次', '地块']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -295,7 +295,7 @@ class agriculture_cost_Edit_ModelForm(BootStrapModelForm):
         model = models.Agriculture_cost
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['日期', '二级工种', '数量', '农资种类', '名称', '单价', '金额', '批次', '地块']
+        fields = ['日期',  '数量', '农资种类', '名称', '单价', '金额', '批次', '地块']
 
 
 # 新增时只显示部分字段
@@ -371,7 +371,7 @@ class DynamicFieldsForm(BootStrapModelForm):
         self.fields['一级工种'].widget = forms.Select(attrs={'class': 'form-control'})
         self.fields['二级工种'].choices = []
         self.fields['二级工种'].widget = forms.Select(attrs={'class': 'form-control'})
-        self.fields['数量'].widget = forms.NumberInput(attrs={'class': 'form-control'})
+        self.fields['数量'].widget = forms.TextInput(attrs={'class': 'form-control'})
         self.fields['工时'].widget = forms.NumberInput(attrs={'class': 'form-control'})
         self.fields['合计工资'].widget = forms.NumberInput(attrs={'class': 'form-control'})
         self.fields['基地'].widget = forms.Select(attrs={'class': 'form-control'})
@@ -573,16 +573,88 @@ class DailyPriceReportForm(BootStrapModelForm):
 class MonthlyPlanForm(BootStrapModelForm):
     class Meta:
         model = MonthlyPlan
-        fields = ['日期', '二级分类', '面积', '周期', '基地']
+        fields = [
+            '日期', '二级分类', '面积', '周期', '每天种植单位亩', '每天产量单位吨',
+            '五天种植单位亩', '盘数', '每天数量单位框', '备注'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # 设置必填字段
+        self.fields['日期'].required = True
+        self.fields['二级分类'].required = True
+        self.fields['面积'].required = True
+        self.fields['周期'].required = True
+        self.fields['每天种植单位亩'].required = True
+        self.fields['每天产量单位吨'].required = True
+        self.fields['五天种植单位亩'].required = True
+        self.fields['盘数'].required = True
+        self.fields['每天数量单位框'].required = True
+
+        # 你可以为某些字段添加自定义标签或帮助文本
+        self.fields['备注'].widget.attrs['placeholder'] = '请输入备注...'
+
+    def clean(self):
+        cleaned_data = super().clean()
 
 
 class DailyPlanForm(BootStrapModelForm):
     """
     日计划表单，用于创建和编辑日计划信息，并包含自定义的验证逻辑。
     """
+
     class Meta:
         model = DailyPlan
-        fields = ['基地经理', '地块', '面积', '生长周期', '采收期', '备注']
+        fields = ['业主', '地块', '面积', '上批批次', '下批种植日期', '播种方式', '备注']
+        widgets = {
+            '种植日期': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),
+            '下批种植日期': forms.DateInput(attrs={'type': 'date', 'class': 'form-control'}),  # 确保下批种植日期使用日期选择器
+        }
+
+    # 添加非空验证
+    def clean_业主(self):
+        业主 = self.cleaned_data.get('业主')
+        if not 业主:
+            raise forms.ValidationError("业主不能为空")
+        return 业主
+
+    def clean_地块(self):
+        地块 = self.cleaned_data.get('地块')
+        if not 地块:
+            raise forms.ValidationError("地块不能为空")
+        return 地块
+
+    def clean_面积(self):
+        面积 = self.cleaned_data.get('面积')
+        if not 面积:
+            raise forms.ValidationError("面积不能为空")
+        return 面积
+
+    def clean_种植日期(self):
+        种植日期 = self.cleaned_data.get('种植日期')
+        if not 种植日期:
+            raise forms.ValidationError("种植日期不能为空")
+        return 种植日期
+
+    def clean_上批批次(self):
+        上批批次 = self.cleaned_data.get('上批批次')
+        if not 上批批次:
+            raise forms.ValidationError("上批批次不能为空")
+        return 上批批次
+
+    def clean_下批种植日期(self):
+        下批种植日期 = self.cleaned_data.get('下批种植日期')
+        if not 下批种植日期:
+            raise forms.ValidationError("下批种植日期不能为空")
+        return 下批种植日期
+
+    def clean_播种方式(self):
+        播种方式 = self.cleaned_data.get('播种方式')
+        if not 播种方式:
+            raise forms.ValidationError("播种方式不能为空")
+        return 播种方式
+
 
 
     def clean_批次ID(self):

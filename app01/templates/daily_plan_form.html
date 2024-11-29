@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-    <div class="container">
+    <div class="container-fluid">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">{% if form.instance.pk %}编辑{% else %}新建{% endif %}日计划</h3>
@@ -10,11 +10,13 @@
                 <form method="post" id="dailyPlanForm">
                     {% csrf_token %}
 
-                    <!-- 用户选择的种植日期 -->
+                        <!-- 用户选择的种植日期 -->
                     <div class="form-group">
                         <label for="id_plant_date">种植日期</label>
-                        <input type="date" class="form-control" name="种植日期" id="id_plant_date" required>
+                        <input type="date" class="form-control" name="种植日期" id="id_plant_date"
+                               value="{{ form.种植日期.value|default:today|date:'Y-m-d' }}" required>
                     </div>
+
 
                     <!-- 基地选择 -->
                     <div class="form-group">
@@ -22,7 +24,10 @@
                         <select class="form-control" name="基地" id="id_base" required>
                             <option value="">请选择基地</option>
                             {% for base in bases %}
-                                <option value="{{ base.id }}">{{ base.代号 }}</option>
+                                <option value="{{ base.id }}"
+                                        {% if form.基地.value == base.id %}selected{% endif %}>
+                                    {{ base.代号 }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
@@ -33,7 +38,10 @@
                         <select class="form-control" name="二级分类" id="id_category" required>
                             <option value="">请选择二级分类</option>
                             {% for category in job_categories %}
-                                <option value="{{ category.id }}">{{ category.category_name }}</option>
+                                <option value="{{ category.id }}"
+                                        {% if form.二级分类.value == category.id %}selected{% endif %}>
+                                    {{ category.category_name }}
+                                </option>
                             {% endfor %}
                         </select>
                     </div>
@@ -41,7 +49,8 @@
                     <!-- 自动生成批次ID -->
                     <div class="form-group">
                         <label for="id_batch_id">批次ID</label>
-                        <input type="text" class="form-control" name="批次ID" id="id_batch_id" readonly>
+                        <input type="text" class="form-control" name="批次ID" id="id_batch_id" readonly
+                               value="{{ form.批次ID.value|default_if_none:'' }}">
                     </div>
 
                     <!-- 其他表单项 -->
@@ -55,14 +64,19 @@
 
     <script>
         // 当种植日期、基地或二级分类变化时，更新批次ID
-        document.getElementById('id_plant_date').addEventListener('change', updateBatchID);
-        document.getElementById('id_base').addEventListener('change', updateBatchID);
-        document.getElementById('id_category').addEventListener('change', updateBatchID);
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('id_plant_date').addEventListener('change', updateBatchID);
+            document.getElementById('id_base').addEventListener('change', updateBatchID);
+            document.getElementById('id_category').addEventListener('change', updateBatchID);
+
+            // 页面加载时自动调用一次更新批次ID的函数
+            updateBatchID();
+        });
 
         function updateBatchID() {
             const plantDate = document.getElementById('id_plant_date').value.replace(/-/g, ''); // 去掉日期中的 "-"
-            const base = document.getElementById('id_base').options[document.getElementById('id_base').selectedIndex].text;
-            const category = document.getElementById('id_category').options[document.getElementById('id_category').selectedIndex].text;
+            const base = document.getElementById('id_base').options[document.getElementById('id_base').selectedIndex]?.text || '';
+            const category = document.getElementById('id_category').options[document.getElementById('id_category').selectedIndex]?.text || '';
 
             if (plantDate && base && category) {
                 const batchID = base + '-' + plantDate + '-' + category;

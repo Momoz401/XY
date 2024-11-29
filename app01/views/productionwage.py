@@ -168,9 +168,10 @@ def production_wage_add(request):
             return redirect('/production_wage_list/list')
         else:
             # 如果有验证错误，打印错误信息以便调试
-            print(fixed_form.errors)  # 打印固定表单的错误
-            print(formset.errors)  # 打印表单集的错误
+            #print(fixed_form.errors)  # 打印固定表单的错误
+            #print(formset.errors)  # 打印表单集的错误
             # 在这里可以进一步处理验证错误
+            pass
 
     else:
         # 如果是GET请求，创建空的固定表单和表单集
@@ -194,7 +195,7 @@ def get_productionwate(request):
         if level_tow_id is not None:
             work_type = BaseInfoWorkHour.objects.filter(一级分类=level_one_id, 二级分类=level_tow_id).values_list(
                 '工种', '工种')
-            print(work_type)
+            # print(work_type)
             return JsonResponse(dict(work_type))
         else:
             return JsonResponse({'error': '一级分类_id 参数缺失'}, status=400)
@@ -267,7 +268,7 @@ def get_secondary_work_types(request):
     primary_work_type_name = request.GET.get('primary_work_type_name', '')
 
     # 打印选择的一级工种名称
-    print(f"Selected Primary Work Type Name: {primary_work_type_name}")
+    # print(f"Selected Primary Work Type Name: {primary_work_type_name}")
 
     # 查询父工种名称对应的工种
     secondary_work_types = JobTypeDetailInfo.objects.filter(
@@ -275,10 +276,10 @@ def get_secondary_work_types(request):
     ).values('id', 'job_name')
 
     # 打印二级工种查询集
-    print(f"Secondary Work Types Queryset: {secondary_work_types}")
+    # print(f"Secondary Work Types Queryset: {secondary_work_types}")
 
     data = list(secondary_work_types)
-    print(f"Data to return: {data}")
+    # print(f"Data to return: {data}")
 
     return JsonResponse(data, safe=False)
 

@@ -2,33 +2,33 @@
 {% load static %}
 
 {% block content %}
-    <div class="container">
-    <div style="margin-bottom: 10px" class="clearfix">
-        <a class="btn btn-success" href="{% url 'monthly_plan_create' %}">
-            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-            新建月度计划
-        </a>
-        <div style="float: right; width: 300px;">
-            <form method="get">
-                <div class="input-group">
-                    <!-- 下拉菜单显示数据库中的日期选项 -->
-                    <select name="month" class="form-control">
-                        <option value="">选择月份...</option>
-                        {% for month in months %}
-                            <option value="{{ month|date:"Y-m" }}" {% if selected_month == month|date:"Y-m" %}selected{% endif %}>
-                                {{ month|date:"Y年m月" }}
-                            </option>
-                        {% endfor %}
-                    </select>
-                    <span class="input-group-btn">
-                        <button class="btn btn-default" type="submit">
-                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                        </button>
-                    </span>
-                </div>
-            </form>
+    <div class="container-fluid">
+        <div style="margin-bottom: 10px" class="clearfix">
+            <a class="btn btn-success" href="{% url 'monthly_plan_create' %}">
+                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+                新建月度计划
+            </a>
+            <div style="float: right; width: 300px;">
+                <form method="get">
+                    <div class="input-group">
+                        <!-- 下拉菜单显示数据库中的日期选项 -->
+                        <select name="month" class="form-control">
+                            <option value="">选择月份...</option>
+                            {% for month in months %}
+                                <option value="{{ month|date:"Y-m" }}" {% if selected_month == month|date:"Y-m" %}selected{% endif %}>
+                                    {{ month|date:"Y年m月" }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        <span class="input-group-btn">
+                            <button class="btn btn-default" type="submit">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </span>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
 
         <div class="panel panel-default">
             <div class="panel-heading">
@@ -45,8 +45,13 @@
                             <th>二级分类</th>
                             <th>面积</th>
                             <th>周期</th>
-                            <th>基地</th>
-
+                            <th>每天种植单位亩</th>
+                            <th>每天产量单位吨</th>
+                            <th>5天种植单位亩</th>
+                            <th>盘数</th>
+                            <th>每天数量单位框</th>
+                            <th>未达成反馈</th>
+                            <th>备注</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -55,11 +60,16 @@
                             <tr>
                                 <td>{{ plan.id }}</td>
                                 <td>{{ plan.日期|date:"Y-m" }}</td>
-                                <td>{{ plan.二级分类.category_name }}</td>  <!-- 显示二级分类 -->
+                                <td>{{ plan.二级分类.category_name }}</td>
                                 <td>{{ plan.面积 }}</td>
                                 <td>{{ plan.周期 }}</td>
-                                <td>{{ plan.基地 }}</td>  <!-- 显示基地 -->
-
+                                <td>{{ plan.每天种植单位亩 }}</td>
+                                <td>{{ plan.每天产量单位吨 }}</td>
+                                <td>{{ plan.五天种植单位亩 }}</td>
+                                <td>{{ plan.盘数 }}</td>
+                                <td>{{ plan.每天数量单位框 }}</td>
+                                <td>{{ plan.未达成反馈 }}</td>
+                                <td>{{ plan.备注 }}</td>
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="{% url 'monthly_plan_edit' plan.id %}">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="{% url 'monthly_plan_delete' plan.id %}">删除</a>
@@ -67,7 +77,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="8">没有找到相关的月度计划数据</td>
+                                <td colspan="13">没有找到相关的月度计划数据</td>
                             </tr>
                         {% endfor %}
                     </tbody>
@@ -77,7 +87,7 @@
 
         <div class="clearfix">
             <ul class="pagination">
-                {{ page_string|safe }}  <!-- 显示分页的 HTML -->
+                {{ page_string|safe }}
             </ul>
         </div>
     </div>

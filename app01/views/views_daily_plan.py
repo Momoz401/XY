@@ -1,9 +1,8 @@
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, date
 from django.shortcuts import render, get_object_or_404, redirect
 from app01.models import DailyPlan, BaseInfoBase, JobCategoryInfo
 from app01.utils.form import DailyPlanForm
 from app01.utils.pagination import Pagination
-
 
 # List View
 def daily_plan_list(request):
@@ -50,13 +49,10 @@ def daily_plan_create(request):
                 print("日期解析错误")
                 return render(request, 'daily_plan_form.html', {'form': form})
 
-            # 获取生长周期和采收期
-            growth_cycle = form.cleaned_data['生长周期']
-            harvest_cycle = form.cleaned_data['采收期']
-
-            # 计算采收初期和采收末期
-            initial_harvest = plant_date + timedelta(days=growth_cycle)
-            final_harvest = initial_harvest + timedelta(days=harvest_cycle)
+            # 获取播种方式、上批批次和下批种植日期
+            播种方式 = form.cleaned_data['播种方式']
+            上批批次 = form.cleaned_data['上批批次']
+            下批种植日期 = form.cleaned_data['下批种植日期']
 
             # 将种植日期转换为 yymmdd 格式
             formatted_date = plant_date.strftime('%y%m%d')
@@ -75,8 +71,9 @@ def daily_plan_create(request):
             daily_plan = form.save(commit=False)
             daily_plan.批次ID = batch_id  # 使用更新后的批次ID
             daily_plan.种植日期 = plant_date
-            daily_plan.采收初期 = initial_harvest
-            daily_plan.采收末期 = final_harvest
+            daily_plan.上批批次 = 上批批次
+            daily_plan.下批种植日期 = 下批种植日期
+            daily_plan.播种方式 = 播种方式
 
             daily_plan.save()
 
@@ -88,17 +85,20 @@ def daily_plan_create(request):
     else:
         # GET 请求时渲染空表单，带入已有的基地和二级分类数据
         form = DailyPlanForm()
+        today = date.today()  # 获取当前日期
 
         # 获取所有的基地和二级分类信息（用于前端选择）
         bases = BaseInfoBase.objects.all()  # 获取完整的基地对象
         job_categories = JobCategoryInfo.objects.filter(category_level=2)  # 获取完整的二级分类对象
 
         context = {
+            'today': today,
             'form': form,
             'bases': bases,
             'job_categories': job_categories,
         }
         return render(request, 'daily_plan_form.html', context)
+
 # Edit View
 def daily_plan_edit(request, pk):
     plan = get_object_or_404(DailyPlan, pk=pk)

@@ -2,7 +2,7 @@
 
 
 {% block content %}
-    <div class="container">
+    <div class="container-fluid">
         <div style="margin-bottom: 10px" class="clearfix">
             <a class="btn btn-success" href="/Agricureture/add/">
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
@@ -41,12 +41,13 @@
                 <tr>
                     <th>序号</th>
                     <th>日期</th>
-                    <th>工种</th>
-                    <th>数量</th>
                     <th>农资种类</th>
                     <th>名称</th>
                     <th>单价</th>
+                    <th>数量</th>
                     <th>金额</th>
+
+
                     <th>批次</th>
                     <th>地块</th>
                     <th>操作</th>
@@ -57,11 +58,10 @@
                     <tr>
                         <th>{{ obj.ID }}</th>
                         <th>{{ obj.日期 }}</th>
-                        <td>{{ obj.工种 }}</td>
-                        <td>{{ obj.数量 }}</td>
                         <td>{{ obj.农资种类 }}</td>
                         <td>{{ obj.名称 }}</td>
                         <td>{{ obj.单价 }}</td>
+                        <td>{{ obj.数量 }}</td>
                         <td>{{ obj.金额 }}</td>
                         <td>{{ obj.批次 }}</td>
                         <td>{{ obj.地块 }}</td>
