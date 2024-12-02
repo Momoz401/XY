@@ -7,9 +7,13 @@ from django.shortcuts import render, get_object_or_404, redirect
 from openpyxl.workbook import Workbook
 
 from app01.models import MonthlyPlan, DailyPlan
+from app01.utils.pagination import Pagination
 
 
 def monthly_plan_rate(request):
+    """
+    月度计划完成情况视图，用于展示月度计划并支持通过月份进行过滤和分页显示。
+    """
     # 获取所有不重复的月份
     unique_months = MonthlyPlan.objects.annotate(month=TruncMonth('日期')).values('month').distinct()
 
@@ -23,10 +27,13 @@ def monthly_plan_rate(request):
     else:
         monthly_plans = MonthlyPlan.objects.all()
 
+    # 使用自定义分页类进行分页
+    page_object = Pagination(request, monthly_plans)
+
     # 准备统计结果
     report_data = []
 
-    for monthly_plan in monthly_plans:
+    for monthly_plan in page_object.page_queryset:  # 使用分页后的数据
         # 获取二级分类名称
         category_name = monthly_plan.二级分类.category_name
         未达成反馈 = monthly_plan.未达成反馈
@@ -63,7 +70,8 @@ def monthly_plan_rate(request):
     context = {
         'report_data': report_data,
         'unique_months': unique_months,  # 传递不重复的月份数据到前端
-        'selected_month': selected_month  # 将选中的月份传递回前端
+        'selected_month': selected_month,  # 将选中的月份传递回前端
+        'page_string': page_object.html()  # 分页控件的HTML
     }
     return render(request, 'plan_completion_report.html', context)
 def monthly_plan_download(request):

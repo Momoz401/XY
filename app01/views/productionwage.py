@@ -1,4 +1,4 @@
-from django.db.models import Sum, Min, Max
+from django.db.models import Sum, Min, Max, Q
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import render, redirect
 from app01 import models
@@ -11,25 +11,19 @@ from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Ed
 
 
 def production_wage_list(request):
-    """ 工时列表 """
+    """ 工时列表 (Production Wage List) """
 
-    data_dict = {}
-    search_data = request.GET.get('q', "")
-    if search_data:
-        data_dict["工种__contains"] = search_data
+    # 获取所有工价记录，按 ID 降序排列
+    queryset = ProductionWage.objects.all().order_by("-id")
 
-    queryset = models.ProductionWage.objects.filter(**data_dict).order_by("-id")
-
-    page_object = Pagination(request, queryset)
+    # 获取所有可用类别品种（如果需要显示在表格中）
+    available_categories = JobCategoryInfo.objects.all()
 
     context = {
-        "search_data": search_data,
-
-        "queryset": page_object.page_queryset,  # 分完页的数据
-        "page_string": page_object.html()  # 页码
+        "queryset": queryset,  # 所有工价记录
+        "available_categories": available_categories,  # 可选，如果需要
     }
     return render(request, 'productionwage.html', context)
-
 
 # 获得基地信息
 def get_base_options(request):

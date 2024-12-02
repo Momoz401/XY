@@ -16,12 +16,10 @@ def Plant_batch_list(request):
         data_dict["批次ID__contains"] = search_data
 
     queryset = Plant_batch.objects.filter(**data_dict).order_by('-种植日期')
-    page_object = Pagination(request, queryset)
 
     context = {
-        "search_data": search_data,
-        "queryset": page_object.page_queryset,  # 分完页的数据
-        "page_string": page_object.html()  # 页码
+        "queryset": queryset,      # 传递所有过滤后的数据
+        "search_data": search_data # 保留搜索数据
     }
     return render(request, 'Plant_batch.html', context)
 

@@ -1,79 +1,208 @@
+<!-- templates/workhour.html -->
+
 {% extends 'layout.html' %}
+{% load static %}
 
 {% block content %}
-    <div class="container-fluid">
-        <div style="margin-bottom: 10px" class="clearfix">
-            <a class="btn btn-success" href="/WorkHour/add/">
-                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                新建工价
-            </a>
-            <a class="btn btn-success" href="/upload/WorkHour/">
-                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                新建工价批量导入
-            </a>
-
-            <div style="float: right;width: 300px;">
-                <form method="get">
-                    <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="请输入一级分类查询..."
-                               value="{{ search_data }}">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="submit">
-                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                </form>
-            </div>
+<div class="container-fluid">
+    <!-- 操作按钮区域 -->
+    <div style="margin-bottom: 10px" class="clearfix">
+        <a class="btn btn-success" href="/WorkHour/add/">
+            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+            新建工价
+        </a>
+    </div>
+    <hr>
+    <!-- 表格区域 -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+            工价列表
         </div>
-        <div class="panel panel-default">
-            <!-- Default panel contents -->
-            <div class="panel-heading">
-                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
-                工价列表
-            </div>
-
-            <!-- Table -->
-            <table class="table table-bordered">
+        <hr>
+        <!-- 包裹表格的 div，设置 overflow-x: auto 实现水平滚动条 -->
+        <div style="overflow-x: auto;">
+            <table id="productionWageTable" class="table table-bordered table-striped">
                 <thead>
                 <tr>
-                    <th style="text-align: center;">工种ID</th>
-                    <th style="text-align: center;">一级分类</th>
-                    <th style="text-align: center;">二级分类</th>
-                    <th style="text-align: center;">一级工种</th>
-                    <th style="text-align: center;">二级工种</th>
-                    <th style="text-align: center;">单价</th>
-                    <th style="text-align: center;">单位</th>
-                    <th style="text-align: center;">默认计入成本</th>
-                    <th style="text-align: center;">备注</th>
-                    <th style="text-align: center;">操作</th>
+                    <th>工种ID</th>
+                    <th>一级分类</th>
+                    <th>二级分类</th>
+                    <th>一级工种</th>
+                    <th>二级工种</th>
+                    <th>单价</th>
+                    <th>单位</th>
+                    <th>默认计入成本</th>
+                    <th>备注</th>
+                    <th>操作</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for obj in queryset %}
                     <tr>
-                        <td style="text-align: center;">{{ obj.工种ID }}</td>
-                        <td style="text-align: center;">{{ obj.一级分类.category_name }}</td>
-                        <td style="text-align: center;">{% if obj.二级分类 %}{{ obj.二级分类.category_name }}{% else %}无{% endif %}</td>
-                        <td style="text-align: center;">{{ obj.一级工种.job_name }}</td>
-                        <td style="text-align: center;">{% if obj.二级工种 %}{{ obj.二级工种.job_name }}{% else %}无{% endif %}</td>
-                        <td style="text-align: center;">{{ obj.单价 }}</td>
-                        <td style="text-align: center;">{{ obj.单位 }}</td>
-                        <td style="text-align: center;">{{ obj.默认计入成本 }}</td>
-                        <td style="text-align: center;">{% if obj.备注 and obj.备注 != "nan" %}{{ obj.备注 }}{% else %}{% endif %}</td>
-                        <td style="text-align: center;">
+                        <td>{{ obj.工种ID }}</td>
+                        <td>{{ obj.一级分类.category_name|default_if_none:"" }}</td>
+                        <td>{% if obj.二级分类 %}{{ obj.二级分类.category_name }}{% else %}无{% endif %}</td>
+                        <td>{{ obj.一级工种.job_name|default_if_none:"" }}</td>
+                        <td>{% if obj.二级工种 %}{{ obj.二级工种.job_name }}{% else %}无{% endif %}</td>
+                        <td>{{ obj.单价|default_if_none:"" }}</td>
+                        <td>{{ obj.单位|default_if_none:"" }}</td>
+                        <td>{{ obj.默认计入成本|default_if_none:"" }}</td>
+                        <td>{% if obj.备注 and obj.备注 != "nan" %}{{ obj.备注 }}{% else %}{% endif %}</td>
+                        <td>
                             <a class="btn btn-primary btn-xs" href="/WorkHour/{{ obj.工种ID }}/edit/">编辑</a>
                             <a class="btn btn-danger btn-xs" href="/WorkHour/{{ obj.工种ID }}/delete/">删除</a>
                         </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="10" style="text-align: center;">没有找到相关的工价数据</td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         </div>
-        <div class="clearfix">
-            <ul class="pagination">
-                {{ page_string }}
-            </ul>
-        </div>
     </div>
+
+    <!-- 移除现有的分页控件，因为 DataTables 将处理分页 -->
+    <!--
+    <div class="clearfix">
+        <ul class="pagination">
+            {{ page_string }}
+        </ul>
+    </div>
+    -->
+</div>
+
+<!-- 自定义 CSS -->
+<style>
+    /* 定义对齐类 */
+    .text-left {
+        text-align: left !important; /* 确保左对齐 */
+    }
+
+    .text-center {
+        text-align: center !important; /* 确保居中对齐 */
+    }
+
+    .text-right {
+        text-align: right !important; /* 确保右对齐 */
+    }
+
+    /* 确保所有表头内容居中对齐 */
+    table.dataTable thead th {
+        text-align: center !important;
+    }
+
+    /* 其他样式保持不变 */
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    th, td {
+        border: 1px solid #ddd;
+        padding: 6px;
+        white-space: nowrap;
+    }
+    th {
+        background-color: #f2f2f2;
+        font-size: 12px;
+    }
+    td {
+        font-size: 12px;
+    }
+</style>
+
+<!-- 引入 DataTables 的 CSS 和 JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css">
+<!-- 引入 DataTables Buttons 插件的 CSS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.3.6/css/buttons.dataTables.min.css">
+
+<!-- 引入 jQuery 和 DataTables 的 JS -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<!-- 引入 DataTables Buttons 插件的 JS -->
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.flash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.36/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.3.6/js/buttons.print.min.js"></script>
+
+<!-- 初始化 DataTables -->
+<script>
+    $(document).ready(function() {
+        var table = $('#productionWageTable').DataTable({
+            "paging": true,                // 启用分页
+            "lengthChange": true,          // 启用更改每页显示条数
+            "lengthMenu": [[10, 25, 100, -1], [10, 25, 100, "全部"]], // 添加“全部”选项
+            "searching": true,             // 启用搜索
+            "ordering": true,              // 启用排序
+            "info": true,                  // 启用表格信息显示
+            "autoWidth": false,            // 禁用自动宽度计算
+            "responsive": false,           // 禁用响应式，防止DataTables隐藏列并添加+号
+            "scrollX": true,               // 启用水平滚动
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/Chinese.json"  // 设置中文语言包
+            },
+            "columnDefs": [
+                {
+                    "targets": [0, 9], // 工种ID 和 操作 列
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": [5], // 单价 列
+                    "className": "text-center"
+                },
+                {
+                    "targets": "_all", // 其他所有列
+                    "className": "text-center"
+                }
+            ],
+            "order": [[2, "desc"]],          // 默认按二级分类降序排序（第3列，索引从0开始）
+            "dom": 'Blfrtip',                // 定义控制元素的位置，包含 'l' 来显示分页长度选择器
+            "buttons": [
+                {
+                    extend: 'copyHtml5',
+                    text: '复制',
+                    title: '工价数据'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '导出CSV',
+                    title: '工价数据'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '导出Excel',
+                    title: '工价数据'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '导出PDF',
+                    title: '工价数据',
+                    orientation: 'landscape', // PDF页面方向
+                    pageSize: 'A4',           // PDF页面大小
+                    exportOptions: {
+                        columns: ':visible'   // 只导出可见列
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '打印',
+                    title: '工价数据',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                }
+            ]
+        });
+    });
+</script>
 {% endblock %}
