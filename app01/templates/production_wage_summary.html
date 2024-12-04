@@ -34,6 +34,21 @@
     </table>
 </div>
 
+  <!-- 引入 DataTables CSS -->
+    <link rel="stylesheet" href="{% static 'plugins/datatables/css/jquery.dataTables.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/datatables/css/buttons.dataTables.min.css' %}">
+
+   <!-- 引入 DataTables JS -->
+    <script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/js/dataTables.buttons.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/js/buttons.flash.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/js/jszip.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/js/buttons.html5.min.js' %}"></script>
+    <script src="{% static 'plugins/datatables/js/buttons.print.min.js' %}"></script>
+    <!-- 引入 jQuery -->
+    <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+
+
 <script>
     $(document).ready(function() {
         // 初始化 DataTable，提供响应式表格和导出功能

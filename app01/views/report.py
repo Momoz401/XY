@@ -58,7 +58,7 @@ def report_salary_by_plople(request):
         {"value": month['日期'], "label": f"{month['日期'][:4]}年{month['日期'][4:]}月"}
         for month in months
     ]
-    print(month_options)
+    #print(month_options)
     # 将月份选项传递给模板
     context = {
         'months': month_options
