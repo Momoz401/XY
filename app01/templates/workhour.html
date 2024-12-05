@@ -33,7 +33,9 @@
                     <th>单价</th>
                     <th>单位</th>
                     <th>默认计入成本</th>
-                    <th>备注</th>
+                    <th>最后更新时间</th>
+                    <th>最后更新时间</th>
+                    <th>上传人</th>
                     <th>操作</th>
                 </tr>
                 </thead>
@@ -48,6 +50,8 @@
                         <td>{{ obj.单价|default_if_none:"" }}</td>
                         <td>{{ obj.单位|default_if_none:"" }}</td>
                         <td>{{ obj.默认计入成本|default_if_none:"" }}</td>
+                        <td>{{ obj.最后更新时间|default_if_none:"" }}</td>
+                        <td>{{ obj.上传人|default_if_none:"" }}</td>
                         <td>{% if obj.备注 and obj.备注 != "nan" %}{{ obj.备注 }}{% else %}{% endif %}</td>
                         <td>
                             <a class="btn btn-primary btn-xs" href="/WorkHour/{{ obj.工种ID }}/edit/">编辑</a>

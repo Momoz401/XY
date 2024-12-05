@@ -11,8 +11,10 @@
         </div>
         <div class="panel-body">
             <!-- 下载模板按钮 -->
-            <a href="{% static 'templates/工价上传模板.xlsx' %}" class="btn btn-info" download>下载工价上传模板</a>
+            <a href="{% static 'files/价格上传.xlsx' %}" class="btn btn-info" download>点击下载工价上传模板</a>
 
+
+         <hr>
             <!-- 上传表单 -->
             <form method="post" enctype="multipart/form-data" novalidate>
                 {% csrf_token %}
@@ -20,9 +22,9 @@
                 {% for field in form %}
                     <div class="form-group">
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                        {% if field.name == 'uploader_name' %}
+                        {% if field.name == 'update_user' %}
                             <!-- 只读上传人字段 -->
-                            <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value }}" readonly class="form-control">
+                            <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ request.session.info.name }}" readonly class="form-control">
                         {% else %}
                             {{ field }}
                         {% endif %}

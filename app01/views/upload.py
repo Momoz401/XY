@@ -6,11 +6,13 @@ from django.shortcuts import render, HttpResponse, redirect
 from app01 import models
 import pandas as pd
 import openpyxl
-
 from app01.utils.database import data_to_db
 from app01.utils.form import OutboundUploadForm, SalesRecordUploadForm
-
-
+from django import forms
+from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
+from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch, ExpenseAllocation, \
+    OutboundRecord, Vehicle, Market, SalesRecord, JobCategoryInfo, JobTypeDetailInfo
+from app01.utils.bootstrap import BootStrapModelForm
 def upload_list(request):
     if request.method == "GET":
         return render(request, 'upload_list.html')
@@ -29,10 +31,6 @@ def upload_list(request):
     f.close()
 
     return HttpResponse("...")
-from django import forms
-from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
-from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch, ExpenseAllocation, \
-    OutboundRecord, Vehicle, Market, SalesRecord, JobCategoryInfo, JobTypeDetailInfo
 class UpForm(BootStrapForm):
     bootstrap_exclude_fields = ['img']
     name = forms.CharField(label="姓名")
@@ -67,10 +65,6 @@ def upload_form(request):
     return render(request, 'upload_form.html', {"form": form, "title": title,'uploader_name': request.session["info"]['name']})
 
 
-from django import forms
-from app01.utils.bootstrap import BootStrapModelForm
-
-
 class UpModelForm(BootStrapModelForm):
     bootstrap_exclude_fields = ['img']
 
@@ -78,19 +72,36 @@ class UpModelForm(BootStrapModelForm):
         model = models.uploader
         fields = "__all__"
 
-
-
 def upload_workhour_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批量上传价格文件"
+
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
+        return render(request, 'upload_form.html', {"form": form, 'title': title})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
+        # 获取上传人信息
+        uploader_name = form.cleaned_data.get('update_user', '')
+        # 保存上传文件到服务器
+        uploaded_file = form.cleaned_data['excel_file']
+        upload_dir = os.path.join(settings.MEDIA_ROOT, "uploads")
+        os.makedirs(upload_dir, exist_ok=True)  # 如果目录不存在，则创建
+        file_path = os.path.join(upload_dir, uploaded_file.name)
+
+        with open(file_path, mode='wb') as f:
+            for chunk in uploaded_file.chunks():
+                f.write(chunk)
+
+        # 保存上传日志到数据库
+        uploader_obj = models.uploader.objects.create(
+            update_user=uploader_name,
+            excel_file=file_path.replace(settings.MEDIA_ROOT, ''),  # 存储相对路径
+        )
+
         # 读取上传的 Excel 文件
-        df = pd.read_excel(form.cleaned_data['excel_file'])
+        df = pd.read_excel(file_path)
         records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
 
         for record in records:
@@ -116,24 +127,25 @@ def upload_workhour_modal_form(request):
                 if not 二级工种_obj:
                     continue  # 如果没有找到对应的二级工种，跳过该记录
 
-            # 创建或更新 BaseInfoWorkHour 对象
+            # 更新或创建 BaseInfoWorkHour 对象
             obj, created = BaseInfoWorkHour.objects.update_or_create(
-                工种ID=record.get('工种ID'),  # 假设 `工种ID` 是唯一标识
+                二级分类=二级分类_obj,
+                一级工种=一级工种_obj,
+                二级工种=二级工种_obj,
                 defaults={
                     '一级分类': 一级分类_obj,
-                    '二级分类': 二级分类_obj,
-                    '一级工种': 一级工种_obj,
-                    '二级工种': 二级工种_obj,
                     '单位': record['单位'],
                     '单价': record['单价'],
                     '备注': record['备注'],
                     '默认计入成本': record['默认计入成本'],
+                    '最后更新时间': uploader_obj.update_date,
+                    '上传人': uploader_name,
                 }
             )
 
         return redirect('/WorkHour/list/')
-    return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
-# 工时工价上传
+
+    return render(request, 'upload_form.html', {"form": form, 'title': title})
 def upload_productionwate_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批量上传工价文件"

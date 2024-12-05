@@ -388,4 +388,9 @@ urlpatterns = [
     path('api/price_trends_data/', get_price_trends_data, name='price_trends_data'),  # 新增的数据接口
     path('api/available_categories/', get_available_categories, name='available_categories'),
 
+
+
 ]
+from django.conf.urls.static import static
+# 添加媒体文件的URL配置
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

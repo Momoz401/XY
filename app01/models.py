@@ -114,8 +114,10 @@ class uploader(models.Model):
     update_date = models.DateField(verbose_name="上传时间", auto_now=True)
     update_user = models.CharField(verbose_name="上传人", max_length=100, default="")
     # 本质上数据库也是CharField，自动保存数据。
-    excel_file = models.FileField(verbose_name="excel_file", max_length=128, upload_to='city/', default='')
+    excel_file = models.FileField(verbose_name="excel_file", max_length=128, upload_to='upload/', default='')
 
+    def __str__(self):
+        return self.update_user
 
 class BaseInfoBase(models.Model):
     ID = models.AutoField(primary_key=True)
@@ -198,7 +200,10 @@ class BaseInfoWorkHour(models.Model):
         choices=[('是', '是'), ('否', '否')],
         default='是'
     )
-
+    # 新增字段
+    最后更新时间 = models.DateTimeField(auto_now=True, verbose_name="最后更新时间")  # 自动更新为修改时间
+    上传人 = models.CharField(max_length=50, verbose_name="上传人", null=True, blank=True)  # 可为空
+    上传时间 = models.DateTimeField(auto_now_add=True, verbose_name="上传时间",null=True, blank=True)  # 自动设置为创建时间
     def __str__(self):
         return f"{self.一级工种.job_name} - {self.二级工种.job_name if self.二级工种 else ''}"
 
