@@ -1,34 +1,39 @@
+<!-- templates/upload_form.html -->
+
 {% extends 'layout.html' %}
-
-
+{% load static %}
 {% block content %}
 
-    <div class="container-fluid">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title"> {{ title }} </h3>
-            </div>
-            <div class="panel-body">
-                <form method="post" enctype="multipart/form-data" novalidate>
-                    {% csrf_token %}
+<div class="container-fluid">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title"> {{ title }} </h3>
+        </div>
+        <div class="panel-body">
+            <!-- 下载模板按钮 -->
+            <a href="{% static 'templates/工价上传模板.xlsx' %}" class="btn btn-info" download>下载工价上传模板</a>
 
-                    {% for field in form %}
-                        <div class="form-group">
-                            <label>{{ field.label }}</label>
-                            {% if field.name == '上传人' %}
-                                <!-- 在模板中检查会话值，并将其作为字段的初始值传递给模板 -->
-                            <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.uploader_name }}">
-                            {% else %}
-                                {{ field }}
-                            {% endif %}
-                            <span style="color: red;">{{ field.errors.0 }}</span>
-                        </div>
-                    {% endfor %}
+            <!-- 上传表单 -->
+            <form method="post" enctype="multipart/form-data" novalidate>
+                {% csrf_token %}
 
-                    <button type="submit" class="btn btn-primary">提 交</button>
-                </form>
-            </div>
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {% if field.name == 'uploader_name' %}
+                            <!-- 只读上传人字段 -->
+                            <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" value="{{ field.value }}" readonly class="form-control">
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
+                        <span style="color: red;">{{ field.errors.0 }}</span>
+                    </div>
+                {% endfor %}
+
+                <button type="submit" class="btn btn-primary">提 交</button>
+            </form>
         </div>
     </div>
+</div>
 
 {% endblock %}

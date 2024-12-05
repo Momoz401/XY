@@ -29,21 +29,15 @@ def upload_list(request):
     f.close()
 
     return HttpResponse("...")
-
-
 from django import forms
 from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
 from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch, ExpenseAllocation, \
     OutboundRecord, Vehicle, Market, SalesRecord, JobCategoryInfo, JobTypeDetailInfo
-
-
 class UpForm(BootStrapForm):
     bootstrap_exclude_fields = ['img']
     name = forms.CharField(label="姓名")
     age = forms.IntegerField(label="年龄")
     img = forms.FileField(label="头像")
-
-
 def upload_form(request):
     title = "Form上传"
     if request.method == "GET":

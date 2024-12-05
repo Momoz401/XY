@@ -5,12 +5,21 @@
     <meta charset="UTF-8">
     <title>云南泰兴</title>
 
+
+  <!-- jQuery -->
+    <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+
+
+
     <!-- 引入 Bootstrap 3.4.1 CSS -->
     <link rel="stylesheet" href="{% static 'plugins/bootstrap-3.4.1/css/bootstrap.min.css' %}">
 
-    <!-- 引入 Font Awesome 6 CSS via CDN without integrity -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"
-          crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- 引入 Bootstrap JS -->
+    <script src="{% static 'plugins/bootstrap-3.4.1/js/bootstrap.min.js' %}"></script>
+
+    <!-- 引入 jQuery UI JS -->
+    <script src="{% static 'plugins/jquery-ui/jquery-ui.min.js' %}"></script>
 
     <!-- 引入 jQuery UI CSS -->
     <link rel="stylesheet" href="{% static 'plugins/jquery-ui/css/jquery-ui.css' %}">
@@ -83,7 +92,7 @@
         .dropdown-menu {
             background-color: #378842; /* 深绿色背景 */
             border: none;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
         }
 
@@ -170,8 +179,8 @@
 
         /* 页脚样式 */
         .footer {
-            position: fixed; /* 固定定位 */
-            bottom: 0;       /* 固定在底部 */
+
+            bottom: 0; /* 固定在底部 */
             left: 0;
             width: 100%;
             background-color: #378842; /* 深绿色背景 */
@@ -228,180 +237,230 @@
     {% block css %}{% endblock %}
 </head>
 <body>
-    <!-- 导航栏 -->
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <!-- 导航栏头部 -->
-            <div class="navbar-header">
-                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
-                        data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
-                    <span class="sr-only">切换导航</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-                <!-- 品牌徽标和名称 -->
-                <a class="navbar-brand" href="/chart/list/">
-                    <img src="{% static 'images/logo.png' %}" alt="祥云泰兴 Logo">
-                    祥云泰兴
-                </a>
-            </div>
-
-            <!-- 导航栏内容 -->
-            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-                <ul class="nav navbar-nav">
-                    <!-- 基础信息下拉菜单 -->
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><i class="fas fa-cogs"></i> 基础信息 <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/admin/list/"><i class="fas fa-user-shield"></i> 管理员账户</a></li>
-                            <li><a href="/depart/list/"><i class="fas fa-building"></i> 部门管理</a></li>
-                            <li><a href="/user/list/"><i class="fas fa-users"></i> 员工管理</a></li>
-                            <li><a href="/salesperson/list"><i class="fas fa-user-tie"></i> 销售管理</a></li>
-                            <li><a href="/BaseInfo/list/"><i class="fas fa-leaf"></i> 基地管理</a></li>
-                            <li><a href="/WorkHour/list/"><i class="fas fa-clock"></i> 工价管理</a></li>
-                            <li><a href="/order/list/"><i class="fas fa-list-alt"></i> 计量管理</a></li>
-                            <li><a href="/vehicle/list/"><i class="fas fa-truck"></i> 车辆管理</a></li>
-                            <li><a href="/market/list/"><i class="fas fa-store"></i> 市场管理</a></li>
-                            <li><a href="/customer/list/"><i class="fas fa-users"></i> 客户管理</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 计划信息下拉菜单 -->
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><i class="fas fa-tasks"></i> 计划信息 <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/monthly_plan/"><i class="fas fa-calendar"></i> 月度计划</a></li>
-                            <li><a href="/daily_plan/"><i class="fas fa-calendar-check"></i> 每日计划</a></li>
-                            <li><a href="/monthly_plan_rate/"><i class="fas fa-chart-line"></i> 计划汇总</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 生产中心下拉菜单 -->
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><i class="fas fa-industry"></i> 生产中心 <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/Plant_batch/list/"><i class="fas fa-seedling"></i> 种植批次表</a></li>
-                            <li><a href="/Plant_batch/calendar/"><i class="fas fa-calendar"></i> 生产汇总表</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 成本中心下拉菜单 -->
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><i class="fas fa-dollar-sign"></i> 成本中心 <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/plant_batch_summary/"><i class="fas fa-file-invoice-dollar"></i> 成本中心-计划费用汇总</a></li>
-                            <li><a href="/production_wage_summary/"><i class="fas fa-money-bill-wave"></i> 成本中心-工价费用汇总</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 报表中心下拉菜单 -->
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><i class="fas fa-chart-pie"></i> 报表中心 <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/report/list/"><i class="fas fa-file-alt"></i> 工资明细</a></li>
-                            <li><a href="/report_salary_temp_by_daily/list"><i class="fas fa-clock"></i> 散工工资</a></li>
-                            <li><a href="/report_salary_by_plople/list/"><i class="fas fa-address-book"></i> 工资名册</a></li>
-                            <li><a href="/report_salary_by_daily/list"><i class="fas fa-calendar-check"></i> 每日工资</a></li>
-                            <li><a href="/report_workhour_by_daily/list/"><i class="fas fa-clipboard"></i> 考勤报表</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 预警中心下拉菜单 -->
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><i class="fas fa-exclamation-triangle"></i> 预警中心 <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/cost_alert/"><i class="fas fa-clock"></i> 工时预警</a></li>
-                            <li><a href="/process_alerts/overview/"><i class="fas fa-stream"></i> 流程预警</a></li>
-                        </ul>
-                    </li>
-
-                    <!-- 数据中心下拉菜单 -->
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false"><i class="fas fa-database"></i> 数据中心 <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="/profit_summary/"><i class="fas fa-chart-bar"></i> 利润管理</a></li>
-                            <li><a href="/price_trends/"><i class="fas fa-chart-line"></i> 价格走势</a></li>
-                            <li><a href="/chart/list/"><i class="fas fa-chart-pie"></i> 数据统计</a></li>
-                        </ul>
-                    </li>
-                </ul>
-
-                <!-- 右侧导航栏 -->
-                <ul class="nav navbar-nav navbar-right">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                           aria-expanded="false">
-                            <i class="fas fa-user-circle"></i> {{ request.session.info.name }} <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#"><i class="fas fa-user-edit"></i> 个人资料</a></li>
-                            <li><a href="#"><i class="fas fa-info-circle"></i> 我的信息</a></li>
-                            <li role="separator" class="divider"></li>
-                            <li><a href="/logout/"><i class="fas fa-sign-out-alt"></i> 注销</a></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-        </nav>
-
-        <!-- 主体内容区域 -->
-        <div class="main-content">
-            {% block content %}{% endblock %}
+<!-- 导航栏 -->
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <!-- 导航栏头部 -->
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse"
+                    data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                <span class="sr-only">切换导航</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <!-- 品牌徽标和名称 -->
+            <a class="navbar-brand" href="/chart/list/">
+                <img src="{% static 'images/logo.png' %}" alt="祥云泰兴 Logo">
+                祥云泰兴
+            </a>
         </div>
 
-        <!-- 页脚区域 -->
-        <footer class="footer">
-            <div class="container">
-                <!-- 页脚徽标 -->
-                <div class="footer-logo">
-                    <img src="{% static 'images/logo.png' %}" alt="祥云泰兴 Logo">
-                </div>
+        <!-- 导航栏内容 -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <!-- 基础信息下拉菜单 -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fas fa-cogs"></i> 基础信息 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/admin/list/"><i class="fas fa-user-shield"></i> 管理账户</a></li>
+                        <li><a href="/depart/list/"><i class="fas fa-building"></i> 部门管理</a></li>
+                        <li><a href="/user/list/"><i class="fas fa-users"></i> 员工管理</a></li>
+                        <li><a href="/salesperson/list"><i class="fas fa-user-tie"></i> 销售管理</a></li>
+                        <li><a href="/BaseInfo/list/"><i class="fas fa-leaf"></i> 基地管理</a></li>
+                        <li><a href="/WorkHour/list/"><i class="fas fa-clock"></i> 工价管理</a></li>
+                        <li><a href="/order/list/"><i class="fas fa-list-alt"></i> 计量管理</a></li>
+                        <li><a href="/vehicle/list/"><i class="fas fa-truck"></i> 车辆管理</a></li>
+                        <li><a href="/market/list/"><i class="fas fa-store"></i> 市场管理</a></li>
+                        <li><a href="/customer/list/"><i class="fas fa-users"></i> 客户管理</a></li>
+                    </ul>
+                </li>
+
+                <!-- 计划信息下拉菜单 -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fas fa-tasks"></i> 计划信息 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/monthly_plan/"><i class="fas fa-calendar"></i> 月度计划</a></li>
+                        <li><a href="/daily_plan/"><i class="fas fa-calendar-check"></i> 每日计划</a></li>
+                        <li><a href="/monthly_plan_rate/"><i class="fas fa-chart-line"></i> 计划汇总</a></li>
+                    </ul>
+                </li>
+
+                <!-- 生产中心下拉菜单 -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fas fa-industry"></i> 生产中心 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/Plant_batch/list/"><i class="fas fa-seedling"></i> 种植批次表</a></li>
+                        <li><a href="/Plant_batch/calendar/"><i class="fas fa-calendar"></i> 生产汇总表</a></li>
+                    </ul>
+                </li>
+
+                <!-- 成本中心下拉菜单 -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fas fa-dollar-sign"></i> 成本中心 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/plant_batch_summary/"><i class="fas fa-file-invoice-dollar"></i> 成本中心-计划费用汇总</a>
+                        </li>
+                        <li><a href="/production_wage_summary/"><i class="fas fa-money-bill-wave"></i> 成本中心-工价费用汇总</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <!-- 报表中心下拉菜单 -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fas fa-chart-pie"></i> 报表中心 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/report/list/"><i class="fas fa-file-alt"></i> 工资明细</a></li>
+                        <li><a href="/report_salary_temp_by_daily/list"><i class="fas fa-clock"></i> 散工工资</a></li>
+                        <li><a href="/report_salary_by_plople/list/"><i class="fas fa-address-book"></i> 工资名册</a>
+                        </li>
+                        <li><a href="/report_salary_by_daily/list"><i class="fas fa-calendar-check"></i> 每日工资</a>
+                        </li>
+                        <li><a href="/report_workhour_by_daily/list/"><i class="fas fa-clipboard"></i> 考勤报表</a></li>
+                    </ul>
+                </li>
+
+                <!-- 预警中心下拉菜单 -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fas fa-exclamation-triangle"></i> 预警中心 <span
+                            class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/cost_alert/"><i class="fas fa-clock"></i> 工时预警</a></li>
+                        <li><a href="/process_alerts/overview/"><i class="fas fa-stream"></i> 流程预警</a></li>
+                    </ul>
+                </li>
+
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="fas fa-database"></i> 数据维护 <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="/production_wage_list/list/">
+                                <i class="fas fa-money-bill-wave"></i> 工价维护
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/Agricureture/list/">
+                                <i class="fas fa-seedling"></i> 农资维护
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/outbound/list/">
+                                <i class="fas fa-box-open"></i> 出库维护
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/loss_report/list/">
+                                <i class="fas fa-file-invoice-dollar"></i> 报损维护
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/expense_allocation/list/">
+                                <i class="fas fa-chart-pie"></i> 分摊维护
+                            </a>
+                        </li>
+                        <li>
+                            <a href="/sales_record/management/list/">
+                                <i class="fas fa-shopping-cart"></i> 销售维护
+                            </a>
+                    </ul>
+                </li>
+
+                <!-- 批量上传下拉菜单 -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fa fa-server"></i> 批量上传 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/upload/WorkHour/"><i class="fas fa-chart-bar"></i> 工价上传</a></li>
+                        <li><a href="/price_trends/"><i class="fas fa-chart-line"></i> 价格走势</a></li>
+                        <li><a href="/chart/list/"><i class="fas fa-chart-pie"></i> 数据统计</a></li>
+                    </ul>
+                </li>
+
+
+                <!-- 数据中心下拉菜单 -->
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false"><i class="fas fa-database"></i> 数据中心 <span class="caret"></span></a>
+                    <ul class="dropdown-menu">
+                        <li><a href="/profit_summary/"><i class="fas fa-chart-bar"></i> 利润管理</a></li>
+                        <li><a href="/price_trends/"><i class="fas fa-chart-line"></i> 价格走势</a></li>
+                        <li><a href="/chart/list/"><i class="fas fa-chart-pie"></i> 数据统计</a></li>
+                    </ul>
+                </li>
+
+
+            </ul>
+
+            <!-- 右侧导航栏 -->
+            <ul class="nav navbar-nav navbar-right">
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
+                       aria-expanded="false">
+                        <i class="fas fa-user-circle"></i> {{ request.session.info.name }} <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="#"><i class="fas fa-user-edit"></i> 个人资料</a></li>
+                        <li><a href="#"><i class="fas fa-info-circle"></i> 我的信息</a></li>
+                        <li role="separator" class="divider"></li>
+                        <li><a href="/logout/"><i class="fas fa-sign-out-alt"></i> 注销</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+</nav>
+
+<!-- 主体内容区域 -->
+<div class="main-content">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- 页脚区域 -->
+<footer class="footer">
+    <div class="container">
+        <!-- 页脚徽标 -->
+        <div class="footer-logo">
+            <img src="{% static 'images/logo.png' %}" alt="祥云泰兴 Logo">
+        </div>
+
+
+        <!-- 版权信息 -->
+        <p>© {% now "Y" %} 祥云泰兴. All rights reserved.</p>
+
+    </div>
+</footer>
 
 
 
-                <!-- 版权信息 -->
-                <p>© {% now "Y" %} 祥云泰兴. All rights reserved.</p>
 
-            </div>
-        </footer>
+<!-- 引入 DataTables JS -->
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.flash.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.print.min.js' %}"></script>
 
-        <!-- 引入 jQuery -->
-        <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<!-- 初始化 DataTables（可根据需要调整） -->
+<script>
+    $(document).ready(function () {
+        $('.datatable').DataTable({
+            dom: 'Bfrtip',
+            buttons: [
+                'copy', 'csv', 'excel', 'pdf', 'print'
+            ]
+        });
+    });
+</script>
 
-        <!-- 引入 Bootstrap JS -->
-        <script src="{% static 'plugins/bootstrap-3.4.1/js/bootstrap.min.js' %}"></script>
-
-        <!-- 引入 jQuery UI JS -->
-        <script src="{% static 'plugins/jquery-ui/jquery-ui.min.js' %}"></script>
-
-        <!-- 引入 DataTables JS -->
-        <script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
-        <script src="{% static 'plugins/datatables/js/dataTables.buttons.min.js' %}"></script>
-        <script src="{% static 'plugins/datatables/js/buttons.flash.min.js' %}"></script>
-        <script src="{% static 'plugins/datatables/js/jszip.min.js' %}"></script>
-        <script src="{% static 'plugins/datatables/js/buttons.html5.min.js' %}"></script>
-        <script src="{% static 'plugins/datatables/js/buttons.print.min.js' %}"></script>
-
-        <!-- 初始化 DataTables（可根据需要调整） -->
-        <script>
-            $(document).ready(function() {
-                $('.datatable').DataTable({
-                    dom: 'Bfrtip',
-                    buttons: [
-                        'copy', 'csv', 'excel', 'pdf', 'print'
-                    ]
-                });
-            });
-        </script>
-
-        {% block js %}{% endblock %}
-    </body>
+{% block js %}{% endblock %}
+</body>
 </html>

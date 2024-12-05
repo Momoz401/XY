@@ -9,22 +9,18 @@ from app01.utils.form import PrettyEditModelForm, workHourModelForm, workHour_Ed
 
 
 def agriculture_cost_list(request):
-    """ 工时列表 """
-
+    """农资成本列表"""
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["名称__contains"] = search_data
+        data_dict["名称__icontains"] = search_data
 
-    queryset = models.Agriculture_cost.objects.filter(**data_dict).order_by("-日期")
-
-    page_object = Pagination(request, queryset)
+    # 查询过滤并按日期降序排列
+    queryset = Agriculture_cost.objects.filter(**data_dict).order_by("-日期")
 
     context = {
-        "search_data": search_data,
-
-        "queryset": page_object.page_queryset,  # 分完页的数据
-        "page_string": page_object.html()  # 页码
+        "queryset": queryset,       # 传递所有过滤后的数据
+        "search_data": search_data  # 保留搜索数据
     }
     return render(request, 'agriculturecost.html', context)
 
