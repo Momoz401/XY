@@ -408,6 +408,13 @@ def upload_expense_allocation(request):
     return redirect('/expense_allocation/list/')
 
 
+import pandas as pd
+from django.shortcuts import render, redirect
+from app01.models import OutboundRecord
+from app01.utils.form import OutboundUploadForm
+from datetime import datetime
+from django.utils import timezone
+
 def outbound_upload(request):
     """上传出库记录"""
     if request.method == "GET":
@@ -419,46 +426,47 @@ def outbound_upload(request):
     if form.is_valid():
         df = pd.read_excel(form.cleaned_data['excel_file'])
 
-        # 处理NaN值，将其替换为0或其他合适的默认值
+        # 处理NaN值，将其替换为合适的默认值
         df = df.fillna({
-            '运送数量': 0,
             '数量_筐': 0,
             '重量_kg': 0,
             '盖布_块': 0,
             '备注': '',
-            '挑菜': '',
-            '客户': ''
         })
 
+        # 处理日期字段，确保格式为 'YYYY-MM-DD'
+        df['日期'] = pd.to_datetime(df['日期'], errors='coerce').dt.date
+        df['日期'] = df['日期'].where(pd.notnull(df['日期']), None)
+
+        # 转换为字典列表
         records = df.to_dict(orient='records')
 
+        # 遍历并保存到数据库
         for record in records:
+            # print(record)
             OutboundRecord.objects.update_or_create(
                 批次=record['批次'],
+                日期=record['日期'],
+                市场=record['市场'],
+                品种=record['品种'],
+                地块=record['地块'],
+                车牌=record['车牌'],
                 defaults={
-                    '日期': record['日期'],
-                    '运送数量': record['运送数量'],
-                    '车牌': record['车牌'],  # 直接保存车牌号
                     '公司': record['公司'],
-                    '市场': record['市场'],  # 直接保存市场名称
                     '品类': record['品类'],
-                    '品种': record['品种'],
                     '规格': record['规格'],
                     '单位': record['单位'],
                     '数量_筐': record['数量_筐'],
                     '重量_kg': record['重量_kg'],
-                    '地块': record['地块'],
                     '盖布_块': record['盖布_块'],
                     '备注': record['备注'],
-                    '挑菜': record['挑菜'],
-                    '客户': record['客户'],
                 }
             )
 
         # 成功上传后跳转到列表页
         return redirect('/outbound/list/')
-    return render(request, 'upload_outbound_from.html', {"form": form, "title": "上传出库记录"})
 
+    return render(request, 'upload_outbound_form.html', {"form": form, "title": "上传出库记录"})
 
 def upload_sales_record(request):
     if request.method == "POST":

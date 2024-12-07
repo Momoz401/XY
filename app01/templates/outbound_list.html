@@ -12,10 +12,10 @@
                 上传出库记录
             </a>
             <a class="btn btn-primary" href="{% url 'upload_sales_record' %}">
-    <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
-    上传销售记录
-</a>
-            <div style="float: right;width: 300px;">
+                <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
+                上传销售记录
+            </a>
+            <div style="float: right; width: 300px;">
                 <form method="get">
                     <div class="input-group">
                         <input type="text" name="q" class="form-control" placeholder="搜索公司" value="{{ search_data }}">
@@ -40,7 +40,6 @@
                         <tr>
                             <th>ID</th>
                             <th>日期</th>
-                            <th>运送数量</th>
                             <th>车牌</th>
                             <th>公司</th>
                             <th>市场</th>
@@ -54,8 +53,6 @@
                             <th>批次</th>
                             <th>盖布/块</th>
                             <th>备注</th>
-                            <th>挑菜</th>
-                            <th>客户</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -64,7 +61,6 @@
                             <tr>
                                 <td>{{ obj.id }}</td>
                                 <td>{{ obj.日期 }}</td>
-                                <td>{{ obj.运送数量 }}</td>
                                 <td>{{ obj.车牌 }}</td>
                                 <td>{{ obj.公司 }}</td>
                                 <td>{{ obj.市场 }}</td>
@@ -78,8 +74,6 @@
                                 <td>{{ obj.批次 }}</td>
                                 <td>{{ obj.盖布_块 }}</td>
                                 <td>{{ obj.备注 }}</td>
-                                <td>{{ obj.挑菜 }}</td>
-                                <td>{{ obj.客户 }}</td>
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="{% url 'outbound_edit' obj.id %}">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="{% url 'outbound_delete' obj.id %}">删除</a>
@@ -87,7 +81,7 @@
                                 </td>
                             </tr>
                             <tr id="sales-records-{{ obj.id }}" style="display: none;">
-                                <td colspan="18">
+                                <td colspan="16">
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>
@@ -115,7 +109,7 @@
                                                         <td>{{ record.销售日期 }}</td>
                                                         <td>{{ record.批次 }}</td>
                                                         <td>{{ record.客户 }}</td>
-                                                        <td class="sales-quantity">{{ record.数量 }}</td>
+                                                        <td>{{ record.数量 }}</td>
                                                         <td>{{ record.单位 }}</td>
                                                         <td>{{ record.规格 }}</td>
                                                         <td>{{ record.单价 }}</td>
@@ -130,6 +124,10 @@
                                                             <a class="btn btn-primary btn-xs" href="{% url 'sales_record_edit' record.id %}">编辑</a>
                                                             <a class="btn btn-danger btn-xs" href="{% url 'sales_record_delete' record.id %}">删除</a>
                                                         </td>
+                                                    </tr>
+                                                {% empty %}
+                                                    <tr>
+                                                        <td colspan="15" class="text-center">暂无销售记录</td>
                                                     </tr>
                                                 {% endfor %}
                                             </tbody>
@@ -149,6 +147,7 @@
             </ul>
         </div>
     </div>
+
     <style>
         .table-responsive {
             width: 100%;
@@ -161,7 +160,7 @@
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
-            text-align: left;
+            text-align: center;
             white-space: nowrap;
         }
         th {
@@ -169,6 +168,7 @@
             line-height: 1.2;
         }
     </style>
+
     <script>
         function toggleSalesRecords(id) {
             var recordsRow = document.getElementById('sales-records-' + id);

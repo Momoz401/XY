@@ -911,7 +911,6 @@ class Customer(models.Model):
 
 class OutboundRecord(models.Model):
     日期 = models.DateField(null=True, default=timezone.now, verbose_name="日期")
-    运送数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="运送数量")
     车牌 = models.CharField(max_length=255, verbose_name="车牌")
     公司 = models.CharField(max_length=255, verbose_name="公司")
     市场 = models.CharField(max_length=255, verbose_name="市场")
@@ -925,8 +924,6 @@ class OutboundRecord(models.Model):
     批次 = models.CharField(max_length=255, verbose_name="批次")
     盖布_块 = models.CharField(max_length=255, verbose_name="盖布/块")
     备注 = models.TextField(verbose_name="备注", null=True, blank=True)
-    挑菜 = models.CharField(max_length=255, verbose_name="挑菜")
-    客户 = models.CharField(max_length=255, verbose_name="客户")
 
     class Meta:
         verbose_name = "出库记录"

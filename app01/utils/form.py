@@ -495,7 +495,6 @@ class OutboundRecordForm(BootStrapModelForm):
         model = OutboundRecord
         fields = [
             '日期',
-            '运送数量',
             '车牌',
             '公司',
             '市场',
@@ -503,12 +502,11 @@ class OutboundRecordForm(BootStrapModelForm):
             '单位',
             '数量_筐',
             '重量_kg',
-            '客户',
             '批次',
             '地块',
             '盖布_块',
             '备注',
-            '挑菜'
+
 
         ]  # 明确列出需要的字段，排除 `品类` 和 `品种`
 
