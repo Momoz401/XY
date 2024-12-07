@@ -1,73 +1,88 @@
 {% extends 'layout.html' %}
+{% load custom_filters %}
+
 {% block content %}
-    <div class="container-fluid">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <h3 class="panel-title">每日价格上报</h3>
-            </div>
-            <div class="panel-body">
-                <form method="post" onsubmit="return validateForm();">
-                    {% csrf_token %}
+<div class="container-fluid">
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">每日价格上报</h3>
+        </div>
+        <div class="panel-body">
+            <form method="post" onsubmit="return validateForm();">
+                {% csrf_token %}
 
-                    <!-- 日期输入字段，默认日期为今天 -->
-                    <div class="form-group">
-                        <label>日期</label>
-                        <input type="date" class="form-control" name="date" value="{{ today }}" id="dateField">
-                    </div>
+                <!-- 日期输入字段，默认日期为今天 -->
+                <div class="form-group">
+                    <label>日期</label>
+                    <input type="date" class="form-control" name="date" value="{{ today }}" id="dateField">
+                </div>
 
+                <div class="table-responsive">
                     <table class="table table-bordered table-hover">
                         <thead>
-                        <tr>
-                            <th>品种 (二级分类)</th>
-                            {% for market in markets %}
-                                <th>{{ market.市场名称 }}</th>
-                            {% endfor %}
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for category in job_categories %}
                             <tr>
-                                <td>{{ category.category_name }}</td>
+                                <th>品种 (二级分类)</th>
                                 {% for market in markets %}
-                                    <td>
-                                        <input type="text" class="form-control" name="price_{{ category.id }}_{{ market.id }}" placeholder="输入价格" required>
-                                    </td>
+                                    <th>{{ market.市场名称 }} - 最低</th>
+                                    <th>{{ market.市场名称 }} - 最高</th>
                                 {% endfor %}
                             </tr>
-                        {% endfor %}
+                        </thead>
+                        <tbody>
+                            {% for category in job_categories %}
+                                <tr>
+                                    <td>{{ category.category_name }}</td>
+                                    {% for market in markets %}
+                                        {% with latest_prices|get_item:category.id|get_item:market.id as latest_price %}
+                                            <td>
+                                                <input type="text" class="form-control"
+                                                       name="price_{{ category.id }}_{{ market.id }}"
+                                                       placeholder="输入价格"
+                                                       value="{{ latest_price.价格|default:'' }}" required>
+                                            </td>
+                                            <td>
+                                                <input type="text" class="form-control"
+                                                       name="max_price_{{ category.id }}_{{ market.id }}"
+                                                       placeholder="输入价格上限"
+                                                       value="{{ latest_price.价格上限|default:'' }}" required>
+                                            </td>
+                                        {% endwith %}
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
                         </tbody>
                     </table>
 
                     <div class="alert alert-danger" id="error-message" style="display: none;">
                         请确保所有价格输入框都有值。
                     </div>
-
-                    <button type="submit" class="btn btn-primary">提交价格</button>
-                </form>
-            </div>
+                </div>
+                <button type="submit" class="btn btn-primary">提交价格</button>
+            </form>
         </div>
     </div>
+</div>
 
-    <script>
-        // JavaScript 验证表单是否有空值
-        function validateForm() {
-            let inputs = document.querySelectorAll("input[type='text']");
-            for (let input of inputs) {
-                if (input.value.trim() === "") {
-                    document.getElementById("error-message").style.display = "block";
-                    return false;  // 阻止表单提交
-                }
-            }
-            return true;  // 允许表单提交
-        }
-
-        // 如果没有指定日期，设置日期默认值为今天
-        window.onload = function() {
-            let dateField = document.getElementById("dateField");
-            if (!dateField.value) {
-                let today = new Date().toISOString().substr(0, 10);
-                dateField.value = today;
+<script>
+    // JavaScript 验证表单是否有空值
+    function validateForm() {
+        let inputs = document.querySelectorAll("input[type='text']");
+        for (let input of inputs) {
+            if (input.value.trim() === "") {
+                document.getElementById("error-message").style.display = "block";
+                return false;  // 阻止表单提交
             }
         }
-    </script>
+        return true;  // 允许表单提交
+    }
+
+    // 如果没有指定日期，设置日期默认值为今天
+    window.onload = function() {
+        let dateField = document.getElementById("dateField");
+        if (!dateField.value) {
+            let today = new Date().toISOString().substr(0, 10);
+            dateField.value = today;
+        }
+    }
+</script>
 {% endblock %}

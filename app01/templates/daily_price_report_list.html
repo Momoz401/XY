@@ -37,7 +37,8 @@
                             <th>日期</th>
                             <th>品种</th>
                             <th>市场</th>
-                            <th>价格</th>
+                            <th>最低价格</th>
+                            <th>最高价格</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -49,6 +50,7 @@
                                 <td>{{ report.品种.category_name }}</td>  <!-- 显示品种的中文名称 -->
                                 <td>{{ report.市场.市场名称 }}</td>  <!-- 显示市场的中文名称 -->
                                 <td>{{ report.价格 }}</td>
+                                <td>{{ report.价格上限 }}</td>
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="/daily_price_report/{{ report.id }}/edit/">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="/daily_price_report/{{ report.id }}/delete/">删除</a>

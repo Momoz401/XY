@@ -11,7 +11,8 @@
         </div>
         <div class="panel-body">
             <!-- 下载模板按钮 -->
-            <a href="{% static 'files/价格上传.xlsx' %}" class="btn btn-info" download>点击下载工价上传模板</a>
+                        <!-- 下载模板按钮，链接和文本通过变量传入 -->
+            <a href="{% static template_path %}" class="btn btn-info" download>{{ download_text }}</a>
 
 
          <hr>

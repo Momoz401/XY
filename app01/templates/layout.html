@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <title>云南泰兴</title>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
   <!-- jQuery -->
     <script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
@@ -347,6 +347,11 @@
                                 <i class="fas fa-money-bill-wave"></i> 工价维护
                             </a>
                         </li>
+                         <li>
+                            <a href="/daily_price_report/list/">
+                                <i class="fas fa-money-bill-wave"></i> 价格维护
+                            </a>
+                        </li>
                         <li>
                             <a href="/Agricureture/list/">
                                 <i class="fas fa-seedling"></i> 农资维护
@@ -380,8 +385,10 @@
                        aria-expanded="false"><i class="fa fa-server"></i> 批量上传 <span class="caret"></span></a>
                     <ul class="dropdown-menu">
                         <li><a href="/upload/WorkHour/"><i class="fas fa-chart-bar"></i> 工价上传</a></li>
-                        <li><a href="/price_trends/"><i class="fas fa-chart-line"></i> 价格走势</a></li>
-                        <li><a href="/chart/list/"><i class="fas fa-chart-pie"></i> 数据统计</a></li>
+                        <li><a href="/upload/agriculturecost/"><i class="fas fa-chart-line"></i> 农资上传</a></li>
+                        <li><a href="/upload/UserInfo/"><i class="fas fa-chart-pie"></i> 员工上传</a></li>
+
+
                     </ul>
                 </li>
 

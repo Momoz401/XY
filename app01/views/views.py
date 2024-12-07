@@ -659,7 +659,7 @@ def daily_price_report_list(request):
         data_dict["品种__category_name__icontains"] = search_data
 
     # 根据查询条件过滤数据并排序
-    queryset = DailyPriceReport.objects.filter(**data_dict).order_by("-id")
+    queryset = DailyPriceReport.objects.filter(**data_dict).order_by("-日期")
 
     # 使用自定义分页类
     page_object = Pagination(request, queryset)

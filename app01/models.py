@@ -1016,13 +1016,14 @@ class DailyPriceReport(models.Model):
     品种 = models.ForeignKey(JobCategoryInfo, verbose_name="品种", on_delete=models.CASCADE)
     市场 = models.ForeignKey(Market, verbose_name="市场", on_delete=models.CASCADE)
     价格 = models.DecimalField(verbose_name="价格", max_digits=10, decimal_places=2)
+    价格上限 = models.DecimalField(verbose_name="价格上限", max_digits=10, decimal_places=2, null=True, blank=True)
 
     class Meta:
         verbose_name = "每日价格上报"
         verbose_name_plural = "每日价格上报"
 
     def __str__(self):
-        return f"{self.日期} - {self.品种.category_name} - {self.市场.market_name}"  # 假设 category_name 和 market_name 是字段名
+        return f"{self.日期} - {self.品种.category_name} - {self.市场.市场名称}"  # 假设 category_name 和 market_name 是字段名
 
 class MonthlyPlan(models.Model):
     日期 = models.DateField()

@@ -567,7 +567,7 @@ class JobTypeDetailInfoModelForm(BootStrapModelForm):
 class DailyPriceReportForm(BootStrapModelForm):
     class Meta:
         model = DailyPriceReport
-        fields = ['日期', '品种', '市场', '价格']
+        fields = ['日期', '品种', '市场', '价格','价格上限']
 
 
 class MonthlyPlanForm(BootStrapModelForm):
@@ -672,3 +672,6 @@ class ProcessAlertForm(forms.ModelForm):
     class Meta:
         model = ProcessAlert
         fields = ['一级分类', '二级分类', '一级工种', '二级工种', '最小时间', '最大时间']
+
+class UpUserForm(forms.Form):
+    excel_file = forms.FileField(label="上传 Excel 文件")

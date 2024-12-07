@@ -41,6 +41,7 @@ from app01.views.productionwage import get_primary_work_types, get_secondary_wor
 from app01.views.sales import salesperson_list, salesperson_add, salesperson_edit, salesperson_delete
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
     upload_sales_record
+from app01.views.user import upload_userinfo_modal_form
 from app01.views.views import create_expense_allocation, expense_allocation_list, expense_allocation_add, \
     expense_allocation_edit, expense_allocation_delete, depreciation_allocation_list, depreciation_allocation_add, \
     depreciation_allocation_edit, depreciation_allocation_delete,  \
@@ -75,6 +76,7 @@ urlpatterns = [
     path('user/model/form/add/', user.user_model_form_add),  # 添加新用户（使用ModelForm）
     path('user/<int:nid>/edit/', user.user_edit),  # 编辑指定用户信息（通过用户ID）
     path('user/<int:nid>/delete/', user.user_delete),  # 删除指定用户（通过用户ID）
+    path('upload/UserInfo/', upload_userinfo_modal_form, name='upload_userinfo'),
 
     # 销售人员路由配置
     path('salesperson/list/', salesperson_list, name='salesperson_list'),  # 销售人员信息列表页面

@@ -13,6 +13,8 @@ from app01.utils.bootstrap import BootStrapForm, BootStrapModelForm
 from app01.models import BaseInfoWorkHour, ProductionWage, Agriculture_cost, Plant_batch, ExpenseAllocation, \
     OutboundRecord, Vehicle, Market, SalesRecord, JobCategoryInfo, JobTypeDetailInfo
 from app01.utils.bootstrap import BootStrapModelForm
+
+
 def upload_list(request):
     if request.method == "GET":
         return render(request, 'upload_list.html')
@@ -31,21 +33,25 @@ def upload_list(request):
     f.close()
 
     return HttpResponse("...")
+
+
 class UpForm(BootStrapForm):
     bootstrap_exclude_fields = ['img']
     name = forms.CharField(label="姓名")
     age = forms.IntegerField(label="年龄")
     img = forms.FileField(label="头像")
+
+
 def upload_form(request):
     title = "Form上传"
     if request.method == "GET":
         form = UpForm()
-        return render(request, 'upload_form.html', {"form": form, "title": title,'uploader_name': request.session["info"]['name']})
+        return render(request, 'upload_form.html',
+                      {"form": form, "title": title, 'uploader_name': request.session["info"]['name']})
 
     form = UpForm(data=request.POST, files=request.FILES)
     if form.is_valid():
-        # {'name': '武沛齐', 'age': 123, 'img': <InMemoryUploadedFile: 图片 1.png (image/png)>}
-        # 1.读取图片内容，写入到文件夹中并获取文件的路径。
+
         image_object = form.cleaned_data.get("img")
 
         # media_path = os.path.join(settings.MEDIA_ROOT, image_object.name)
@@ -62,7 +68,8 @@ def upload_form(request):
             img=media_path,
         )
         return HttpResponse("...")
-    return render(request, 'upload_form.html', {"form": form, "title": title,'uploader_name': request.session["info"]['name']})
+    return render(request, 'upload_form.html',
+                  {"form": form, "title": title, 'uploader_name': request.session["info"]['name']})
 
 
 class UpModelForm(BootStrapModelForm):
@@ -72,13 +79,16 @@ class UpModelForm(BootStrapModelForm):
         model = models.uploader
         fields = "__all__"
 
+
 def upload_workhour_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批量上传价格文件"
-
+    download_text = f"点击下载 {title} 模板"
+    template_path = 'files/工价价格上传模板.xlsx'  # 指定 Excel 文件路径
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title})
+        return render(request, 'upload_form.html',
+                      {"download_text": download_text, "template_path": template_path, "form": form, 'title': title})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -112,7 +122,8 @@ def upload_workhour_modal_form(request):
 
             二级分类_obj = None
             if '二级分类' in record and record['二级分类']:
-                二级分类_obj = JobCategoryInfo.objects.filter(category_name=record['二级分类'], category_level=2).first()
+                二级分类_obj = JobCategoryInfo.objects.filter(category_name=record['二级分类'],
+                                                              category_level=2).first()
                 if not 二级分类_obj:
                     continue  # 如果没有找到对应的二级分类，跳过该记录
 
@@ -146,6 +157,8 @@ def upload_workhour_modal_form(request):
         return redirect('/WorkHour/list/')
 
     return render(request, 'upload_form.html', {"form": form, 'title': title})
+
+
 def upload_productionwate_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批量上传工价文件"
@@ -233,7 +246,11 @@ def upload_agriculturecost_modal_form(request):
     title = "批量农资成本文件"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
+        download_text = f"点击下载 {title} 模板"
+        template_path = 'files/农资成本数据上传模板.xlsx'  # 指定 Excel 文件路径
+        return render(request, 'upload_form.html',
+                      {"form": form, 'title': title, "download_text": download_text, "template_path": template_path,
+                       'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -242,30 +259,33 @@ def upload_agriculturecost_modal_form(request):
         # print(form.cleaned_data)
         df = pd.read_excel(form.cleaned_data['excel_file'])
         # print(df)
-        # data_to_db(df, 'tpx_hxb_province')
         records = df.to_dict(orient='records')  # 将 DataFrame 转换为字典列表
         for record in records:
+            # 创建或更新 Agriculture_cost 对象
             obj, created = Agriculture_cost.objects.update_or_create(
                 日期=record['日期'],
-                工种=record['工种'],
-                数量=record['数量'],
-                农资种类=record['农资种类'],
                 名称=record['名称'],
-                单价=record['单价'],
-                金额=record['金额'],
                 批次=record['批次'],
                 地块=record['地块'],
-
+                defaults={
+                    '数量': record['数量'],
+                    '农资种类': record['农资种类'],
+                    '单价': record['单价'],
+                    '金额': record['金额'],
+                }
             )
         return redirect('/Agricureture/list/')
-    return render(request, 'upload_form.html', {"form": form, 'title': title,'uploader_name': request.session["info"]['name']})
+    return render(request, 'upload_form.html',
+                  {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
+
 
 def upload_Plant_batch_modal_form(request):
     """ 上传文件和数据（modelForm）"""
     title = "批次表文件上传"
     if request.method == "GET":
         form = UpModelForm()
-        return render(request, 'upload_form.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
+        return render(request, 'upload_form.html',
+                      {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
 
     form = UpModelForm(data=request.POST, files=request.FILES)
     if form.is_valid():
@@ -342,7 +362,8 @@ def upload_Plant_batch_modal_form(request):
         except Exception as e:
             print(f"处理过程中出现错误：{e}")
             form.add_error(None, "上传过程中出现问题，请检查数据格式并重试。")
-    return render(request, 'Plant_batch.html', {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
+    return render(request, 'Plant_batch.html',
+                  {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
 
 
 def upload_expense_allocation(request):
@@ -385,6 +406,7 @@ def upload_expense_allocation(request):
         )
 
     return redirect('/expense_allocation/list/')
+
 
 def outbound_upload(request):
     """上传出库记录"""
