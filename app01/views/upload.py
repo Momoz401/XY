@@ -476,33 +476,21 @@ def upload_sales_record(request):
             excel_file = form.cleaned_data['excel_file']
             df = pd.read_excel(excel_file)
 
+            # 处理日期字段，确保格式正确
+            df['销售日期'] = pd.to_datetime(df['销售日期'], errors='coerce')
+            df['收款日期'] = pd.to_datetime(df['收款日期'], errors='coerce')
+
             # 遍历每一行数据并创建或更新 SalesRecord 对象
             for _, row in df.iterrows():
                 # 根据批次号查找出库记录
                 outbound_record = OutboundRecord.objects.filter(批次=row['批次']).first()
                 if outbound_record:
-                    # 处理日期字段
-                    sales_date = None
-                    payment_date = None
-
-                    try:
-                        if pd.notna(row['销售日期']):
-                            sales_date = parse_date(str(row['销售日期']))
-                    except Exception as e:
-                        print(f"销售日期解析错误: {e}")
-
-                    try:
-                        if pd.notna(row['收款日期']):
-                            payment_date = parse_date(str(row['收款日期']))
-                    except Exception as e:
-                        print(f"收款日期解析错误: {e}")
-
                     # 创建或更新销售记录
                     SalesRecord.objects.update_or_create(
                         出库记录=outbound_record,
                         批次=row['批次'],  # 根据批次号查找
                         defaults={
-                            '销售日期': sales_date,
+                            '销售日期': row['销售日期'].date() if pd.notnull(row['销售日期']) else None,
                             '客户': row['客户'],
                             '数量': row['数量'],
                             '单价': row['单价'],
@@ -510,7 +498,7 @@ def upload_sales_record(request):
                             '应收金额': row['应收金额'],
                             '实收金额': row['实收金额'],
                             '备注': row['备注'],
-                            '收款日期': payment_date,
+                            '收款日期': row['收款日期'].date() if pd.notnull(row['收款日期']) else None,
                             '销售人员': row['销售人员'],
                             '单位': row['单位'],
                             '规格': row['规格'],
@@ -521,8 +509,8 @@ def upload_sales_record(request):
                     # 处理找不到对应出库记录的情况，可以记录错误或跳过
                     print(f"找不到批次号为 {row['批次']} 的出库记录")
 
-                    # 成功后重定向到出库记录列表页面
-                return redirect('outbound_list')
+            # 成功后重定向到出库记录列表页面
+            return redirect('outbound_list')
     else:
         form = SalesRecordUploadForm()
 

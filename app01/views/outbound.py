@@ -8,9 +8,9 @@ from app01.utils.pagination import Pagination
 def outbound_list(request):
     """出库记录列表"""
     search_data = request.GET.get('q', "")
-    queryset = OutboundRecord.objects.exclude(日期__isnull=True)
+    queryset = OutboundRecord.objects.exclude(日期__isnull=True).order_by('-日期')
     if search_data:
-        queryset = queryset.filter(公司__contains=search_data).order_by('-日期')
+        queryset = queryset.filter(批次__contains=search_data).order_by('-日期')
 
     page_object = Pagination(request, queryset)
     context = {

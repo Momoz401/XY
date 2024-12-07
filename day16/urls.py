@@ -33,6 +33,7 @@ from app01.views.daily_price_report_views import daily_price_report
 from app01.views.loss import loss_report_list, loss_report_add, loss_report_edit, loss_report_delete
 
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
+from app01.views.outbound import outbound_list, outbound_add, outbound_edit, outbound_delete
 from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
 from app01.views.plant_batch_calendar import plant_batch_calendar_view
 from app01.views.process_alert import process_alert_list, process_alert_create, process_alert_update, \
@@ -47,8 +48,8 @@ from app01.views.views import create_expense_allocation, expense_allocation_list
     expense_allocation_edit, expense_allocation_delete, depreciation_allocation_list, depreciation_allocation_add, \
     depreciation_allocation_edit, depreciation_allocation_delete,  \
     get_plant_batch_dk, loss_report_autocomplete, \
-    add_sales_record, fetch_unique_second_level_categories, outbound_list, outbound_add, outbound_edit, \
-    outbound_delete, get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
+    add_sales_record, fetch_unique_second_level_categories, \
+     get_sales_records, add_sale_form, sales_record_edit, sales_record_delete, sales_record_add, \
     plant_batch_summary, production_wage_summary, production_wage_second_level, production_wage_details, profit_summary, \
     daily_price_report_list, daily_price_report_edit, daily_price_report_delete, cost_alert_summary, cost_alert_feedback
 from app01.views.views_daily_plan import daily_plan_list, daily_plan_create, daily_plan_edit, daily_plan_delete

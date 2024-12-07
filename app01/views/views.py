@@ -204,51 +204,6 @@ def loss_report_autocomplete(request):
     return JsonResponse([], safe=False)
 
 
-def outbound_list(request):
-    """出库记录列表"""
-    search_data = request.GET.get('q', "")
-    queryset = OutboundRecord.objects.all()
-    if search_data:
-        queryset = queryset.filter(公司__contains=search_data)
-
-    page_object = Pagination(request, queryset)
-    context = {
-        "search_data": search_data,
-        "queryset": page_object.page_queryset,  # 分页后的数据
-        "page_string": page_object.html()  # 分页HTML
-    }
-    return render(request, 'outbound_list.html', context)
-
-def outbound_add(request):
-    """添加出库记录"""
-    if request.method == "GET":
-        form = OutboundRecordForm()
-        return render(request, 'outbound_form.html', {"form": form, "title": "添加出库记录"})
-
-    form = OutboundRecordForm(data=request.POST)
-    if form.is_valid():
-        form.save()
-        return redirect('/outbound/list/')
-    return render(request, 'outbound_form.html', {"form": form, "title": "添加出库记录"})
-
-def outbound_edit(request, nid):
-    """编辑出库记录"""
-    row_object = get_object_or_404(OutboundRecord, id=nid)
-    if request.method == "GET":
-        form = OutboundRecordForm(instance=row_object)
-        return render(request, 'outbound_form.html', {"form": form, "title": "编辑出库记录"})
-
-    form = OutboundRecordForm(data=request.POST, instance=row_object)
-    if form.is_valid():
-        form.save()
-        return redirect('/outbound/list/')
-    return render(request, 'outbound_form.html', {"form": form, "title": "编辑出库记录"})
-
-def outbound_delete(request, nid):
-    """删除出库记录"""
-    OutboundRecord.objects.filter(id=nid).delete()
-    return redirect('/outbound/list/')
-
 
 def add_sales_record(request, outbound_id):
     outbound_record = get_object_or_404(OutboundRecord, id=outbound_id)
@@ -333,7 +288,7 @@ def sales_record_management_list(request):
     if search_data:
         data_dict["客户__icontains"] = search_data
 
-    queryset = SalesRecord.objects.filter(**data_dict).order_by("-id")
+    queryset = SalesRecord.objects.filter(**data_dict).order_by("-销售日期")
     page_object = Pagination(request, queryset)  # 使用分页功能
 
     context = {

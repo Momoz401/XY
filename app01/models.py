@@ -931,6 +931,8 @@ class OutboundRecord(models.Model):
 
     def __str__(self):
         return f"{self.日期} - {self.车牌} - {self.公司}"
+
+
 class SalesRecord(models.Model):
     出库记录 = models.ForeignKey(OutboundRecord, on_delete=models.CASCADE, related_name='sales_records')
     批次 = models.CharField(max_length=255, verbose_name="批次", default=None)
@@ -948,6 +950,7 @@ class SalesRecord(models.Model):
     单位 = models.CharField(max_length=255, verbose_name="单位", null=True, blank=True)
     规格 = models.CharField(max_length=255, verbose_name="规格", null=True, blank=True)
     收款方式 = models.CharField(max_length=255, verbose_name="收款方式", null=True, blank=True)
+    实销筐数 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="实销筐数", default=0)  # 新增字段
 
     class Meta:
         verbose_name = "销售记录"
