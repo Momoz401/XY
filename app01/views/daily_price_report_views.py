@@ -1,9 +1,10 @@
 from django.shortcuts import render, redirect
-from app01.models import DailyPriceReport, Market, JobCategoryInfo
+from app01.models import DailyPriceReport, Channel, JobCategoryInfo
 from datetime import date
 
 def daily_price_report(request):
-    markets = Market.objects.all()
+    # 将市场替换为渠道
+    markets = Channel.objects.all()
     job_categories = JobCategoryInfo.objects.filter(category_level=2)
     today = date.today().isoformat()  # 获取今天的日期
 
@@ -39,7 +40,7 @@ def daily_price_report(request):
         return redirect('/daily_price_report/list/')
 
     return render(request, 'daily_price_report.html', {
-        'markets': markets,
+        'markets': markets,  # 这里的 markets 实际上是渠道
         'job_categories': job_categories,
         'today': today,
         'latest_prices': latest_prices,

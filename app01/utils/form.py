@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 
 from app01.models import BaseInfoWorkType, BaseInfoWorkHour, ProductionWage, ExpenseAllocation, DepreciationAllocation, \
     LossReport, Salesperson, Vehicle, Market, Customer, OutboundRecord, SalesRecord, DailyPriceReport, MonthlyPlan, \
-    BaseInfoBase, DailyPlan, Plant_batch, ProcessAlert, UserInfo
+    BaseInfoBase, DailyPlan, Plant_batch, ProcessAlert, UserInfo, Channel
 from app01.utils.bootstrap import BootStrapModelForm
 from django.core.validators import RegexValidator
 from django import forms
@@ -668,10 +668,16 @@ class DailyPlanForm(BootStrapModelForm):
                 raise forms.ValidationError("批次ID只能包含字母、数字和连字符。")
         return 批次ID
 
-class ProcessAlertForm(forms.ModelForm):
+class ProcessAlertForm(BootStrapModelForm):
     class Meta:
         model = ProcessAlert
         fields = ['一级分类', '二级分类', '一级工种', '二级工种', '最小时间', '最大时间']
 
 class UpUserForm(forms.Form):
     excel_file = forms.FileField(label="上传 Excel 文件")
+
+
+class ChannelForm(BootStrapModelForm):
+    class Meta:
+        model = Channel
+        fields = ["渠道名称", "地区", "联系人"]

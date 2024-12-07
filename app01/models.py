@@ -823,6 +823,17 @@ class Vehicle(models.Model):
         return self.车牌
 
 
+class Channel(models.Model):
+    渠道名称 = models.CharField(max_length=255, unique=True, verbose_name="渠道名称")
+    地区 = models.CharField(max_length=255, verbose_name="地区")
+    联系人 = models.CharField(max_length=255, verbose_name="联系人")
+    插入时间 = models.DateTimeField(auto_now_add=True, verbose_name="插入时间")
+
+    class Meta:
+        verbose_name = "报价渠道信息"
+
+    def __str__(self):
+        return self.渠道名称
 
 
 
@@ -836,7 +847,7 @@ class Customer(models.Model):
     联系电话 = models.CharField(max_length=20, verbose_name="联系电话")
     邮箱 = models.EmailField(verbose_name="邮箱", null=True, blank=True)
     地址 = models.CharField(max_length=255, verbose_name="地址", null=True, blank=True)
-    销售地区 = models.CharField(max_length=255, verbose_name="销售地区")
+    销售地区 = models.CharField(max_length=255, verbose_name="销售地区", null=True, blank=True)
     客户类型 = models.CharField(
         max_length=50,
         verbose_name="客户类型",
@@ -867,7 +878,7 @@ class Customer(models.Model):
         null=True,
         blank=True
     )
-    客户流失时间 = models.DateField(
+    客户流失时间 = models.TextField(
         verbose_name="客户流失时间",
         null=True,
         blank=True
@@ -888,8 +899,8 @@ class Customer(models.Model):
     )
 
     # 时间戳
-    创建时间 = models.DateTimeField(auto_now_add=True, verbose_name="创建时间")
-    更新时间 = models.DateTimeField(auto_now=True, verbose_name="更新时间")
+    创建时间 = models.DateTimeField(auto_now_add=True, verbose_name="创建时间",null=True, blank=True)
+    更新时间 = models.DateTimeField(auto_now=True, null=True, blank=True, verbose_name="更新时间")
 
     class Meta:
         verbose_name = "客户管理"
@@ -1014,7 +1025,7 @@ class JobTypeDetailInfo(models.Model):
 class DailyPriceReport(models.Model):
     日期 = models.DateField(verbose_name="日期")
     品种 = models.ForeignKey(JobCategoryInfo, verbose_name="品种", on_delete=models.CASCADE)
-    市场 = models.ForeignKey(Market, verbose_name="市场", on_delete=models.CASCADE)
+    市场 = models.ForeignKey(Channel, verbose_name="渠道", on_delete=models.CASCADE)  # 修改为 Channel
     价格 = models.DecimalField(verbose_name="价格", max_digits=10, decimal_places=2)
     价格上限 = models.DecimalField(verbose_name="价格上限", max_digits=10, decimal_places=2, null=True, blank=True)
 
@@ -1023,8 +1034,7 @@ class DailyPriceReport(models.Model):
         verbose_name_plural = "每日价格上报"
 
     def __str__(self):
-        return f"{self.日期} - {self.品种.category_name} - {self.市场.市场名称}"  # 假设 category_name 和 market_name 是字段名
-
+        return f"{self.日期} - {self.品种.category_name} - {self.市场.渠道名称}"
 class MonthlyPlan(models.Model):
     日期 = models.DateField()
     二级分类 = models.ForeignKey(JobCategoryInfo, on_delete=models.CASCADE)
@@ -1093,3 +1103,4 @@ class ProcessAlert(models.Model):
 
     def __str__(self):
         return f"{self.一级分类} - {self.二级分类} - {self.一级工种} - {self.二级工种}"
+

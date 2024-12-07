@@ -6,7 +6,7 @@ from app01.utils.pagination import Pagination
 
 def customer_list(request):
     """
-    客户信息列表视图，用于展示客户信息，并支持通过客户名称进行模糊搜索和分页显示。
+    客户信息列表视图，用于展示客户信息，并支持通过客户名称进行模糊搜索。
     """
     data_dict = {}
 
@@ -15,17 +15,13 @@ def customer_list(request):
     if search_data:
         data_dict["客户名称__icontains"] = search_data  # 根据客户名称进行模糊过滤
 
-    # 获取客户数据，按ID降序排序
+    # 获取所有客户数据，按ID降序排序
     queryset = Customer.objects.filter(**data_dict).order_by("-id")
-
-    # 使用自定义分页类进行分页
-    page_object = Pagination(request, queryset)
 
     # 构建上下文数据
     context = {
         "search_data": search_data,  # 搜索关键词，用于回显
-        "queryset": page_object.page_queryset,  # 分页后的客户数据
-        "page_string": page_object.html()  # 页码HTML
+        "queryset": queryset,  # 传递所有客户数据给模板
     }
 
     # 渲染模板并传递上下文

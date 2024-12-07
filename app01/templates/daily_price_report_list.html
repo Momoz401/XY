@@ -6,7 +6,7 @@
         <div style="margin-bottom: 10px" class="clearfix">
             <a class="btn btn-success" href="/daily_price_report/add/">
                 <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                新建价格上报
+                新建渠道价格上报
             </a>
             <div style="float: right; width: 300px;">
                 <form method="get">
@@ -48,7 +48,7 @@
                                 <td>{{ report.id }}</td>
                                 <td>{{ report.日期 }}</td>
                                 <td>{{ report.品种.category_name }}</td>  <!-- 显示品种的中文名称 -->
-                                <td>{{ report.市场.市场名称 }}</td>  <!-- 显示市场的中文名称 -->
+                                <td>{{ report.市场.渠道名称 }}</td>  <!-- 显示市场的中文名称 -->
                                 <td>{{ report.价格 }}</td>
                                 <td>{{ report.价格上限 }}</td>
                                 <td>

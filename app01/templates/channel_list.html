@@ -1,0 +1,58 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <div style="margin-bottom: 10px" class="clearfix">
+        <a class="btn btn-success" href="{% url 'channel_add' %}">
+            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+            新建报价渠道信息
+        </a>
+
+        <div style="float: right;width: 300px;">
+            <form method="get">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="请输入渠道名称进行查询..."
+                           value="{{ search_data }}">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                    </span>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+            报价渠道信息列表
+        </div>
+        <table class="table table-bordered">
+            <thead>
+            <tr>
+                <th style="text-align: center;">ID</th>
+                <th style="text-align: center;">渠道名称</th>
+                <th style="text-align: center;">地区</th>
+                <th style="text-align: center;">联系人</th>
+                <th style="text-align: center;">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for obj in queryset %}
+                <tr>
+                    <td style="text-align: center;">{{ obj.id }}</td>
+                    <td style="text-align: center;">{{ obj.渠道名称 }}</td>
+                    <td style="text-align: center;">{{ obj.地区 }}</td>
+                    <td style="text-align: center;">{{ obj.联系人 }}</td>
+                    <td style="text-align: center;">
+                        <a class="btn btn-primary btn-xs" href="{% url 'channel_edit' obj.id %}">编辑</a>
+                        <a class="btn btn-danger btn-xs" href="{% url 'channel_delete' obj.id %}">删除</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -7,7 +7,7 @@
 <div class="container-fluid">
     <!-- 操作按钮区域 -->
     <div style="margin-bottom: 10px" class="clearfix">
-        <a class="btn btn-success" href="/WorkHour/add/">
+        <a class="btn btn-success" href="/customer/add/">
             <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
             新建客户信息
         </a>
@@ -76,8 +76,8 @@
                             <td>{{ obj.创建时间 }}</td>
                             <td>{{ obj.更新时间 }}</td>
                             <td>
-                                <a class="btn btn-primary btn-xs" href="/WorkHour/{{ obj.id }}/edit/">编辑</a>
-                                <a class="btn btn-danger btn-xs" href="/WorkHour/{{ obj.id }}/delete/">删除</a>
+                                <a class="btn btn-primary btn-xs" href="/customer/{{ obj.id }}/edit/">编辑</a>
+                                <a class="btn btn-danger btn-xs" href="/customer/{{ obj.id }}/delete/">删除</a>
                             </td>
                         </tr>
                     {% empty %}

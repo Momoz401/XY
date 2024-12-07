@@ -27,6 +27,7 @@ from app01.views import depart, user, pretty, admin, account, task, order, chart
 from app01.views.DailyPriceReport import get_price_trends, get_available_categories, get_price_trends_data
 from app01.views.Plant_batch import export_plant_batches
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
+from app01.views.channel import channel_list, channel_add, channel_edit, channel_delete
 
 from app01.views.daily_price_report_views import daily_price_report
 from app01.views.loss import loss_report_list, loss_report_add, loss_report_edit, loss_report_delete
@@ -117,6 +118,8 @@ urlpatterns = [
     path('market/add/', market_add, name='market_add'),  # 添加市场信息
     path('market/<int:nid>/edit/', market_edit, name='market_edit'),  # 编辑市场信息
     path('market/<int:nid>/delete/', market_delete, name='market_delete'),  # 删除市场信息
+
+
     # 客户管理相关的路径配置
     # 显示客户信息列表页面
     path('customer/list/', customer_list, name='customer_list'),
@@ -390,7 +393,11 @@ urlpatterns = [
     path('api/price_trends_data/', get_price_trends_data, name='price_trends_data'),  # 新增的数据接口
     path('api/available_categories/', get_available_categories, name='available_categories'),
 
-
+    # 报价渠道管理
+    path('channel/list/', channel_list, name='channel_list'),  # 显示报价渠道信息列表
+    path('channel/add/', channel_add, name='channel_add'),  # 添加报价渠道信息
+    path('channel/<int:nid>/edit/', channel_edit, name='channel_edit'),  # 编辑报价渠道信息
+    path('channel/<int:nid>/delete/', channel_delete, name='channel_delete'),  # 删除报价渠道信息
 
 ]
 from django.conf.urls.static import static
