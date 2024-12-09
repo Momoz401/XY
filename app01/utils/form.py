@@ -342,9 +342,15 @@ WorkHourFormSet = modelformset_factory(BaseInfoWorkHour, form=WorkHourModelForm,
 
 
 class FixedFieldsForm(BootStrapModelForm):  # 静态字段
+    try:
+        from app01.models import BaseInfoBase
+        choices = [('', '请选择基地经理')] + [(manager, manager) for manager in
+                                              BaseInfoBase.objects.values_list('基地经理', flat=True).distinct()]
+    except Exception:
+        choices = [('', '请选择基地经理')]
+
     负责人 = forms.ChoiceField(
-        choices=[('', '请选择基地经理')] + [(manager, manager) for manager in
-                                            BaseInfoBase.objects.values_list('基地经理', flat=True).distinct()],
+        choices=choices,
         required=True,
         label="基地经理"
     )

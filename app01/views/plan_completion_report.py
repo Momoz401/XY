@@ -9,18 +9,13 @@ from openpyxl.workbook import Workbook
 from app01.models import MonthlyPlan, DailyPlan
 from app01.utils.pagination import Pagination
 
-
 def monthly_plan_rate(request):
-    """
-    月度计划完成情况视图，用于展示月度计划并支持通过月份进行过滤和分页显示。
-    """
     # 获取所有不重复的月份
     unique_months = MonthlyPlan.objects.annotate(month=TruncMonth('日期')).values('month').distinct()
 
-    # 获取用户选择的月份（从查询参数中获取）
+    # 获取用户选择的月份
     selected_month = request.GET.get('q', '')
 
-    # 按照用户选择的月份进行过滤
     if selected_month:
         year, month = selected_month.split('-')
         monthly_plans = MonthlyPlan.objects.filter(日期__year=year, 日期__month=month)
@@ -33,21 +28,20 @@ def monthly_plan_rate(request):
     # 准备统计结果
     report_data = []
 
-    for monthly_plan in page_object.page_queryset:  # 使用分页后的数据
-        # 获取二级分类名称
+    for monthly_plan in page_object.page_queryset:
         category_name = monthly_plan.二级分类.category_name
         未达成反馈 = monthly_plan.未达成反馈
 
-        # 按月份和二级分类查询日计划完成情况
+        # 按月份和二级分类查询日计划完成情况，并排除面积为 None 的数据
         daily_plans = DailyPlan.objects.filter(
             种植日期__year=monthly_plan.日期.year,
             种植日期__month=monthly_plan.日期.month,
             批次ID__contains=category_name
-        )
+        ).exclude(面积__isnull=True)
 
         # 统计日计划的总面积
-        total_daily_plan_area = daily_plans.aggregate(
-            total=Coalesce(Sum(Cast('面积', output_field=DecimalField())), Value(0, output_field=DecimalField()))
+        total_daily_plan_area = daily_plans.exclude(面积__isnull=True).aggregate(
+            total=Coalesce(Sum('面积', output_field=DecimalField()), Value(0, output_field=DecimalField()))
         )['total']
 
         # 计算计划实现率
@@ -69,10 +63,11 @@ def monthly_plan_rate(request):
 
     context = {
         'report_data': report_data,
-        'unique_months': unique_months,  # 传递不重复的月份数据到前端
-        'selected_month': selected_month,  # 将选中的月份传递回前端
-        'page_string': page_object.html()  # 分页控件的HTML
+        'unique_months': unique_months,
+        'selected_month': selected_month,
+        'page_string': page_object.html()
     }
+
     return render(request, 'plan_completion_report.html', context)
 def monthly_plan_download(request):
     # 获取查询条件中的月份

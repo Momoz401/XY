@@ -55,10 +55,10 @@ def report_salary_by_plople(request):
 
     # 生成月份选项
     month_options = [
-        {"value": month['日期'], "label": f"{month['日期'][:4]}年{month['日期'][4:]}月"}
+        {"value": month['日期'], "label": f"{str(month['日期'])[:4]}年{str(month['日期'])[4:]}月"}
         for month in months
     ]
-    #print(month_options)
+    print(month_options)
     # 将月份选项传递给模板
     context = {
         'months': month_options
@@ -72,7 +72,8 @@ def report_salary_by_daily(request):
 
     # 生成月份选项
     month_options = [
-        {"value": month['月份'], "label": f"{month['月份'][:4]}年{month['月份'][4:]}月"}
+        { "value": month['月份'],
+            "label": f"{str(month['月份'])[:4]}年{str(month['月份'])[4:]}月"}
         for month in months
     ]
     print(month_options)
@@ -89,10 +90,10 @@ def report_workhour_by_daily(request):
 
     # 生成月份选项
     month_options = [
-        {"value": month['月份'], "label": f"{month['月份'][:4]}年{month['月份'][4:]}月"}
+        {"value": month['月份'], "label": f"{str(month['月份'])[:4]}年{str(month['月份'])[4:]}月"}
         for month in months
     ]
-    print(month_options)
+    # print(month_options)
     # 将月份选项传递给模板
     context = {
         'months': month_options
