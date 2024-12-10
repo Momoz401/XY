@@ -1,0 +1,90 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- 标题 -->
+    <h3 class="text-center">日计划完成率</h3>
+
+    <!-- 表格区域 -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+            日计划完成率列表
+        </div>
+
+        <!-- 表格内容，支持水平滚动 -->
+        <div style="overflow-x: auto;">
+            <table id="dailyPlanTable" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>批次ID</th>
+                        <th>计划面积</th>
+                        <th>计划日期</th>
+                        <th>实际面积</th>
+                        <th>完成率 (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in result %}
+                        <tr>
+                            <td>{{ item.批次ID }}</td>
+                            <td>{{ item.计划面积 }}</td>
+                            <td>{{ item.计划日期 }}</td>
+                            <td>{{ item.实际面积 }}</td>
+                            <td>{{ item.完成率 }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center">没有找到相关的日计划数据</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 引入 DataTables CSS -->
+<link rel="stylesheet" href="{% static 'plugins/datatables/css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables/css/buttons.dataTables.min.css' %}">
+
+<!-- 引入 DataTables 和相关插件的 JS -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.flash.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.print.min.js' %}"></script>
+
+<!-- 初始化 DataTables -->
+<script>
+    $(document).ready(function() {
+        $('#dailyPlanTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "全部"]],
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "scrollX": true,
+            "language": {
+                "url": "{% static 'plugins/datatables/i18n/zh-CN.json' %}"
+            },
+            "dom": 'Blfrtip',
+            "buttons": [
+                { extend: 'copyHtml5', text: '复制' },
+                { extend: 'csvHtml5', text: '导出 CSV' },
+                { extend: 'excelHtml5', text: '导出 Excel' },
+                { extend: 'pdfHtml5', text: '导出 PDF' },
+                { extend: 'print', text: '打印' }
+            ],
+            "columnDefs": [
+                { "targets": "_all", "className": "text-center" }
+            ]
+        });
+    });
+</script>
+{% endblock %}

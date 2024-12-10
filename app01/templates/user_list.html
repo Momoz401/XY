@@ -1,79 +1,170 @@
 {% extends 'layout.html' %}
+{% load static %}
 
 {% block content %}
-    <div class="container-fluid">
-        <div style="margin-bottom: 10px" class="clearfix">
-            <a class="btn btn-success" href="/user/model/form/add/">
-                <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
-                新建用户
-            </a>
+<div class="container-fluid">
+    <div style="margin-bottom: 10px" class="clearfix">
+        <a class="btn btn-success" href="/user/model/form/add/">
+            <span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span>
+            新建用户
+        </a>
 
-            <div style="float: right;width: 300px;">
-                <form method="get">
-                    <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="搜索用户姓名" value="{{ query }}">
-                        <span class="input-group-btn">
-                            <button class="btn btn-default" type="submit">
-                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
-                            </button>
-                        </span>
-                    </div>
-                </form>
-            </div>
+        <div style="float: right;width: 300px;">
+            <form method="get">
+                <div class="input-group">
+                    <input type="text" name="q" class="form-control" placeholder="搜索用户姓名" value="{{ query }}">
+                    <span class="input-group-btn">
+                        <button class="btn btn-default" type="submit">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                    </span>
+                </div>
+            </form>
         </div>
+    </div>
 
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
-                用户列表
-            </div>
-            <table class="table table-bordered">
-                <thead class="text-center">
-                <tr>
-                    <th class="text-center">ID</th>
-                    <th class="text-center">姓名</th>
-                    <th class="text-center">密码</th>
-                    <th class="text-center">年龄</th>
-                    <th class="text-center">工资</th>
-                    <th class="text-center">身份证号</th>
-                    <th class="text-center">手机号码</th>
-                    <th class="text-center">银行卡号</th>
-                    <th class="text-center">开户行信息</th>
-                    <th class="text-center">入职时间</th>
-                    <th class="text-center">性别</th>
-                    <th class="text-center">所属部门</th>
-                    <th class="text-center">操作</th>
-                </tr>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+            用户列表
+        </div>
+        <hr>
+        <div style="overflow-x: auto;">
+            <table id="userTable" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">ID</th>
+                        <th class="text-center">姓名</th>
+                        <th class="text-center">密码</th>
+                        <th class="text-center">年龄</th>
+                        <th class="text-center">工资</th>
+                        <th class="text-center">身份证号</th>
+                        <th class="text-center">手机号码</th>
+                        <th class="text-center">银行卡号</th>
+                        <th class="text-center">开户行信息</th>
+                        <th class="text-center">入职时间</th>
+                        <th class="text-center">性别</th>
+                        <th class="text-center">所属部门</th>
+                        <th class="text-center">操作</th>
+                    </tr>
                 </thead>
                 <tbody>
-                {% for obj in queryset %}
-                    <tr>
-                        <td class="text-center">{{ obj.id }}</td>
-                        <td class="text-center">{{ obj.name }}</td>
-                        <td class="text-center">{{ obj.password }}</td>
-                        <td class="text-center">{{ obj.age }}</td>
-                        <td class="text-center">{{ obj.salary }}</td>
-                        <td class="text-center">{{ obj.id_card }}</td>
-                        <td class="text-center">{{ obj.phone }}</td>
-                        <td class="text-center">{{ obj.bank_account }}</td>
-                        <td class="text-center">{{ obj.bank_name }}</td>
-                        <td class="text-center">{{ obj.create_time|date:"Y-m-d" }}</td>
-                        <td class="text-center">{{ obj.get_gender_display }}</td>
-                        <td class="text-center">{{ obj.depart.title|default:"暂无部门" }}</td>
-                        <td class="text-center">
-                            <a class="btn btn-primary btn-xs" href="/user/{{ obj.id }}/edit/">编辑</a>
-                            <a class="btn btn-danger btn-xs" href="/user/{{ obj.id }}/delete/">删除</a>
-                        </td>
-                    </tr>
-                {% endfor %}
+                    {% for obj in queryset %}
+                        <tr>
+                            <td class="text-center">{{ obj.id }}</td>
+                            <td class="text-center">{{ obj.name }}</td>
+                            <td class="text-center">{{ obj.password }}</td>
+                            <td class="text-center">{{ obj.age }}</td>
+                            <td class="text-center">{{ obj.salary }}</td>
+                            <td class="text-center">{{ obj.id_card }}</td>
+                            <td class="text-center">{{ obj.phone }}</td>
+                            <td class="text-center">{{ obj.bank_account }}</td>
+                            <td class="text-center">{{ obj.bank_name }}</td>
+                            <td class="text-center">{{ obj.create_time|date:"Y-m-d" }}</td>
+                            <td class="text-center">{{ obj.get_gender_display }}</td>
+                            <td class="text-center">{{ obj.depart.title|default:"暂无部门" }}</td>
+                            <td class="text-center">
+                                <a class="btn btn-primary btn-xs" href="/user/{{ obj.id }}/edit/">编辑</a>
+                                <a class="btn btn-danger btn-xs" href="/user/{{ obj.id }}/delete/">删除</a>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="13" style="text-align: center;">没有找到相关的用户数据</td>
+                        </tr>
+                    {% endfor %}
                 </tbody>
             </table>
         </div>
-
-        <div class="clearfix">
-            <ul class="pagination">
-                {{ page_string }}
-            </ul>
-        </div>
     </div>
+
+    <div class="clearfix">
+        <!-- 取消掉原来的分页控件，DataTables 会自动处理分页 -->
+    </div>
+</div>
+
+<!-- 引入 DataTables 的 CSS -->
+<link rel="stylesheet" href="{% static 'plugins/datatables/css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables/css/buttons.dataTables.min.css' %}">
+
+<!-- 引入 DataTables 的 JS -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.flash.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.print.min.js' %}"></script>
+
+<script>
+    $(document).ready(function() {
+        $('#userTable').DataTable({
+            "paging": true,                // 启用分页
+            "lengthChange": true,          // 启用更改每页显示条数
+            "lengthMenu": [[10, 25, 100, -1], [10, 25, 100, "全部"]], // 添加“全部”选项
+            "searching": true,             // 启用搜索
+            "ordering": true,              // 启用排序
+            "info": true,                  // 启用表格信息显示
+            "autoWidth": false,            // 禁用自动宽度计算
+            "responsive": false,           // 禁用响应式，防止DataTables隐藏列并添加+号
+            "scrollX": true,               // 启用水平滚动
+            "language": {
+                "url": "//cdn.datatables.net/plug-ins/1.13.4/i18n/Chinese.json"  // 设置中文语言包
+            },
+            "columnDefs": [
+                {
+                    "targets": [0, 12], // 工种ID 和 操作 列
+                    "className": "text-center",
+                    "orderable": false
+                },
+                {
+                    "targets": [5], // 单价 列
+                    "className": "text-center"
+                },
+                {
+                    "targets": "_all", // 其他所有列
+                    "className": "text-center"
+                }
+            ],
+            "order": [[2, "desc"]],          // 默认按二级分类降序排序（第3列，索引从0开始）
+            "dom": 'Blfrtip',                // 定义控制元素的位置，包含 'l' 来显示分页长度选择器
+            "buttons": [
+                {
+                    extend: 'copyHtml5',
+                    text: '复制',
+                    title: '用户数据'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '导出CSV',
+                    title: '用户数据'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '导出Excel',
+                    title: '用户数据'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '导出PDF',
+                    title: '用户数据',
+                    orientation: 'landscape', // PDF页面方向
+                    pageSize: 'A4',           // PDF页面大小
+                    exportOptions: {
+                        columns: ':visible'   // 只导出可见列
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: '打印',
+                    title: '用户数据',
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                }
+            ]
+        });
+    });
+</script>
+
 {% endblock %}

@@ -3,33 +3,41 @@ from datetime import datetime
 
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
+from django import forms
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from app01 import models
-from app01.models import ProductionWage
+from app01.models import ProductionWage, Order, JobCategoryInfo, JobTypeDetailInfo
 from app01.utils.bootstrap import BootStrapModelForm
 from app01.utils.pagination import Pagination
 
 
 class OrderModelForm(BootStrapModelForm):
-    """
-    对照模型表单，支持对照管理的表单输入
-    """
+    # 动态加载二级分类，确保从 JobCategoryInfo 表获取所有符合条件的二级分类
+    status = forms.ModelChoiceField(
+        queryset=JobCategoryInfo.objects.filter(category_level=2),  # 假设二级分类的level为2
+        empty_label="选择二级分类",  # 空白选项
+        label="二级分类")
+
+    category = forms.ModelChoiceField(
+        queryset=JobTypeDetailInfo.objects.filter(job_level=2),  # 获取所有二级工种
+        empty_label="选择二级工种",  # 空白选项
+        label="二级工种"
+    )
     class Meta:
         model = models.Order
         exclude = ["oid", 'admin']  # 排除自动生成的字段
 
 
 def order_list(request):
-    """
-    对照列表展示，支持搜索和分页功能
-    """
+    """ 订单列表展示 """
     data_dict = {}
     search_data = request.GET.get('q', "")
     if search_data:
-        data_dict["title__icontains"] = search_data  # 模糊匹配对照标题
-    queryset = models.Order.objects.filter(**data_dict)
+        data_dict["title__icontains"] = search_data  # 模糊匹配标题
+    queryset = Order.objects.filter(**data_dict)
+
     page_object = Pagination(request, queryset)
 
     form = OrderModelForm()  # 创建空表单实例，用于添加新对照
@@ -37,7 +45,7 @@ def order_list(request):
     context = {
         'form': form,
         "queryset": page_object.page_queryset,  # 分页后的对照数据
-        "page_string": page_object.html()  # 页码显示
+        "page_string": page_object.html(),  # 页码显示
     }
 
     return render(request, 'order_list.html', context)
@@ -75,16 +83,20 @@ def order_delete(request):
 
 def order_detail(request):
     """
-    获取对照详情信息，返回对照的具体数据
+    获取订单详情
     """
     uid = request.GET.get("uid")
-    row_dict = models.Order.objects.filter(id=uid).values("title", 'price', 'status').first()
-    if not row_dict:
+    row_object = models.Order.objects.filter(id=uid).first()
+    print(row_object.category)
+    if not row_object:
         return JsonResponse({"status": False, 'error': "数据不存在。"})
-
     return JsonResponse({
         "status": True,
-        "data": row_dict
+        "data": {
+            "category": row_object.category ,
+            "price": row_object.price,
+            "status": row_object.status,
+        }
     })
 
 

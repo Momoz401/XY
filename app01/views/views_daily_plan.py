@@ -6,20 +6,18 @@ from app01.utils.pagination import Pagination
 
 # List View
 def daily_plan_list(request):
-    # 获取用户输入的日期
-    search_date = request.GET.get('date', "")
+    # 获取用户输入的日期，默认为当前月份
+    search_date = request.GET.get('date', datetime.now().strftime('%Y-%m'))
 
     # 如果用户输入了日期，按种植日期进行过滤
     if search_date:
         try:
-            # 将字符串转换为日期格式
-            search_date = datetime.strptime(search_date, '%Y-%m-%d').date()
-            plans = DailyPlan.objects.filter(种植日期=search_date).order_by('-种植日期')
+            # 将字符串转换为日期格式（默认当前月）
+            search_date = datetime.strptime(search_date, '%Y-%m').date()
+            plans = DailyPlan.objects.filter(种植日期__year=search_date.year, 种植日期__month=search_date.month).order_by('-种植日期')
         except ValueError:
-            # 如果输入的日期格式不正确，返回空的计划列表
             plans = DailyPlan.objects.none()
     else:
-        # 如果没有输入日期，显示所有的日计划
         plans = DailyPlan.objects.all().order_by('-种植日期')
 
     # 分页处理
@@ -31,7 +29,6 @@ def daily_plan_list(request):
     }
 
     return render(request, 'daily_plan_list.html', context)
-
 
 def daily_plan_create(request):
     if request.method == "POST":

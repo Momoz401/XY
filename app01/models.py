@@ -19,6 +19,21 @@ class Admin(models.Model):
         return self.username
 
 
+# 工种表
+# models.py
+class JobTypeDetailInfo(models.Model):
+    CATEGORY_CHOICES = (
+        (1, "一级工种"),
+        (2, "二级工种"),
+    )
+
+    job_name = models.CharField(verbose_name="工种名称", max_length=50)
+    job_level = models.IntegerField(verbose_name="工种级别", choices=CATEGORY_CHOICES)
+    parent_job = models.ForeignKey('self', verbose_name="父工种", null=True, blank=True, on_delete=models.CASCADE, related_name="sub_work_types")
+
+    def __str__(self):
+        return self.job_name
+
 class Department(models.Model):
     """ 部门表 """
     title = models.CharField(verbose_name='标题', max_length=32)
@@ -88,17 +103,10 @@ class Task(models.Model):
 
 
 class Order(models.Model):
-    """ 订单 """
     oid = models.CharField(verbose_name="上传时间", max_length=64)
-    title = models.CharField(verbose_name="名称", max_length=32)
+    category = models.CharField(verbose_name="二级分类", max_length=64)  # 二级分类，字符类型
     price = models.IntegerField(verbose_name="数量")
-
-    status_choices = (
-        (1, "移栽"),
-        (2, "采收"),
-    )
-    status = models.SmallIntegerField(verbose_name="二级分类", choices=status_choices, default=1)
-    # admin_id
+    status = models.CharField(verbose_name="二级工种", max_length=64)  # 直接填写二级工种，无选择项
     admin = models.ForeignKey(verbose_name="管理员", to="Admin", on_delete=models.CASCADE)
 
 
@@ -763,7 +771,7 @@ class LossReport(models.Model):
     报损人 = models.CharField(max_length=255, verbose_name="报损人")
     批次 = models.CharField(max_length=255, verbose_name="批次")
     报损地块 = models.CharField(max_length=255, verbose_name="报损地块")
-    报损类型 = models.CharField(max_length=50, choices=[('地内报损', '地内报损'), ('销售报损', '销售报损')], verbose_name="报损类型")
+    报损类型 = models.CharField(max_length=50, choices=[('地内报损', '地内报损'), ('销售报损', '销售报损'),('打包报损', '打包报损')], verbose_name="报损类型")
     报损数量 = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="报损数量")
     报损单位 = models.CharField(max_length=50, verbose_name="报损单位")
     报损面积 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 新增报损面积
@@ -1005,21 +1013,6 @@ class JobCategoryInfo(models.Model):
 
     def __str__(self):
         return self.category_name
-
-# 工种表
-# models.py
-class JobTypeDetailInfo(models.Model):
-    CATEGORY_CHOICES = (
-        (1, "一级工种"),
-        (2, "二级工种"),
-    )
-
-    job_name = models.CharField(verbose_name="工种名称", max_length=50)
-    job_level = models.IntegerField(verbose_name="工种级别", choices=CATEGORY_CHOICES)
-    parent_job = models.ForeignKey('self', verbose_name="父工种", null=True, blank=True, on_delete=models.CASCADE, related_name="sub_work_types")
-
-    def __str__(self):
-        return self.job_name
 
 
 class DailyPriceReport(models.Model):

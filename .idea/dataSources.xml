@@ -10,7 +10,7 @@
       <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/db.sqlite3</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="@localhost" uuid="1460dc69-cb5c-4381-a082-f674109f43e3">
+    <data-source source="LOCAL" name="TX" uuid="1460dc69-cb5c-4381-a082-f674109f43e3">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>

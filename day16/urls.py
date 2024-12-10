@@ -28,6 +28,7 @@ from app01.views.DailyPriceReport import get_price_trends, get_available_categor
 from app01.views.Plant_batch import export_plant_batches
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
 from app01.views.channel import channel_list, channel_add, channel_edit, channel_delete
+from app01.views.daily_plan_report import daily_plan_rate
 
 from app01.views.daily_price_report_views import daily_price_report
 from app01.views.loss import loss_report_list, loss_report_add, loss_report_edit, loss_report_delete
@@ -158,6 +159,11 @@ urlpatterns = [
     path('monthly_plan/download/', monthly_plan_download, name='monthly_plan_download'),
     # 针对未达成的月度计划的反馈操作路径，基于计划ID
     path('monthly_plan/feedback/<int:plan_id>/', plan_feedback, name='feedback'),
+
+
+    # 日度计划达成情况视图
+    path('daily_plan_rate/', daily_plan_rate, name='daily_plan_rate'),
+
 
 
 

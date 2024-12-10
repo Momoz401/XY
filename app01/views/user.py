@@ -19,16 +19,12 @@ def user_list(request):
         # 根据姓名或手机号码进行过滤查询
         queryset = queryset.filter(Q(name__icontains=query) | Q(phone__icontains=query))
 
-    # 使用自定义的Pagination工具类进行分页
-    page_object = Pagination(request, queryset, page_size=20)
-
+    # 不再手动分页，因为 DataTables 会处理分页
     context = {
-        "search_data": page_object,
-        "queryset": page_object.page_queryset,  # 分页后的数据
-        "page_string": page_object.html()  # 页码HTML字符串
+        "queryset": queryset,  # 原始数据会传递给 DataTables
+        "query": query,
     }
     return render(request, 'user_list.html', context)
-
 
 
 def user_model_form_add(request):

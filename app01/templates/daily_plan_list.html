@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+
 {% block content %}
     <div class="container-fluid">
         <div style="margin-bottom: 10px" class="clearfix">
@@ -9,8 +10,8 @@
             <div style="float: right; width: 300px;">
                 <form method="get">
                     <div class="input-group">
-                        <input type="date" name="date" class="form-control" placeholder="按种植日期搜索..."
-                               value="{{ search_date }}">
+                        <input type="month" name="date" class="form-control" placeholder="按种植日期搜索..."
+                               value="{{ search_date|date:'Y-m' }}">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">
                                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>

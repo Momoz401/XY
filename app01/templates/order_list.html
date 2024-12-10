@@ -34,9 +34,9 @@
                 <tr>
                     <th style="text-align: center;">ID</th>
                     <th style="text-align: center;">维护日期</th>
-                    <th style="text-align: center;">一级分类</th>
+                    <th style="text-align: center;">二级分类</th>
                     <th style="text-align: center;">数量</th>
-                    <th style="text-align: center;">一级工种</th>
+                    <th style="text-align: center;">二级工种</th>
                     <th style="text-align: center;">操作员</th>
                     <th style="text-align: center;">操作</th>
                 </tr>
@@ -46,13 +46,15 @@
                     <tr uid="{{ obj.id }}">
                         <td style="text-align: center;">{{ obj.id }}</td>
                         <td style="text-align: center;">{{ obj.oid }}</td>
-                        <td style="text-align: center;">{{ obj.title }}</td>
+                        <td style="text-align: center;">{{ obj.status }}</td>
                         <td style="text-align: center;">{{ obj.price }}</td>
-                        <td style="text-align: center;">{{ obj.get_status_display }}</td>
+                        <td style="text-align: center;">{{ obj.category }}</td>
                         <td style="text-align: center;">{{ obj.admin.username }}</td>
                         <td style="text-align: center;">
-                            <input uid="{{ obj.id }}" type="button" class="btn btn-primary btn-xs btn-edit" value="编辑">
-                            <input uid="{{ obj.id }}" class="btn btn-danger btn-xs btn-delete" type="button" value="删除">
+                            <input uid="{{ obj.id }}" type="button" class="btn btn-primary btn-xs btn-edit"
+                                   value="编辑">
+                            <input uid="{{ obj.id }}" class="btn btn-danger btn-xs btn-delete" type="button"
+                                   value="删除">
                         </td>
                     </tr>
                 {% endfor %}
@@ -77,19 +79,30 @@
                 </div>
 
                 <div class="modal-body">
-                    <form id="formAdd">
-                        <div class="clearfix">
-                            {% for field in form %}
-                                <div class="col-xs-6">
-                                    <div class="form-group" style="position: relative;margin-bottom: 20px;">
-                                        <label>{{ field.label }}</label>
-                                        {{ field }}
-                                        <span class="error-msg" style="color: red;position: absolute;"></span>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    </form>
+<form id="formAdd">
+    <div class="clearfix">
+        {% for field in form %}
+            <div class="col-xs-6">
+                <div class="form-group" style="position: relative;margin-bottom: 20px;">
+                    <label>{{ field.label }}</label>
+                    {% if field.name == "category" %}
+                        <!-- category 字段，使用文本框 -->
+                        <input type="text" id="id_category" name="category" class="form-control" value="{{ field.value }}">
+                    {% elif field.name == "price" %}
+                        <!-- price 字段，使用文本框 -->
+                        <input type="text" id="id_price" name="price" class="form-control" value="{{ field.value }}">
+                    {% elif field.name == "status" %}
+                        <!-- status 字段，使用文本框 -->
+                        <input type="text" id="id_status" name="status" class="form-control" value="{{ field.value }}">
+                    {% else %}
+                        {{ field }}
+                    {% endif %}
+                    <span class="error-msg" style="color: red;position: absolute;"></span>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-default" data-dismiss="modal">取 消</button>
@@ -155,8 +168,6 @@
                     // 添加
                     doAdd();
                 }
-
-
             });
         }
 
@@ -201,10 +212,7 @@
                 dataType: "JSON",
                 success: function (res) {
                     if (res.status) {
-
-                        // alert("创建成功");
-
-                        // 清空表单  $("#formAdd")是jQuery对象 -> $("#formAdd")[0] DOM对象
+                        // 清空表单
                         $("#formAdd")[0].reset();
 
                         // 关闭对话框
@@ -212,9 +220,8 @@
 
                         // 刷新页面
                         location.reload();
-
                     } else {
-                        // 把错误信息显示在对话框中。
+                        // 把错误信息显示在对话框中
                         $.each(res.error, function (name, errorList) {
                             $("#id_" + name).next().text(errorList[0]);
                         })
@@ -225,7 +232,6 @@
 
         function bindBtnDeleteEvent() {
             $(".btn-delete").click(function () {
-                // alert("点击了删除");
                 // 显示删除对话框
                 $("#deleteModal").modal('show');
 
@@ -246,15 +252,8 @@
                     success: function (res) {
                         if (res.status) {
                             // 隐藏删除框
-                            // $("#deleteModal").modal('hide');
-                            // 在页面上将当前一行数据删除（js）
-                            // $("tr[uid='" + DELETE_ID + "']").remove();
-                            // 要删除的ID制空
-                            // DELETE_ID = 0;
-                            // 简单的思路：
                             location.reload();
                         } else {
-                            // 删除失败
                             alert(res.error);
                         }
                     }
@@ -269,7 +268,7 @@
                 var uid = $(this).attr("uid");
                 EDIT_ID = uid;
 
-                // 发送Ajax去后端获取当前行的相关数据  /order/detail/?uid=123
+                // 发送Ajax去后端获取当前行的相关数据
                 $.ajax({
                     url: "/order/detail/",
                     type: "get",
@@ -279,10 +278,11 @@
                     dataType: "JSON",
                     success: function (res) {
                         if (res.status) {
-                            // 将数据赋值到对话框中的标签中。
+                            // 将数据赋值到对话框中的标签中
                             $.each(res.data, function (name, value) {
                                 $("#id_" + name).val(value);
                             })
+
                             // 修改对话框的标题
                             $("#myModalLabel").text("编辑");
 
