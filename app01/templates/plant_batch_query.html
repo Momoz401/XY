@@ -1,0 +1,104 @@
+{% extends 'layout.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <h3 class="text-center">批次查询</h3>
+
+    <!-- 查询区域 -->
+    <form method="get" class="form-inline">
+        <div class="form-group">
+            <label for="batchSearch">批次ID:</label>
+            <input type="text" class="form-control" id="batchSearch" name="q" value="{{ search_data }}" placeholder="输入批次ID">
+        </div>
+        <button type="submit" class="btn btn-primary">查询</button>
+    </form>
+
+    <hr>
+
+    <!-- 表格区域 -->
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-th-list" aria-hidden="true"></span>
+            批次数据列表
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table id="batchTable" class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th>批次ID</th>
+                        <th>地块</th>
+                        <th>工种数据</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in result %}
+                        <tr>
+                            <td>{{ item.批次ID }}</td>
+                            <td>{{ item.地块 }}</td>
+                            <td>
+                                <ul>
+                                    {% for job in item.工种数据 %}
+                                        <li><strong>{{ job.工种 }}</strong>:
+                                            {{ job.开始时间 }} 到 {{ job.结束时间 }}，数量: {{ job.数量 }}
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center">没有找到匹配的批次数据</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 引入 DataTables CSS -->
+<link rel="stylesheet" href="{% static 'plugins/datatables/css/jquery.dataTables.min.css' %}">
+<link rel="stylesheet" href="{% static 'plugins/datatables/css/buttons.dataTables.min.css' %}">
+
+<!-- 引入 DataTables 和相关插件的 JS -->
+<script src="{% static 'plugins/jquery/jquery.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/jquery.dataTables.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/dataTables.buttons.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.flash.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/jszip.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.html5.min.js' %}"></script>
+<script src="{% static 'plugins/datatables/js/buttons.print.min.js' %}"></script>
+
+<!-- 初始化 DataTables -->
+<script>
+    $(document).ready(function() {
+        $('#batchTable').DataTable({
+            "paging": true,
+            "lengthChange": true,
+            "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "全部"]],
+            "searching": true,
+            "ordering": true,
+            "info": true,
+            "autoWidth": false,
+            "scrollX": true,
+            "language": {
+                "url": "{% static 'plugins/datatables/i18n/zh-CN.json' %}"
+            },
+            "dom": 'Blfrtip',
+            "buttons": [
+                { extend: 'copyHtml5', text: '复制' },
+                { extend: 'csvHtml5', text: '导出 CSV' },
+                { extend: 'excelHtml5', text: '导出 Excel' },
+                { extend: 'pdfHtml5', text: '导出 PDF' },
+                { extend: 'print', text: '打印' }
+            ],
+            "columnDefs": [
+                { "targets": "_all", "className": "text-center" }
+            ]
+        });
+    });
+</script>
+
+{% endblock %}

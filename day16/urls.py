@@ -25,7 +25,7 @@ from app01.views import depart, user, pretty, admin, account, task, order, chart
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
     daily_price_report_views
 from app01.views.DailyPriceReport import get_price_trends, get_available_categories, get_price_trends_data
-from app01.views.Plant_batch import export_plant_batches
+from app01.views.Plant_batch import export_plant_batches, Plant_batch_query
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
 from app01.views.channel import channel_list, channel_add, channel_edit, channel_delete
 from app01.views.daily_plan_report import daily_plan_rate
@@ -182,6 +182,8 @@ urlpatterns = [
     path('upload/Plant_batch/', upload.upload_Plant_batch_modal_form),
     # 日历视图显示种植批次
     path('Plant_batch/calendar/', plant_batch_calendar_view, name='plant_batch_calendar_view'),
+    #批次查询
+    path('Plant_batch_query/', Plant_batch_query, name='Plant_batch_query'),
 
     # 工种管理
     path('BaseInfoWorkType/list/', worktype.work_type_list),

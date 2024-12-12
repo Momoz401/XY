@@ -115,6 +115,11 @@
                             <th>施肥结束时间</th>
                             <th>施肥周期</th>
                             <th>施肥数量</th>
+                            <!-- 新增收苗字段 -->
+                            <th>收苗开始时间</th>
+                            <th>收苗结束时间</th>
+                            <th>收苗数量</th>
+                            <th>收苗单位</th>
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -187,6 +192,11 @@
                                 <td>{{ obj.施肥结束时间|default_if_none:"" }}</td>
                                 <td>{{ obj.施肥周期|default_if_none:"" }}</td>
                                 <td>{{ obj.施肥数量|default_if_none:"" }}</td>
+                                <!-- 新增收苗字段 -->
+                                <td>{{ obj.收苗开始时间|default_if_none:"" }}</td>
+                                <td>{{ obj.收苗开始结束|default_if_none:"" }}</td>
+                                <td>{{ obj.收苗数量|default_if_none:"" }}</td>
+                                <td>{{ obj.收苗单位|default_if_none:"" }}</td>
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="/Plant_batch/{{ obj.ID }}/edit/">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="/Plant_batch/{{ obj.ID }}/delete/">删除</a>
@@ -194,7 +204,7 @@
                             </tr>
                         {% empty %}
                             <tr>
-                                <td colspan="46" style="text-align: center;">没有找到相关的批次数据</td>
+                                <td colspan="49" style="text-align: center;">没有找到相关的批次数据</td>
                             </tr>
                         {% endfor %}
                     </tbody>

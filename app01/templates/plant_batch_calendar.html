@@ -1,3 +1,5 @@
+<!-- templates/Plant_batch.html -->
+
 {% extends 'layout.html' %}
 {% load static %}
 
@@ -7,13 +9,13 @@
         <!-- 筛选条件 -->
         <form method="get" class="form-inline mb-3">
             <div class="form-group mr-2">
-                <input type="text" class="form-control" name="批次ID" id="id_batch_id" placeholder="输入批次ID" value="{{ request.GET.batch_id }}">
+                <input type="text" class="form-control" name="q" id="id_batch_id" placeholder="输入批次ID" value="{{ request.GET.q }}">
             </div>
             <div class="form-group mr-2">
                 <select class="form-control" name="二级分类" id="id_second_category">
                     <option value="">选择二级分类</option>
                     {% for category in job_categories %}
-                        <option value="{{ category.category_name }}" {% if category.category_name == request.GET.second_category %}selected{% endif %}>{{ category.category_name }}</option>
+                        <option value="{{ category.category_name }}" {% if category.category_name == request.GET.二级分类 %}selected{% endif %}>{{ category.category_name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -22,6 +24,7 @@
     <hr>
         <!-- 工种选择按钮 -->
         <div class="mb-3">
+            <button class="btn btn-info work-filter" data-work-name="收苗">收苗</button>
             <button class="btn btn-info work-filter" data-work-name="移栽">移栽</button>
             <button class="btn btn-info work-filter" data-work-name="点籽">点籽</button>
             <button class="btn btn-info work-filter" data-work-name="采收">采收</button>
@@ -54,16 +57,18 @@
                 },
                 locale: 'zh-cn',
                 eventDidMount: function(info) {
-                    // 每次渲染后做一些额外操作，例如添加背景颜色
+                    // 设置事件的背景颜色
                     var workName = info.event.extendedProps.work_name;
                     var workColor = info.event.extendedProps.color;
                     info.el.style.backgroundColor = workColor;
                 },
                 eventClick: function(info) {
-                    // 点击事件后删除对应的工种时间
-                    var workName = info.event.extendedProps.work_name;
-                    if (confirm("是否删除此事件？")) {
-                        info.event.remove();
+                    // 点击事件后跳转到批次查询页面
+                    var batchId = info.event.extendedProps.batch_id;
+                    if(batchId) {
+
+                        var queryUrl = "{% url 'Plant_batch_query' %}?q=" + encodeURIComponent(batchId);
+                        window.location.href = queryUrl;
                     }
                 }
             });
@@ -71,6 +76,7 @@
 
             // 按钮点击逻辑，控制事件的显示/隐藏
             var workVisibility = {
+                '收苗': true,  // 添加收苗的初始显示状态
                 '移栽': true,
                 '点籽': true,
                 '采收': true,

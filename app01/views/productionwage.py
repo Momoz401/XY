@@ -41,7 +41,7 @@ def production_wage_add(request):
         # 如果固定表单和表单集都有效，则保存数据并重定向
         if fixed_form.is_valid() and formset.is_valid():
             fixed_instance = fixed_form.save(commit=False)
-            # fixed_instance.save()  # 首先保存固定实例
+            # fixed_instance.save()  # 根据需要决定是否先保存固定实例
             instances = formset.save(commit=False)
             for instance in instances:
                 instance.日期 = fixed_instance.日期
@@ -61,8 +61,10 @@ def production_wage_add(request):
                 # 获取二级分类名称，并根据它查找对应的一级分类
                 second_category_name = instance.二级分类
                 try:
-                    second_category_instance = JobCategoryInfo.objects.get(category_name=second_category_name,
-                                                                           category_level=2)
+                    second_category_instance = JobCategoryInfo.objects.get(
+                        category_name=second_category_name,
+                        category_level=2
+                    )
 
                     # 获取并设置一级分类的名称
                     if second_category_instance.parent_category:
@@ -108,6 +110,7 @@ def production_wage_add(request):
                         '间菜': ('间菜开始时间', '间菜结束时间', '间菜数量', '间菜周期'),
                         '吹生菜': ('吹生菜开始时间', '吹生菜结束时间', '吹生菜数量', '吹生菜周期'),
                         '施肥': ('施肥开始时间', '施肥结束时间', '施肥数量', '施肥周期'),
+                        '收苗': ('收苗开始时间', '收苗结束时间', '收苗数量', '收苗周期'),  # 新增收苗工种
                     }
 
                     if 工种名称 in 工种字段映射:
@@ -144,8 +147,10 @@ def production_wage_add(request):
 
                         # 计算总产量、总亩产
                         if instance.一级工种 == "采收":
-                            total_yield = ProductionWage.objects.filter(批次=instance.批次, 一级工种="采收").aggregate(
-                                total_yield=Sum('数量'))['total_yield']
+                            total_yield = ProductionWage.objects.filter(
+                                批次=instance.批次,
+                                一级工种="采收"
+                            ).aggregate(total_yield=Sum('数量'))['total_yield']
                             batch.总产量 = total_yield if total_yield else 0
                             batch.总亩产 = batch.总产量 / (batch.面积 or 1)  # 总亩产 = 总产量 / 面积
 
@@ -154,7 +159,8 @@ def production_wage_add(request):
                             batch.总周期天数 = (end_time - start_time).days
 
                         # 填充批次周期（例如：240401-240525）
-                        batch.周期批次 = f"{start_time.strftime('%y%m%d')}-{end_time.strftime('%y%m%d')}"
+                        if start_time and end_time:
+                            batch.周期批次 = f"{start_time.strftime('%y%m%d')}-{end_time.strftime('%y%m%d')}"
 
                         batch.save()
 
@@ -173,7 +179,7 @@ def production_wage_add(request):
         formset = DynamicFieldsFormSet(queryset=ProductionWage.objects.none())
     {}
     # 渲染模板并将固定表单和表单集传递给模板
-    return render(request, 'productionwate_add.html',
+    return render(request, 'productionwate_add.html',  # 请确保模板名称正确，如有需要可修改为 'productionwage_add.html'
                   {'fixed_form': fixed_form, 'formset': formset, 'redirect': '/production_wage_list/list'})
 
 

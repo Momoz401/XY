@@ -176,3 +176,57 @@ def Plant_batch_delete(request, nid):
     """ 删除批次 """
     Plant_batch.objects.filter(ID=nid).delete()
     return redirect('/Plant_batch/list/')
+
+
+
+
+def Plant_batch_query(request):
+    """ 批次信息查询 """
+    data_dict = {}
+    search_data = request.GET.get('q', "")  # 获取查询条件（批次ID）
+    if search_data:
+        data_dict["批次ID__contains"] = search_data  # 过滤批次ID
+
+    # 查询匹配的批次
+    queryset = Plant_batch.objects.filter(**data_dict).order_by('-种植日期')
+
+    # 处理查询结果：将每个批次的工种相关数据提取出来
+    result = []
+    for batch in queryset:
+        job_data = {
+            '批次ID': batch.批次ID,
+            '地块': batch.地块,
+            '工种数据': []
+        }
+
+        # 遍历每个工种的开始时间、结束时间和数量（如果有）
+        job_fields = [
+            ('收苗', batch.收苗开始时间, batch.收苗结束时间, batch.收苗数量),
+            ('打地', batch.打地开始时间, batch.打地结束时间, batch.打地数量),
+            ('移栽', batch.移栽开始时间, batch.移栽结束时间, batch.移栽数量),
+            ('除草', batch.除草开始时间, batch.除草结束时间, batch.除草数量),
+            ('采收', batch.采收开始时间, batch.采收结束时间, batch.采收数量),
+            ('清棚', batch.清棚开始时间, batch.清棚结束时间, batch.清棚数量),
+            ('点籽', batch.点籽开始时间, batch.点籽结束时间, batch.点籽数量),
+            ('间菜', batch.间菜开始时间, batch.间菜结束时间, batch.间菜数量),
+            ('吹生菜', batch.吹生菜开始时间, batch.吹生菜结束时间, batch.吹生菜数量),
+            ('施肥', batch.施肥开始时间, batch.施肥结束时间, batch.施肥数量),
+        ]
+
+        # 将工种数据添加到批次中
+        for job in job_fields:
+            job_data['工种数据'].append({
+                '工种': job[0],
+                '开始时间': job[1] if job[1] else '未设定',
+                '结束时间': job[2] if job[2] else '未设定',
+                '数量': job[3] if job[3] else '未设定'
+            })
+
+        result.append(job_data)
+
+    context = {
+        'result': result,  # 将结果传递到模板
+        'search_data': search_data  # 保留搜索的批次ID
+    }
+
+    return render(request, 'plant_batch_query.html', context)

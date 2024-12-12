@@ -553,7 +553,11 @@ class Plant_batch(models.Model):
     施肥结束时间 = models.DateField(null=True, blank=True)
     施肥周期 = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     施肥数量 = models.FloatField(null=True, blank=True)
-
+    # 新增收苗字段
+    收苗开始时间 = models.DateField(null=True, blank=True)
+    收苗结束时间 = models.DateField(null=True, blank=True)
+    收苗数量 = models.FloatField(null=True, blank=True)
+    收苗单位 = models.CharField(max_length=50, null=True, blank=True,default="板")
     def save(self, *args, **kwargs):
         # 保持原逻辑：生成批次ID
         if not self.批次ID:

@@ -17,7 +17,7 @@ def plant_batch_calendar_view(request):
     # 获取符合筛选条件的批次记录
     plant_batches = Plant_batch.objects.filter(**filters).values(
         '批次ID', '二级分类', '移栽开始时间', '点籽日期', '采收初期', '采收末期',
-        '打地开始时间', '清棚开始时间', '间菜开始时间', '施肥开始时间', '吹生菜开始时间', '除草开始时间'
+        '打地开始时间', '清棚开始时间', '间菜开始时间', '施肥开始时间', '吹生菜开始时间', '除草开始时间', '收苗开始时间'
     )
 
     # 获取所有二级分类
@@ -65,6 +65,7 @@ def get_time_field(work_name):
         '吹生菜': '吹生菜开始时间',
         '除草': '除草开始时间',
         '移栽': '移栽开始时间',
+        '收苗': '收苗开始时间',
     }
     return work_time_fields.get(work_name, None)
 
@@ -81,6 +82,7 @@ def get_work_color(work_name):
         '间菜': 'pink',
         '吹生菜': 'red',
         '除草': 'limegreen',
+        '收苗': 'green',
     }
     return colors.get(work_name, 'gray')
 
@@ -97,4 +99,5 @@ def get_work_colors():
         '间菜': 'pink',
         '吹生菜': 'red',
         '除草': 'limegreen',
+        '收苗': 'green',
     }
