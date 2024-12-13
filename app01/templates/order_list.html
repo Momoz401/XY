@@ -85,18 +85,7 @@
             <div class="col-xs-6">
                 <div class="form-group" style="position: relative;margin-bottom: 20px;">
                     <label>{{ field.label }}</label>
-                    {% if field.name == "category" %}
-                        <!-- category 字段，使用文本框 -->
-                        <input type="text" id="id_category" name="category" class="form-control" value="{{ field.value }}">
-                    {% elif field.name == "price" %}
-                        <!-- price 字段，使用文本框 -->
-                        <input type="text" id="id_price" name="price" class="form-control" value="{{ field.value }}">
-                    {% elif field.name == "status" %}
-                        <!-- status 字段，使用文本框 -->
-                        <input type="text" id="id_status" name="status" class="form-control" value="{{ field.value }}">
-                    {% else %}
-                        {{ field }}
-                    {% endif %}
+                    {{ field }}
                     <span class="error-msg" style="color: red;position: absolute;"></span>
                 </div>
             </div>
@@ -172,7 +161,7 @@
         }
 
         function doEdit() {
-            // 向后台发送请求（添加的Ajax请求）
+            // 向后台发送请求（编辑的Ajax请求）
             $.ajax({
                 url: "/order/edit/" + "?uid=" + EDIT_ID,  //  -> /order/edit/?uid=12
                 type: "post",
@@ -180,7 +169,7 @@
                 dataType: "JSON",
                 success: function (res) {
                     if (res.status) {
-                        // 清空表单  $("#formAdd")是jQuery对象 -> $("#formAdd")[0] DOM对象
+                        // 清空表单
                         $("#formAdd")[0].reset();
 
                         // 关闭对话框
@@ -235,7 +224,7 @@
                 // 显示删除对话框
                 $("#deleteModal").modal('show');
 
-                // 获取当前行的ID并赋值给全部变量。
+                // 获取当前行的ID并赋值给变量。
                 DELETE_ID = $(this).attr("uid");
             });
         }
@@ -251,7 +240,7 @@
                     dataType: "JSON",
                     success: function (res) {
                         if (res.status) {
-                            // 隐藏删除框
+                            // 隐藏删除框并刷新页面
                             location.reload();
                         } else {
                             alert(res.error);

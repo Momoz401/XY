@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DdlMappings">
+    <mapping uuid="a49139fe-8772-48c7-9ae3-bf04d9eb1ab2" name="TX (DDL) Mapping">
+      <data-sources db="1460dc69-cb5c-4381-a082-f674109f43e3" ddl="2dc9dd2c-54c9-4b67-9cd4-c28f93bf05f6" />
+      <scope>
+        <node negative="1">
+          <node kind="schema" qname="TXDB" />
+          <node kind="database" negative="1" />
+        </node>
+      </scope>
+    </mapping>
+  </component>
+</project>
