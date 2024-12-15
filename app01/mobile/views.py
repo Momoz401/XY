@@ -196,3 +196,11 @@ def batch_autocomplete(request):
     batches = Plant_batch.objects.filter(批次ID__icontains=term)  # 替换为实际字段名
     batch_list = [{'label': batch.批次ID, 'value': batch.批次ID} for batch in batches]
     return JsonResponse(batch_list, safe=False)
+
+
+def vehicle_autocomplete(request):
+    """车牌自动完成视图"""
+    term = request.GET.get('term', '')
+    vehicles = Vehicle.objects.filter(车牌__icontains=term)[:10]
+    vehicle_list = [{'label': vehicle.车牌, 'value': vehicle.车牌} for vehicle in vehicles]
+    return JsonResponse(vehicle_list, safe=False)

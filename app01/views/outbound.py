@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 
-from app01.models import OutboundRecord
+from app01.models import OutboundRecord, Market
 from app01.utils.form import OutboundRecordForm
 from app01.utils.pagination import Pagination
 
@@ -24,7 +24,8 @@ def outbound_add(request):
     """添加出库记录"""
     if request.method == "GET":
         form = OutboundRecordForm()
-        return render(request, 'outbound_form.html', {"form": form, "title": "添加出库记录"})
+        markets = Market.objects.values_list('市场名称', flat=True)
+        return render(request, 'outbound_form.html', {"form": form, "title": "添加出库记录", "markets": markets, },)
 
     form = OutboundRecordForm(data=request.POST)
     if form.is_valid():

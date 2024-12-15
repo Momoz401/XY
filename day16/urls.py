@@ -27,6 +27,7 @@ from app01.views import depart, user, pretty, admin, account, task, order, chart
 from app01.views.DailyPriceReport import get_price_trends, get_available_categories, get_price_trends_data
 from app01.views.Plant_batch import export_plant_batches, Plant_batch_query
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
+from app01.views.auto_complete import vehicle_autocomplete, client_autocomplete
 from app01.views.channel import channel_list, channel_add, channel_edit, channel_delete
 from app01.views.daily_plan_report import daily_plan_rate
 
@@ -408,6 +409,9 @@ urlpatterns = [
     path('channel/<int:nid>/edit/', channel_edit, name='channel_edit'),  # 编辑报价渠道信息
     path('channel/<int:nid>/delete/', channel_delete, name='channel_delete'),  # 删除报价渠道信息
 
+
+    #自动补全
+    path('ajax/vehicle-autocomplete/', vehicle_autocomplete, name='vehicle_autocomplete'),
 ]
 from django.conf.urls.static import static
 # 添加媒体文件的URL配置
