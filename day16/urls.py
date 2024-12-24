@@ -19,7 +19,7 @@ from django.views.static import serve
 from django.conf import settings
 
 from app01.mobile.views import mobile_login, mobile_home, mobile_logout, mobile_gongshiluru, mobile_outbound_add, \
-    customer_autocomplete, worker_autocomplete, batch_autocomplete
+    customer_autocomplete, worker_autocomplete, batch_autocomplete, batch_autocomplete_pc, get_Plant_batch_dk_dk
 from app01.models import BaseInfoWorkHour, PlanPlantBatch
 from app01.views import depart, user, pretty, admin, account, task, order, chart, upload, city, worktype, baseinfo, \
     WorkHour, planplantbatch, productionwage, agriculturecost, Plant_batch, views, report, job_type_views, \
@@ -27,7 +27,7 @@ from app01.views import depart, user, pretty, admin, account, task, order, chart
 from app01.views.DailyPriceReport import get_price_trends, get_available_categories, get_price_trends_data
 from app01.views.Plant_batch import export_plant_batches, Plant_batch_query
 from app01.views.WorkHour import get_second_level_categories, get_second_level_jobs
-from app01.views.auto_complete import vehicle_autocomplete, client_autocomplete
+from app01.views.auto_complete import vehicle_autocomplete
 from app01.views.channel import channel_list, channel_add, channel_edit, channel_delete
 from app01.views.daily_plan_report import daily_plan_rate
 
@@ -41,7 +41,8 @@ from app01.views.plant_batch_calendar import plant_batch_calendar_view
 from app01.views.process_alert import process_alert_list, process_alert_create, process_alert_update, \
     process_alert_delete
 from app01.views.process_alert_over import process_alert_overview
-from app01.views.productionwage import get_primary_work_types, get_secondary_work_types, get_base_options
+from app01.views.productionwage import get_primary_work_types, get_secondary_work_types, get_base_options, \
+    get_Plant_batch_dk
 from app01.views.sales import salesperson_list, salesperson_add, salesperson_edit, salesperson_delete
 from app01.views.upload import upload_depreciation_excel, upload_expense_allocation, outbound_upload, \
     upload_sales_record
@@ -412,6 +413,17 @@ urlpatterns = [
 
     #自动补全
     path('ajax/vehicle-autocomplete/', vehicle_autocomplete, name='vehicle_autocomplete'),
+    path('ajax/get_Plant_batch_dk/', get_Plant_batch_dk, name='get_Plant_batch_dk'),
+    path('ajax/batch_autocomplete/', batch_autocomplete, name='batch_autocomplete'),
+    path('ajax/customer_autocomplete/', customer_autocomplete, name='customer_autocomplete'),
+    path('ajax/worker_autocomplete/', worker_autocomplete, name='worker_autocomplete'),
+    path('ajax/vehicle_autocomplete/', vehicle_autocomplete, name='vehicle_autocomplete'),
+
+    path('ajax/batch_autocomplete_pc/', batch_autocomplete_pc, name='batch_autocomplete_pc'),
+    path('ajax/get_Plant_batch_dk_dk/', get_Plant_batch_dk_dk, name='get_Plant_batch_dk_kd'),
+
+
+
 ]
 from django.conf.urls.static import static
 # 添加媒体文件的URL配置

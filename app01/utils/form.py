@@ -512,10 +512,15 @@ class OutboundRecordForm(BootStrapModelForm):
             '地块',
             '盖布_块',
             '备注',
+        ]
+        widgets = {
+            '地块': forms.Select(attrs={'class': 'form-control plot-select'}),
+            '车牌': forms.Select(attrs={'class': 'form-control vehicle-select'}),
+            '市场': forms.Select(attrs={'class': 'form-control market-select'}),
+            '单位': forms.Select(attrs={'class': 'form-control unit-select'}),
+            '批次': forms.TextInput(attrs={'class': 'form-control batch-autocomplete'}),
 
-
-        ]  # 明确列出需要的字段，排除 `品类` 和 `品种`
-
+        }
 
 
 class SalesRecordForm(BootStrapModelForm):

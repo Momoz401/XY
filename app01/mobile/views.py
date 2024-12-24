@@ -204,3 +204,17 @@ def vehicle_autocomplete(request):
     vehicles = Vehicle.objects.filter(车牌__icontains=term)[:10]
     vehicle_list = [{'label': vehicle.车牌, 'value': vehicle.车牌} for vehicle in vehicles]
     return JsonResponse(vehicle_list, safe=False)
+
+
+
+def batch_autocomplete_pc(request):
+    term = request.GET.get('term', '')
+    # 返回与手机端一样的数据结构
+    qs = Plant_batch.objects.filter(批次ID__icontains=term)[:10]
+    data = [{'label': x.批次ID, 'value': x.批次ID} for x in qs]
+    return JsonResponse(data, safe=False)
+
+def get_Plant_batch_dk_dk(request):
+    one = request.GET.get('one', '')
+    qs = Plant_batch.objects.filter(批次ID__icontains=one).values('id', 'location')
+    return JsonResponse(list(qs), safe=False)

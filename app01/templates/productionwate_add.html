@@ -77,7 +77,7 @@
             function bindEvents(prefix) {
 
                 // 基地字段的动态填充
-                $('#' + prefix + '-基地').click(function () {
+                $('#' + prefix + '-基地').one('click', function () {
                     $.ajax({
                         url: "{% url 'get_base_options' %}",  // 使用Django模板标签来获取URL
                         type: 'GET',
