@@ -58,5 +58,5 @@ def agriculture_cost_edit(request, nid):
 
 
 def agriculture_cost_delete(request, nid):
-    models.Agriculture_cost.objects.filter(id=nid).delete()
+    models.Agriculture_cost.objects.filter(ID=nid).delete()
     return redirect('/Agricureture/list/')
