@@ -524,8 +524,12 @@ class OutboundRecordForm(BootStrapModelForm):
 
 
 class SalesRecordForm(BootStrapModelForm):
+    # 在模型中 “销售人员” 只是 CharField
+    # 在表单中，用 ChoiceField 并在 __init__ 中动态填充
+    销售人员 = forms.ChoiceField(label="销售人员", choices=[], required=False)
+
     class Meta:
-        model = SalesRecord
+        model = SalesRecord  # 你的销售记录模型
         fields = [
             '客户',
             '数量',
@@ -533,14 +537,22 @@ class SalesRecordForm(BootStrapModelForm):
             '金额',
             '应收金额',
             '实收金额',
-            '收款日期',  # 新增字段
-            '销售人员',  # 新增字段
-            '单位',  # 新增字段
-            '规格',  # 新增字段
-            '收款方式',  # 新增字段
+            '收款日期',
+            '销售人员',   # <-- 这里与模型字段名一致
+            '单位',
+            '规格',
+            '收款方式',
             '备注'
         ]
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # 1) 从 Salesperson 表中获取所有销售人员姓名
+        salesperson_list = Salesperson.objects.values_list('姓名', flat=True)
+
+        # 2) 构造 choices => [("", "请选择销售人员"), ("张三","张三"), ...]
+        choices = [("", "请选择销售人员")] + [(name, name) for name in salesperson_list]
+        self.fields['销售人员'].choices = choices
 
 class ExpenseAllocationModelForm(forms.ModelForm):
     class Meta:

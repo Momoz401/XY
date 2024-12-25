@@ -317,11 +317,11 @@ urlpatterns = [
     path('upload/outbound/', outbound_upload, name='outbound_upload'),
     path('get_sales_records/', get_sales_records, name='get_sales_records'),
     path('add_sale_form/', add_sale_form, name='add_sale_form'),
-    path('fetch_unique_second_level_categories/', fetch_unique_second_level_categories,
-         name='fetch_unique_second_level_categories'),
+    path('fetch_unique_second_level_categories/', fetch_unique_second_level_categories, name='fetch_unique_second_level_categories'),
     path('sales_record/add/<int:outbound_id>/', sales_record_add, name='sales_record_add'),
     path('sales_record/edit/<int:pk>/', sales_record_edit, name='sales_record_edit'),
     path('sales_record/delete/<int:pk>/', sales_record_delete, name='sales_record_delete'),
+    path('ajax/customer_autocomplete/', views.customer_autocomplete, name='customer_autocomplete'),
 
     # 单独管理销售记录的URL
     path('sales_record/management/list/', views.sales_record_management_list, name='sales_record_management_list'),

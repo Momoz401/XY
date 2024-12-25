@@ -326,8 +326,26 @@ def sales_record_management_delete(request, pk):
     return redirect('sales_record_management_list')
 
 
+
+# 客户自动补全接口
+def customer_autocomplete(request):
+    """
+    假设您要对“客户”进行自动补全
+    """
+    term = request.GET.get('term', '')
+    qs = Customer.objects.filter(客户名称__icontains=term)[:10]
+    data = [{'label': x.客户名称, 'value': x.客户名称} for x in qs]
+    return JsonResponse(data, safe=False)
+
+
+
 from django.shortcuts import render
 from app01.models import Plant_batch
+
+
+
+
+
 
 
 

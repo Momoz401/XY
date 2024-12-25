@@ -6,7 +6,37 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
+        <!--
+            这会生成:
+            - 客户 -> <input id="id_客户" ...>
+            - 数量, 单价, 金额, ...
+            - 收款日期 -> <input id="id_收款日期" ...>
+            - 销售人员 -> <select id="id_销售人员"> ... </select>
+            - 单位, 规格, 收款方式, 备注, etc
+        -->
         <button type="submit" class="btn btn-primary">保存</button>
     </form>
 </div>
-{% endblock %}
+{% endblock content %}
+
+{% block js %}
+<script>
+$(function(){
+    // 1) 客户 -> 自动补全
+    $("#id_客户").autocomplete({
+        source: "{% url 'customer_autocomplete' %}",
+        minLength: 1
+        // select: function(event, ui){ ... } // 若需回调
+    });
+
+    // 2) 销售人员 -> 已是 Django ModelChoiceField => 下拉框 <select> 不需要JS了
+    //    如果要Ajax动态生成, 就要写额外的 JS. 但多数情况ModelChoiceField足够.
+
+    // 3) 收款日期 -> jQuery UI datepicker
+    //    要保证 <input type="text" id="id_收款日期"> (默认 Django DateField->TextInput)
+    $("#id_收款日期").datepicker({
+        dateFormat: "yy-mm-dd"
+    });
+});
+</script>
+{% endblock js %}
