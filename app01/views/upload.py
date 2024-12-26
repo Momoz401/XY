@@ -317,6 +317,7 @@ def upload_Plant_batch_modal_form(request):
                         '二级分类': record.get('二级分类'),
                         '地块': record.get('地块'),
                         '面积': record.get('面积', 0),
+                        '基地': record.get('基地'),
                         '基地经理': record.get('基地经理'),
                         '移栽日期': record.get('移栽日期'),
                         '移栽板量': record.get('移栽板量', 0),
