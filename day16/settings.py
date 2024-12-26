@@ -72,13 +72,31 @@ WSGI_APPLICATION = 'day16.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'txdb',       # 你的MySQL数据库名
+        'USER': 'root',             # 你的数据库用户名
+        'PASSWORD': 'Tx1qaz2wsx20241212',          # 你的数据库密码
+        'HOST': '1.13.79.111', # 远程服务器IP或域名
+        'PORT': '3306',             # MySQL默认端口3306
+        # 如果需要严谨地控制字符集，可加:
+        # 'OPTIONS': {
+        #     'charset': 'utf8mb4',
+        #     'use_unicode': True,
+        #     'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        # },
     }
 }
-
 
 
 
