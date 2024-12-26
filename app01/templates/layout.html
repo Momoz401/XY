@@ -3,7 +3,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>云南泰兴</title>
+   <title>{% block title %}云南泰兴{% endblock %}</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
   <!-- jQuery -->
@@ -30,6 +30,7 @@
 
     <!-- 引入 Google Fonts（可选） -->
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,700&display=swap" rel="stylesheet">
+
 
     <!-- 自定义 CSS -->
     <style>
@@ -434,6 +435,7 @@
                 </li>
             </ul>
         </div>
+    </div>
 </nav>
 
 <!-- 主体内容区域 -->
@@ -467,6 +469,15 @@
 <script src="{% static 'plugins/datatables/js/buttons.html5.min.js' %}"></script>
 <script src="{% static 'plugins/datatables/js/buttons.print.min.js' %}"></script>
 
+
+
+<!-- 新增 FixedColumns CSS/JS -->
+<link rel="stylesheet" href="https://cdn.datatables.net/fixedcolumns/4.2.2/css/fixedColumns.dataTables.min.css"/>
+<script src="https://cdn.datatables.net/fixedcolumns/4.2.2/js/dataTables.fixedColumns.min.js"></script>
+
+
+
+
 <!-- 初始化 DataTables（可根据需要调整） -->
 <script>
     $(document).ready(function () {
@@ -477,6 +488,20 @@
             ]
         });
     });
+</script>
+
+<script>
+document.addEventListener('keydown', function(event) {
+    // 检测是否按下 Ctrl 或 Cmd（Mac 用户可能想支持 metaKey）
+    // 并且检测是否按下 '1' 键
+    if ((event.ctrlKey || event.metaKey) && event.key === '1') {
+        // 阻止默认行为（有时可能与系统快捷键冲突）
+        event.preventDefault();
+
+        // 执行您想要的操作，比如跳转
+        window.location.href = "/productionwate/add/";  // 跳转到新建工价页面
+    }
+});
 </script>
 
 {% block js %}{% endblock %}

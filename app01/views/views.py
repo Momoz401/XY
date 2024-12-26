@@ -620,6 +620,13 @@ def job_category_edit(request, pk):
     })
 
 
+def job_category_delete(request, pk):
+    """ Delete a job type """
+    job_category = get_object_or_404(models.JobCategoryInfo, pk=pk)
+    job_category.delete()
+    return redirect('/job_category/list/')
+
+
 # 每日价格上报列表
 
 

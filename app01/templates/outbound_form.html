@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% load static %}
 
 {% block content %}
 <div class="container-fluid">
@@ -10,31 +11,25 @@
             <form method="post" id="desktop_outbound_form" novalidate>
                 {% csrf_token %}
 
-                <!-- 日期 默认今天 -->
+                <!-- 日期 默认今天(示例) -->
                 <div class="form-group">
                     <label for="id_日期">日期</label>
-                    <!-- value="{{ today }}" 可以使输入框默认显示今天的日期 -->
-                    <input type="date" name="日期" id="id_日期" class="form-control" value="{{ today }}">
+                    <input type="date" name="日期" id="id_日期" class="form-control" value="{{ today|default_if_none:'' }}">
                 </div>
 
-                <!-- 车牌 -->
+                <!-- 车牌 (自动补全) -->
                 <div class="form-group">
                     <label for="id_车牌">车牌</label>
-                    <select name="车牌" id="id_车牌" class="form-control">
-                        <option value="">请选择车牌</option>
-                        {% for vehicle in vehicles %}
-                            <option value="{{ vehicle.车牌 }}">{{ vehicle.车牌 }}</option>
-                        {% endfor %}
-                    </select>
+                    <input type="text" name="车牌" id="id_车牌" class="form-control" autocomplete="off">
                 </div>
 
-                <!-- 公司（手动输入） -->
+                <!-- 公司 (手动输入) -->
                 <div class="form-group">
                     <label for="id_公司">公司</label>
                     <input type="text" name="公司" id="id_公司" class="form-control" autocomplete="off">
                 </div>
 
-                <!-- 市场（下拉） -->
+                <!-- 市场 (下拉) -->
                 <div class="form-group">
                     <label for="id_市场">市场</label>
                     <select name="市场" id="id_市场" class="form-control">
@@ -47,7 +42,7 @@
                     </select>
                 </div>
 
-                <!-- 规格（手动输入） -->
+                <!-- 规格 (手动输入) -->
                 <div class="form-group">
                     <label for="id_规格">规格</label>
                     <input type="text" name="规格" id="id_规格" class="form-control" autocomplete="off">
@@ -75,17 +70,17 @@
                     <input type="number" name="重量_kg" id="id_重量_kg" class="form-control" step="0.01">
                 </div>
 
-                <!-- 批次(自动补全) -->
-                <div class="form-group">
-                    <label for="id_批次">批次</label>
-                    <input type="text" name="批次" id="id_批次" class="form-control" autocomplete="off">
-                </div>
-
-                <!-- 地块(随批次刷新) -->
+                <!-- 地块 (自动补全) -->
                 <div class="form-group">
                     <label for="id_地块">地块</label>
-                    <select name="地块" id="id_地块" class="form-control">
-                        <option value="">请选择地块</option>
+                    <input type="text" name="地块" id="id_地块" class="form-control" autocomplete="off">
+                </div>
+
+                <!-- 批次(选择框,随地块刷新) -->
+                <div class="form-group">
+                    <label for="id_批次">批次</label>
+                    <select name="批次" id="id_批次" class="form-control">
+                        <option value="">请选择批次</option>
                     </select>
                 </div>
 
@@ -93,6 +88,12 @@
                 <div class="form-group">
                     <label for="id_盖布_块">盖布(块)</label>
                     <input type="number" name="盖布_块" id="id_盖布_块" class="form-control" step="1">
+                </div>
+
+            <!-- 挑菜 -->
+                <div class="form-group">
+                    <label for="id_挑菜">挑菜</label>
+                    <input type="text" name="挑菜" id="id_挑菜" class="form-control" step="1">
                 </div>
 
                 <!-- 备注 -->
@@ -111,11 +112,26 @@
 {% block js %}
 <script>
 $(function(){
-    // 批次自动补全
-    $('#id_批次').autocomplete({
+    // 1. 车牌自动补全
+    $('#id_车牌').autocomplete({
         source: function(request, response){
             $.ajax({
-                url: "{% url 'batch_autocomplete' %}",
+                url: "{% url 'vehicle_autocomplete' %}",
+                dataType: "json",
+                data: { term: request.term },
+                success: function(data){
+                    response(data);
+                }
+            });
+        },
+        minLength: 1
+    });
+
+    // 2. 地块自动补全 (先选地块)
+    $('#id_地块').autocomplete({
+        source: function(request, response){
+            $.ajax({
+                url: "{% url 'plot_autocomplete' %}",  // 你需后端实现
                 dataType: "json",
                 data: { term: request.term },
                 success: function(data){
@@ -125,40 +141,49 @@ $(function(){
         },
         minLength: 1,
         select: function(event, ui){
-            refreshPlot(ui.item.value);
+            // 用户选中地块后 -> 刷新批次下拉
+            loadBatchByPlot(ui.item.value);
         }
     });
 
-    // 批次输入 -> 刷新地块
-    $('#id_批次').on('input', function(){
+
+    $(function(){
+    // 挑菜 -> 自动补全
+    $('#id_挑菜').autocomplete({
+        source: "{% url 'worker_autocomplete' %}",
+        minLength: 1
+    });
+});
+
+
+    // 若用户仅输入地块(而不选autocomplete的选项), 也监听 input
+    $('#id_地块').on('input', function(){
         const val = $(this).val();
-        if (val.length >= 1) {
-            refreshPlot(val);
-        } else {
-            $('#id_地块').empty().append($('<option>').val('').text('请选择地块'));
+        if(val.length >=1){
+            loadBatchByPlot(val);
+        }else{
+            // 清空批次下拉
+            $('#id_批次').empty().append($('<option>').val('').text('请选择批次'));
         }
     });
 
-    // 地块刷新函数
-    function refreshPlot(batchVal){
+    function loadBatchByPlot(plotVal){
         $.ajax({
-            url: "{% url 'get_Plant_batch_dk' %}",
-            type: "GET",
-            data: { one: batchVal },
+            url: "{% url 'get_batch_by_plot' %}",
+            type: 'GET',
+            data: { plot: plotVal },
             success: function(res){
-                let $plot = $('#id_地块');
-                $plot.empty().append($('<option>').val('').text('请选择地块'));
-
-                // 如果后端返回字典 => { "B13-B23":"B13-B23", ... }
-                const keys = Object.keys(res);
-                if (keys.length === 0) return;
-                keys.forEach(function(key){
-                    const val = res[key];
-                    $plot.append($('<option>').val(key).text(val));
-                });
-                // 若只有一条 -> 自动选中
-                if (keys.length === 1) {
-                    $plot.val(keys[0]);
+                // res 可能是 ["TXA-202310-ABC","TXA-241205-xxx"] etc
+                let $batch = $('#id_批次');
+                $batch.empty().append($('<option>').val('').text('请选择批次'));
+                if(res.length>0){
+                    res.forEach(function(bid){
+                        $batch.append($('<option>').val(bid).text(bid));
+                    });
+                    // 若只有一条 => 自动选中
+                    if(res.length===1){
+                        $batch.val(res[0]);
+                    }
                 }
             }
         });

@@ -116,16 +116,17 @@
                         <input type="date" class="form-control" name="采收末期" id="id_harvest_end" readonly>
                     </div>
 
-                        <div class="form-group">
-                            <label for="id_transplant_quantity">正常产量</label>
-                            <input type="number" class="form-control" name="正常产量" id="id_transplant_quantity">
-                        </div>
+                    <!-- 正常亩产 -->
+                    <div class="form-group">
+                        <label for="id_normal_acre_yield">正常亩产</label>
+                        <input type="number" class="form-control" name="正常亩产" id="id_normal_acre_yield">
+                    </div>
 
-                        <div class="form-group">
-                            <label for="id_transplant_quantity">正常亩产</label>
-                            <input type="number" class="form-control" name="正常亩产" id="id_transplant_quantity">
-                        </div>
-
+                    <!-- 正常产量 (只读, 自动计算 = 面积 * 正常亩产) -->
+                    <div class="form-group">
+                        <label for="id_normal_yield">正常产量</label>
+                        <input type="number" class="form-control" name="正常产量" id="id_normal_yield" readonly>
+                    </div>
 
                     <!-- 自动生成批次ID -->
                     <div class="form-group">
@@ -140,29 +141,31 @@
     </div>
 
     <script>
-        // 设置种植日期默认值为今天
+        // 1) 设置种植日期默认值为今天
         document.addEventListener("DOMContentLoaded", function () {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('id_plant_date').value = today;
         });
 
-        // 更新批次ID
+        // 2) 更新批次ID
         document.getElementById('id_plant_date').addEventListener('change', updateBatchID);
         document.getElementById('id_base').addEventListener('change', updateBatchID);
         document.getElementById('id_category').addEventListener('change', updateBatchID);
 
         function updateBatchID() {
             const plantDate = document.getElementById('id_plant_date').value.replace(/-/g, '');
-            const base = document.getElementById('id_base').options[document.getElementById('id_base').selectedIndex].text;
-            const category = document.getElementById('id_category').options[document.getElementById('id_category').selectedIndex].text;
+            const baseText = document.getElementById('id_base').options[document.getElementById('id_base').selectedIndex].text;
+            const categoryText = document.getElementById('id_category').options[document.getElementById('id_category').selectedIndex].text;
 
-            if (plantDate && base && category) {
-                const batchID = base + '-' + plantDate + '-' + category;
+            if (plantDate && baseText && categoryText) {
+                const batchID = baseText + '-' + plantDate + '-' + categoryText;
                 document.getElementById('id_batch_id').value = batchID;
+            } else {
+                document.getElementById('id_batch_id').value = '';
             }
         }
 
-        // 当选择栽种方式时，动态显示相应字段
+        // 3) 当选择栽种方式时，动态显示/隐藏相应字段
         document.getElementById("id_planting_method").addEventListener("change", function() {
             var selected = this.value;
             if (selected === "移栽") {
@@ -177,7 +180,7 @@
             }
         });
 
-        // 自动计算采收初期和采收末期
+        // 4) 自动计算采收初期和采收末期
         document.getElementById("id_growth_cycle").addEventListener("input", calculateDates);
         document.getElementById("id_harvest_period").addEventListener("input", calculateDates);
 
@@ -188,11 +191,38 @@
 
             if (plantingDate && growthCycle && harvestPeriod) {
                 var plantingDateObj = new Date(plantingDate);
+                // 生长周期结束 -> 采收开始
                 var harvestStartDate = new Date(plantingDateObj.getTime() + growthCycle * 24 * 60 * 60 * 1000);
+                // 采收开始 + 采收期 -> 采收末期
                 var harvestEndDate = new Date(harvestStartDate.getTime() + harvestPeriod * 24 * 60 * 60 * 1000);
 
                 document.getElementById("id_harvest_start").value = harvestStartDate.toISOString().split('T')[0];
                 document.getElementById("id_harvest_end").value = harvestEndDate.toISOString().split('T')[0];
+            } else {
+                // 如果无法计算，则清空
+                document.getElementById("id_harvest_start").value = '';
+                document.getElementById("id_harvest_end").value = '';
+            }
+        }
+
+        // 5) 自动计算“正常产量”
+        //    正常产量 = 面积 * 正常亩产
+        document.getElementById('id_area').addEventListener('input', calcNormalYield);
+        document.getElementById('id_normal_acre_yield').addEventListener('input', calcNormalYield);
+
+        function calcNormalYield() {
+            // 获取面积（id_area）和正常亩产（id_normal_acre_yield）
+            var areaVal = parseFloat(document.getElementById('id_area').value);
+            var normalAcreYield = parseFloat(document.getElementById('id_normal_acre_yield').value);
+
+            // 如果是非数字，则结果留空
+            if (!isNaN(areaVal) && !isNaN(normalAcreYield)) {
+                var result = areaVal * normalAcreYield;
+                // 格式化到两位小数（也可按需求保留N位或不保留）
+                document.getElementById('id_normal_yield').value = result.toFixed(2);
+            } else {
+                // 输入非法或空 -> 清空
+                document.getElementById('id_normal_yield').value = '';
             }
         }
     </script>

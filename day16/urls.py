@@ -35,7 +35,8 @@ from app01.views.daily_price_report_views import daily_price_report
 from app01.views.loss import loss_report_list, loss_report_add, loss_report_edit, loss_report_delete
 
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
-from app01.views.outbound import outbound_list, outbound_add, outbound_edit, outbound_delete
+from app01.views.outbound import outbound_list, outbound_add, outbound_edit, outbound_delete, plot_autocomplete, \
+    get_batch_by_plot
 from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
 from app01.views.plant_batch_calendar import plant_batch_calendar_view
 from app01.views.process_alert import process_alert_list, process_alert_create, process_alert_update, \
@@ -367,7 +368,7 @@ urlpatterns = [
     path('job_category/list/', views.job_category_list, name='job_category_list'),
     path('job_category/add/', views.job_category_add, name='job_category_add'),
     path('job_category/<int:pk>/edit/', views.job_category_edit, name='job_category_edit'),
-
+    path('job_category/<int:pk>/delete/', views.job_category_delete, name='job_category_delete'),
     # 工种相关的 URL 路由
     path('job_type/list/', job_type_views.job_type_list, name='job_type_list'),
     path('job_type/add/', job_type_views.job_type_add, name='job_type_add'),
@@ -417,11 +418,11 @@ urlpatterns = [
     path('ajax/batch_autocomplete/', batch_autocomplete, name='batch_autocomplete'),
     path('ajax/customer_autocomplete/', customer_autocomplete, name='customer_autocomplete'),
     path('ajax/worker_autocomplete/', worker_autocomplete, name='worker_autocomplete'),
-    path('ajax/vehicle_autocomplete/', vehicle_autocomplete, name='vehicle_autocomplete'),
 
     path('ajax/batch_autocomplete_pc/', batch_autocomplete_pc, name='batch_autocomplete_pc'),
     path('ajax/get_Plant_batch_dk_dk/', get_Plant_batch_dk_dk, name='get_Plant_batch_dk_kd'),
-
+    path('ajax/plot-autocomplete/', plot_autocomplete, name='plot_autocomplete'),
+    path('ajax/batch-by-plot/', get_batch_by_plot, name='get_batch_by_plot'),
 
 
 ]

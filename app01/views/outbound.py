@@ -1,3 +1,4 @@
+from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from app01.models import OutboundRecord, Market, Plant_batch, Vehicle
@@ -75,3 +76,16 @@ def outbound_delete(request, nid):
     """删除出库记录"""
     OutboundRecord.objects.filter(id=nid).delete()
     return redirect('/outbound/list/')
+
+def plot_autocomplete(request):
+    term = request.GET.get('term','')
+    qs = Plant_batch.objects.filter(地块__icontains=term).values_list('地块', flat=True).distinct()[:10]
+    data = [{"label": x, "value": x} for x in qs]
+    return JsonResponse(data, safe=False)
+
+
+def get_batch_by_plot(request):
+    plot_val = request.GET.get('plot','')
+    qs = Plant_batch.objects.filter(地块=plot_val).values_list('批次ID', flat=True)
+    data = list(qs)  # ["TXA-123xx","xxxx"]
+    return JsonResponse(data, safe=False)

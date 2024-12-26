@@ -4,14 +4,10 @@ from app01.models import Vehicle, Plant_batch, Customer
 
 
 def vehicle_autocomplete(request):
-    """车牌自动完成视图"""
-    if 'q' in request.GET:
-        q = request.GET.get('q')
-        vehicles = Vehicle.objects.filter(车牌__icontains=q)[:10]
-        results = [{'id': vehicle.id, 'text': vehicle.车牌} for vehicle in vehicles]
-    else:
-        results = []
-    return JsonResponse({'results': results})
+    term = request.GET.get('term','')
+    qs = Vehicle.objects.filter(车牌__icontains=term)[:10]
+    data = [{"label": v.车牌, "value": v.车牌} for v in qs]
+    return JsonResponse(data, safe=False)
 
 def batch_autocomplete(request):
     """批次自动完成视图"""

@@ -938,7 +938,8 @@ class OutboundRecord(models.Model):
     批次 = models.CharField(max_length=255, verbose_name="批次")
     盖布_块 = models.CharField(max_length=255, verbose_name="盖布/块")
     备注 = models.TextField(verbose_name="备注", null=True, blank=True)
-
+    # 新增的“挑菜”字段：存储一个姓名或简单字符串
+    挑菜 = models.CharField(max_length=255, verbose_name="挑菜", null=True, blank=True)
     class Meta:
         verbose_name = "出库记录"
         verbose_name_plural = "出库记录"

@@ -270,7 +270,7 @@ class production_wage_Edit_ModelForm(BootStrapModelForm):
         model = models.ProductionWage
         # fields = "__all__"
         # exclude = ['level']
-        fields = ['日期', '工人', '批次', '一级分类', '一级工种', '二级工种', '工价', '数量','合计工资', '工时', '地块']
+        fields = ['日期', '工人', '批次', '一级分类', '一级工种', '二级工种', '工价', '数量','合计工资', '工时', '地块', ]
 
 
 class agriculture_cost_ModelForm(BootStrapModelForm):
@@ -511,7 +511,9 @@ class OutboundRecordForm(BootStrapModelForm):
             '批次',
             '地块',
             '盖布_块',
+            '挑菜',
             '备注',
+
         ]
         widgets = {
             '地块': forms.Select(attrs={'class': 'form-control plot-select'}),

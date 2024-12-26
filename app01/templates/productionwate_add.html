@@ -203,19 +203,45 @@
                 // 获取地块
                 $('#' + prefix + '-数量').change(function () {
 
-                    var quantity = $(this).val();
-                    // 使用正则表达式匹配数字*数字的格式
-                    var regex = /^(\d+)\*(\d+)$/;  // 匹配 "数字*数字" 格式
-                    var match = quantity.match(regex);
+                       var quantityVal = $(this).val();
 
-                    // 如果匹配成功
-                    if (match) {
-                        var result = parseInt(match[1]) * parseInt(match[2]);  // 计算结果
-                        $('#' + prefix + '-数量').val(result);  // 更新为计算后的结果
-                    }
+                        // ② 定义一个表达式解析函数（也可以单独放在更上层）
+                        function parseExpression(expression) {
+                            // 去掉所有空格
+                            expression = expression.replace(/\s+/g, "");
+
+                            // 只允许数字、小数点、加减乘除符号（如需括号可加 ()）
+                            if (!/^[\d.+\-*/]+$/.test(expression)) {
+                                return null; // 如果包含了其他字符，则认为无效
+                            }
+                            try {
+                                let result = eval(expression);  // 直接用 eval 计算
+                                if (isNaN(result)) {
+                                    return null;
+                                }
+                                // 保留2位小数
+                                return parseFloat(result.toFixed(2));
+                            } catch (error) {
+                                console.log("表达式解析错误:", error);
+                                return null;
+                            }
+                        }
+
+                        // ③ 尝试解析该表达式
+                        var parsedValue = parseExpression(quantityVal);
+                        if (parsedValue !== null) {
+                            // 如果解析成功，则更新文本框为计算结果
+                            $('#' + prefix + '-数量').val(parsedValue);
+                        } else {
+                            // 解析失败，可根据需求提示或清空
+                            alert("输入的数量表达式有误，请检查。");
+                            // $('#' + prefix + '-数量').val(''); // 若想清空可解除注释
+                        }
 
 
                     calculateSalary(prefix);
+
+
                     var pc = $('#' + prefix + '-批次').val();
                     //alert(pc);
 

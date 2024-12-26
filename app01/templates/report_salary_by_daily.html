@@ -84,6 +84,10 @@
                 "processing": true,
                 "serverSide": false,
                 "scrollX": true,
+                 "fixedColumns": {
+                    leftColumns: 4 // 固定左侧 4 列，即[工人, 基地, 负责人, 月份]
+                },
+
                 "ajax": {
                     "url": "{% url 'report_salary_by_daily' %}",
                     "data": function (d) {
