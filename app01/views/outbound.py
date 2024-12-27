@@ -100,7 +100,7 @@ def outbound_edit(request, nid):
     row_object = get_object_or_404(OutboundRecord, id=nid)
     if request.method == "GET":
         form = OutboundRecordEditForm(instance=row_object)
-        print(form)
+        # print(form)
         return render(request, 'outbound_edit_form.html', {"form": form, "title": "编辑出库记录"})
 
     form = OutboundRecordEditForm(data=request.POST, instance=row_object)
