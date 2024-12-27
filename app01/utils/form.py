@@ -346,6 +346,8 @@ class FixedFieldsForm(BootStrapModelForm):  # 静态字段
         from app01.models import BaseInfoBase
         choices = [('', '请选择基地经理')] + [(manager, manager) for manager in
                                               BaseInfoBase.objects.values_list('基地经理', flat=True).distinct()]
+        # print("选择项 (choices):", choices)  # 打印生成的选择项列表
+
     except Exception:
         choices = [('', '请选择基地经理')]
 
@@ -523,6 +525,29 @@ class OutboundRecordForm(BootStrapModelForm):
             '批次': forms.TextInput(attrs={'class': 'form-control batch-autocomplete'}),
 
         }
+
+
+class OutboundRecordEditForm(BootStrapModelForm):
+    class Meta:
+        model = OutboundRecord
+        fields = [
+            '日期',
+            '车牌',
+            '公司',
+            '市场',
+            '规格',
+            '单位',
+            '数量_筐',
+            '重量_kg',
+            '批次',
+            '地块',
+            '盖布_块',
+            '挑菜',
+            '备注',
+
+        ]
+
+
 
 
 class SalesRecordForm(BootStrapModelForm):

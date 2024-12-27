@@ -53,8 +53,9 @@
                     <label for="id_单位">单位</label>
                     <select name="单位" id="id_单位" class="form-control">
                         <option value="kg">kg</option>
-                        <option value="吨">吨</option>
-                        <option value="斤">斤</option>
+                        <option value="筐">筐</option>
+                        <option value="泡沫箱">泡沫箱</option>
+                        <option value="烟箱">烟箱</option>
                     </select>
                 </div>
 
@@ -67,7 +68,7 @@
                 <!-- 重量_kg -->
                 <div class="form-group">
                     <label for="id_重量_kg">重量(kg)</label>
-                    <input type="number" name="重量_kg" id="id_重量_kg" class="form-control" step="0.01">
+                    <input type="text" name="重量_kg" id="id_重量_kg" class="form-control" >
                 </div>
 
                 <!-- 地块 (自动补全) -->
@@ -145,6 +146,37 @@ $(function(){
             loadBatchByPlot(ui.item.value);
         }
     });
+       // 5. 重量(kg) 支持算术表达式
+        $('#id_重量_kg').on('blur', function(){
+            let expr = $(this).val().trim();
+            if(expr === '') return; // 为空无需处理
+
+            // 检查是否包含算术运算符
+            if(/[*/+-]/.test(expr)){
+                try{
+                    // 使用 Function 构造器安全地计算表达式
+                    // 仅支持数字和基本运算符
+                    let sanitizedExpr = expr.replace(/[^0-9.+\-*/() ]/g, '');
+                    let result = Function('"use strict";return (' + sanitizedExpr + ')')();
+                    if(isNaN(result) || !isFinite(result)){
+                        throw new Error('无效的运算结果');
+                    }
+                    // 保留三位小数
+                    result = result.toFixed(3);
+                    $(this).val(result);
+                } catch(err){
+                    alert('请输入有效的算术表达式，例如：1.111*2/2.312');
+                    $(this).val('');
+                    $(this).focus();
+                }
+            } else {
+                // 如果是纯数字，格式化为三位小数
+                let num = parseFloat(expr);
+                if(!isNaN(num) && isFinite(num)){
+                    $(this).val(num.toFixed(3));
+                }
+            }
+        });
 
 
     $(function(){
@@ -166,6 +198,8 @@ $(function(){
             $('#id_批次').empty().append($('<option>').val('').text('请选择批次'));
         }
     });
+
+
 
     function loadBatchByPlot(plotVal){
         $.ajax({

@@ -45,8 +45,8 @@
                             <th>车牌</th>
                             <th>公司</th>
                             <th>市场</th>
-                            <th>品类</th>
-                            <th>品种</th>
+                            <th>一级分类</th>
+                            <th>二级分类</th>
                             <th>规格</th>
                             <th>单位</th>
                             <th>数量/筐</th>
@@ -54,6 +54,7 @@
                             <th>地块</th>
                             <th>批次</th>
                             <th>盖布/块</th>
+                            <th>挑菜</th>
                             <th>备注</th>
                             <th>操作</th>
                         </tr>
@@ -75,6 +76,7 @@
                                 <td>{{ obj.地块 }}</td>
                                 <td>{{ obj.批次 }}</td>
                                 <td>{{ obj.盖布_块 }}</td>
+                                <td>{{ obj.挑菜 }}</td>
                                 <td>{{ obj.备注 }}</td>
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="{% url 'outbound_edit' obj.id %}">编辑</a>

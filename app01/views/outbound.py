@@ -1,8 +1,10 @@
+from pyexpat.errors import messages
+
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
-from app01.models import OutboundRecord, Market, Plant_batch, Vehicle
-from app01.utils.form import OutboundRecordForm
+from app01.models import OutboundRecord, Market, Plant_batch, Vehicle, JobCategoryInfo
+from app01.utils.form import OutboundRecordForm, OutboundRecordEditForm
 from app01.utils.pagination import Pagination
 
 
@@ -37,7 +39,41 @@ def outbound_add(request):
     form = OutboundRecordForm(data=request.POST)
     if form.is_valid():
         instance = form.save(commit=False)
+        # 获取批次ID
+        batch_id = form.cleaned_data.get('批次')
+        if batch_id:
+            try:
+                # 根据批次ID获取 Plant_batch 对象
+                batch_obj = Plant_batch.objects.get(批次ID=batch_id)
+                instance.地块 = batch_obj.地块
 
+                # 解析批次ID以获取二级分类
+                # 假设批次ID格式为 "XQA-240106-冬娃娃菜"
+                try:
+                    secondary_category = batch_id.split('-')[-1]
+                except IndexError:
+                    secondary_category = ""
+
+                # 根据二级分类查询一级分类
+                try:
+                    classification_obj = JobCategoryInfo.objects.get(
+                        category_level=2,
+                        category_name=secondary_category
+                    )
+                    primary_category = classification_obj.parent_category.category_name if classification_obj.parent_category else ""
+                except JobCategoryInfo.DoesNotExist:
+                    primary_category = ""
+                    # 添加错误消息或其他逻辑
+                    messages.error(request, f"未找到二级分类 '{secondary_category}' 对应的一级分类。")
+
+                # 赋值分类信息
+                instance.品种 = secondary_category
+                instance.品类 = primary_category
+
+            except Plant_batch.DoesNotExist:
+                instance.地块 = ""
+                messages.error(request, f"批次ID '{batch_id}' 不存在。")
+                # 根据需要，您可以选择不保存实例或进行其他处理
         # 处理批次获取地块
         batch = form.cleaned_data.get('批次')
         if batch:
@@ -63,14 +99,15 @@ def outbound_edit(request, nid):
     """编辑出库记录"""
     row_object = get_object_or_404(OutboundRecord, id=nid)
     if request.method == "GET":
-        form = OutboundRecordForm(instance=row_object)
-        return render(request, 'outbound_form.html', {"form": form, "title": "编辑出库记录"})
+        form = OutboundRecordEditForm(instance=row_object)
+        print(form)
+        return render(request, 'outbound_edit_form.html', {"form": form, "title": "编辑出库记录"})
 
-    form = OutboundRecordForm(data=request.POST, instance=row_object)
+    form = OutboundRecordEditForm(data=request.POST, instance=row_object)
     if form.is_valid():
         form.save()
         return redirect('/outbound/list/')
-    return render(request, 'outbound_form.html', {"form": form, "title": "编辑出库记录"})
+    return render(request, 'outbound_edit_form.html', {"form": form, "title": "编辑出库记录"})
 
 def outbound_delete(request, nid):
     """删除出库记录"""

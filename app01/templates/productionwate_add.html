@@ -1,5 +1,7 @@
 {% extends 'layout.html' %}
-
+{% block title %}
+    数据维护 - 工价维护
+{% endblock %}
 {% block content %}
     <div class="container-fluid">
         <div class="panel panel-default">
@@ -15,6 +17,7 @@
                         {% for form in formset %}
                             <div class="col-md-3 formset_item">
                                 {{ form.as_p }}
+
                                 <button type="button" class="btn btn-danger remove-form">删除</button>
                             </div>
                         {% endfor %}
@@ -63,7 +66,7 @@
                 // 检查输入是否为数字
                 if ($.isNumeric(quantity) && $.isNumeric(wage)) {
                     var salary = parseFloat(quantity) * parseFloat(wage);
-                    salary = salary.toFixed(2);  // 格式化小数位
+                    salary = salary.toFixed(3);  // 格式化小数位
                     // 将结果赋值给工资输入框
                     $('#' + prefix + '-合计工资').val(salary);
                 } else {
@@ -203,45 +206,43 @@
                 // 获取地块
                 $('#' + prefix + '-数量').change(function () {
 
-                       var quantityVal = $(this).val();
+                var quantity = $(this).val().trim();
 
-                        // ② 定义一个表达式解析函数（也可以单独放在更上层）
-                        function parseExpression(expression) {
-                            // 去掉所有空格
-                            expression = expression.replace(/\s+/g, "");
+                // 设置默认值为 0 如果输入为空
+                if (quantity === "") {
+                    quantity = "0";
+                    $(this).val(quantity);
+                }
 
-                            // 只允许数字、小数点、加减乘除符号（如需括号可加 ()）
-                            if (!/^[\d.+\-*/]+$/.test(expression)) {
-                                return null; // 如果包含了其他字符，则认为无效
-                            }
-                            try {
-                                let result = eval(expression);  // 直接用 eval 计算
-                                if (isNaN(result)) {
-                                    return null;
-                                }
-                                // 保留2位小数
-                                return parseFloat(result.toFixed(2));
-                            } catch (error) {
-                                console.log("表达式解析错误:", error);
-                                return null;
-                            }
-                        }
+                // 使用正则表达式匹配复杂表达式，如 "10.1*2.25/1.2"
+                var regex = /^(\d+(\.\d+)?)([*\/](\d+(\.\d+)?))*$/;  // 匹配 "数字*数字/数字" 等格式
+                var match = quantity.match(regex);
 
-                        // ③ 尝试解析该表达式
-                        var parsedValue = parseExpression(quantityVal);
-                        if (parsedValue !== null) {
-                            // 如果解析成功，则更新文本框为计算结果
-                            $('#' + prefix + '-数量').val(parsedValue);
+                // 如果匹配成功
+                if (match) {
+                    try {
+                        // 使用 Function 构造函数来安全地计算表达式
+                        var result = Function('"use strict";return (' + quantity + ')')();
+                        if ($.isNumeric(result)) {
+                            // 保留两位小数
+                            result = parseFloat(result).toFixed(3);
+                            $('#' + prefix + '-数量').val(result);  // 更新为计算后的结果
                         } else {
-                            // 解析失败，可根据需求提示或清空
-                            alert("输入的数量表达式有误，请检查。");
-                            // $('#' + prefix + '-数量').val(''); // 若想清空可解除注释
+                            console.log("计算结果不是数字");
+                            $('#' + prefix + '-数量').val("0");
                         }
-
+                    } catch (e) {
+                        console.log("表达式计算错误:", e);
+                        // 如果表达式无效，恢复为 0
+                        $('#' + prefix + '-数量').val("0");
+                    }
+                } else {
+                    console.log("输入的数量格式不正确");
+                    // 如果格式不正确，恢复为 0
+                    $('#' + prefix + '-数量').val("0");
+                }
 
                     calculateSalary(prefix);
-
-
                     var pc = $('#' + prefix + '-批次').val();
                     //alert(pc);
 
@@ -297,6 +298,7 @@
             $('#add_more').click(function () {
                 var newForm = $('.formset_item:first').clone(false); // 克隆第一个表单项以保留事件绑定
                 var form_idx = $('#formset_container .formset_item').length;
+ // 设置 '工时' 和 '数量' 字段默认值为 0
 
                 newForm.find(':input').each(function () {
                     var name = $(this).attr('name');
@@ -313,7 +315,7 @@
 
                     $(this).val('').removeAttr('checked').removeAttr('selected');
                 });
-
+                newForm.find(':input[name$="-工时"]').val('0');
                 $('#formset_container').append(newForm); // 将新表单项添加到页面
 
                 // 为新表单项绑定事件
