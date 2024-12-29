@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.db.models import Sum, Min, Max, Q
 from django.http import JsonResponse, QueryDict
 from django.shortcuts import render, redirect
@@ -37,7 +38,7 @@ def production_wage_add(request):
         # 将POST数据传递给固定表单和表单集
         fixed_form = FixedFieldsForm(request.POST)
         formset = DynamicFieldsFormSet(request.POST)
-        # print(formset)
+        print("POST 数据:", request.POST)  # 调试信息
         # 如果固定表单和表单集都有效，则保存数据并重定向
         if fixed_form.is_valid() and formset.is_valid():
             fixed_instance = fixed_form.save(commit=False)
@@ -168,8 +169,10 @@ def production_wage_add(request):
             return redirect('/production_wage_list/list')
         else:
             # 如果有验证错误，打印错误信息以便调试
-            #print(fixed_form.errors)  # 打印固定表单的错误
-            #print(formset.errors)  # 打印表单集的错误
+            # 打印错误信息
+            print("Fixed Form Errors:", fixed_form.errors)
+            print("Formset Errors:", formset.errors)
+            messages.error(request, "表单验证失败，请检查错误信息。")
             # 在这里可以进一步处理验证错误
             pass
 
