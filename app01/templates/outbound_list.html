@@ -20,7 +20,7 @@
             <div style="float: right; width: 300px;">
                 <form method="get">
                     <div class="input-group">
-                        <input type="text" name="q" class="form-control" placeholder="搜索公司" value="{{ search_data }}">
+                        <input type="text" name="q" class="form-control" placeholder="搜索" value="{{ search_data }}">
                         <span class="input-group-btn">
                             <button class="btn btn-default" type="submit">
                                 <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
@@ -56,6 +56,7 @@
                             <th>盖布/块</th>
                             <th>挑菜</th>
                             <th>备注</th>
+                            <th>销售记录数</th> <!-- 新增列 -->
                             <th>操作</th>
                         </tr>
                     </thead>
@@ -78,6 +79,9 @@
                                 <td>{{ obj.盖布_块 }}</td>
                                 <td>{{ obj.挑菜 }}</td>
                                 <td>{{ obj.备注 }}</td>
+                                <td class="{% if obj.sales_count > 0 %}text-success{% else %}text-danger{% endif %}">
+                                    {{ obj.sales_count }}
+                                </td>
                                 <td>
                                     <a class="btn btn-primary btn-xs" href="{% url 'outbound_edit' obj.id %}">编辑</a>
                                     <a class="btn btn-danger btn-xs" href="{% url 'outbound_delete' obj.id %}">删除</a>
@@ -85,7 +89,7 @@
                                 </td>
                             </tr>
                             <tr id="sales-records-{{ obj.id }}" style="display: none;">
-                                <td colspan="16">
+                                <td colspan="17"> <!-- 确保 colspan 等于总列数 -->
                                     <div class="table-responsive">
                                         <table class="table table-bordered">
                                             <thead>

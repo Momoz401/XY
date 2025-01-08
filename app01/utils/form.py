@@ -346,7 +346,7 @@ class FixedFieldsForm(BootStrapModelForm):  # 静态字段
         from app01.models import BaseInfoBase
         choices = [('', '请选择基地经理')] + [(manager, manager) for manager in
                                               BaseInfoBase.objects.values_list('基地经理', flat=True).distinct()]
-        # print("选择项 (choices):", choices)  # 打印生成的选择项列表
+       # print("选择项 (choices):", choices)  # 打印生成的选择项列表
 
     except Exception:
         choices = [('', '请选择基地经理')]

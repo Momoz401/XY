@@ -134,65 +134,69 @@ $(function(){
     //    如果要Ajax动态生成, 就要写额外的 JS. 但多数情况ModelChoiceField足够.
 
     // 3) 收款日期 -> jQuery UI datepicker
-    //    要保证 <input type="text" id="id_收款日期"> (默认 Django DateField->TextInput)
+    //    确保 <input type="text" id="id_收款日期"> 是 TextInput
     $("#id_收款日期").datepicker({
-        dateFormat: "yy-mm-dd"
+        dateFormat: "yy-mm-dd",
+        changeMonth: true,      // 允许改变月份
+        changeYear: true,       // 允许改变年份
+        yearRange: "c-100:c+10", // 设置年份范围，从当前年份前100年到后10年
+        showButtonPanel: true   // 显示按钮面板，方便快速选择
     });
 
-      // 3) 数量 -> 允许数学表达式，并计算金额
-  function calculateAmount() {
-    var quantityInput = $("#id_数量");
-    var unitPriceInput = $("#id_单价");
-    var amountInput = $("#id_金额");
-    var receivableAmountInput = $("#id_应收金额");
-    var receivedAmountInput = $("#id_实收金额");
+    // 4) 数量 -> 允许数学表达式，并计算金额
+    function calculateAmount() {
+        var quantityInput = $("#id_数量");
+        var unitPriceInput = $("#id_单价");
+        var amountInput = $("#id_金额");
+        var receivableAmountInput = $("#id_应收金额");
+        var receivedAmountInput = $("#id_实收金额");
 
-    var quantityExpr = quantityInput.val();
-    var unitPrice = parseFloat(unitPriceInput.val());
+        var quantityExpr = quantityInput.val();
+        var unitPrice = parseFloat(unitPriceInput.val());
 
-    if (!unitPrice || isNaN(unitPrice)) {
-        // 如果单价无效，无法计算金额
-        amountInput.val('');
-        receivableAmountInput.val('');
-        receivedAmountInput.val('');
-        return;
+        if (!unitPrice || isNaN(unitPrice)) {
+            // 如果单价无效，无法计算金额
+            amountInput.val('');
+            receivableAmountInput.val('');
+            receivedAmountInput.val('');
+            return;
+        }
+
+        var quantity = 0;
+        try {
+            // 使用安全的方式计算表达式
+            quantity = Function('"use strict";return (' + quantityExpr + ')')();
+            if (isNaN(quantity)) throw "NaN";
+        } catch (e) {
+            // 如果表达式无效，显示错误并清空金额
+            alert('数量输入格式不正确，请输入有效的数学表达式或数字。');
+            amountInput.val('');
+            receivableAmountInput.val('');
+            receivedAmountInput.val('');
+            return;
+        }
+
+        // 计算金额
+        var amount = unitPrice * quantity;
+
+        // 格式化金额为三位小数，不添加千分位分隔符
+        var formattedAmount = amount.toFixed(3);
+        // 设置金额字段的值
+        amountInput.val(formattedAmount);
+
+        // 自动设置应收金额和实收金额
+        receivableAmountInput.val(formattedAmount);
+        receivedAmountInput.val(formattedAmount);
+        // 将收款方式默认设置为“现金”
+        $("#id_收款方式").val("现金");
     }
-
-    var quantity = 0;
-    try {
-        // 使用安全的方式计算表达式
-        quantity = Function('"use strict";return (' + quantityExpr + ')')();
-        if (isNaN(quantity)) throw "NaN";
-    } catch (e) {
-        // 如果表达式无效，显示错误并清空金额
-        alert('数量输入格式不正确，请输入有效的数学表达式或数字。');
-        amountInput.val('');
-        receivableAmountInput.val('');
-        receivedAmountInput.val('');
-        return;
-    }
-
-    // 计算金额
-    var amount = unitPrice * quantity;
-
-    // 格式化金额为三位小数，不添加千分位分隔符
-    var formattedAmount = amount.toFixed(3);
-    // 设置金额字段的值
-    amountInput.val(formattedAmount);
-
-    // 自动设置应收金额和实收金额
-    receivableAmountInput.val(formattedAmount);
-    receivedAmountInput.val(formattedAmount);
-    // 将收款方式默认设置为“现金”
-    $("#id_收款方式").val("现金");
-}
 
     // 绑定事件
     $("#id_数量, #id_单价").on('input', function(){
         calculateAmount();
     });
 
-    // 4) 当“单价”发生变化时，重新计算“金额”
+    // 当“单价”发生变化时，重新计算“金额”
     $("#id_单价").on('change', function(){
         calculateAmount();
     });

@@ -1,5 +1,6 @@
 from pyexpat.errors import messages
 
+from django.db.models import Q, Count
 from django.http import JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -11,9 +12,20 @@ from app01.utils.pagination import Pagination
 def outbound_list(request):
     """出库记录列表"""
     search_data = request.GET.get('q', "")
-    queryset = OutboundRecord.objects.exclude(日期__isnull=True).order_by('-日期')
+    queryset = OutboundRecord.objects.exclude(日期__isnull=True).annotate(
+        sales_count=Count('sales_records')  # related_name='sales_records'
+    ).order_by('-日期')
+
     if search_data:
-        queryset = queryset.filter(批次__contains=search_data).order_by('-日期')
+        queryset = queryset.filter(
+            Q(批次__icontains=search_data) |
+            Q(车牌__icontains=search_data) |
+            Q(挑菜__icontains=search_data) |
+            Q(地块__icontains=search_data) |
+            Q(公司__icontains=search_data) |
+            Q(日期__icontains=search_data) |
+            Q(市场__icontains=search_data)
+        ).order_by('-日期')
 
     page_object = Pagination(request, queryset)
     context = {
