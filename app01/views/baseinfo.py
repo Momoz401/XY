@@ -65,5 +65,6 @@ def BaseInfo_delete(request, nid):
     删除基地信息视图
     删除指定的基地信息。
     """
-    models.BaseInfoBase.objects.filter(基地ID=nid).delete()  # 删除指定ID的对象
+
+    models.BaseInfoBase.objects.filter(ID=nid).delete()  # 删除指定ID的对象
     return redirect('/BaseInfo/list/')
