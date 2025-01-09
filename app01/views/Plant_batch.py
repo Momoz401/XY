@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import pandas as pd
+from django.db import IntegrityError
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from app01.models import Plant_batch, BaseInfoBase, JobCategoryInfo
@@ -84,9 +85,8 @@ def Plant_batch_add(request):
             try:
                 planting_date = instance.种植日期
                 growth_cycle = float(instance.生长周期)  # 将 decimal.Decimal 转为 float
-                harvest_period = float(instance.采收期)  # 将 decimal.Decimal 转为 float
+                harvest_period = float(instance.采收期) # 将 decimal.Decimal 转为 float
 
-                # 计算采收初期和采收末期
                 harvest_start_date = planting_date + timedelta(days=growth_cycle)
                 harvest_end_date = harvest_start_date + timedelta(days=harvest_period)
 
@@ -95,11 +95,15 @@ def Plant_batch_add(request):
             except ValueError:
                 print("生长周期或采收期无效，请检查输入")
 
-        # 保存批次数据
-        instance.save()
-        return redirect('/Plant_batch/list/')
+        # 保存批次数据，并捕获唯一约束错误
+        try:
+            instance.save()
+            return redirect('/Plant_batch/list/')
+        except IntegrityError:
+            # 如果捕获到重复主键或唯一约束错误，就给 form 中相应字段添加错误
+            form.add_error('批次ID', "该批次ID已存在，请更换后再添加。")
 
-    # 如果表单无效，重新加载页面并显示错误
+    # 如果表单无效 或 捕获了重复错误，则重新渲染表单页面并显示错误
     bases = BaseInfoBase.objects.all()
     job_categories = JobCategoryInfo.objects.filter(category_level=2)
     return render(request, 'Plant_batch_add.html', {

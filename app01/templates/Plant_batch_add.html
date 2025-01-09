@@ -133,7 +133,9 @@
                         <label for="id_batch_id">批次ID</label>
                         <input type="text" class="form-control" name="批次ID" id="id_batch_id" readonly>
                     </div>
-
+                      {% for error in form.批次ID.errors %}
+                            <div class="text-danger">{{ error }}</div>
+                        {% endfor %}
                     <button type="submit" class="btn btn-primary">保存</button>
                 </form>
             </div>
