@@ -36,7 +36,7 @@ from app01.views.loss import loss_report_list, loss_report_add, loss_report_edit
 
 from app01.views.month_plan import monthly_plan_list, monthly_plan_create, monthly_plan_edit, monthly_plan_delete
 from app01.views.outbound import outbound_list, outbound_add, outbound_edit, outbound_delete, plot_autocomplete, \
-    get_batch_by_plot
+    get_batch_by_plot, outbound_export
 from app01.views.plan_completion_report import monthly_plan_rate, monthly_plan_download, plan_feedback
 from app01.views.plant_batch_calendar import plant_batch_calendar_view
 from app01.views.process_alert import process_alert_list, process_alert_create, process_alert_update, \
@@ -323,6 +323,7 @@ urlpatterns = [
     path('sales_record/edit/<int:pk>/', sales_record_edit, name='sales_record_edit'),
     path('sales_record/delete/<int:pk>/', sales_record_delete, name='sales_record_delete'),
     path('ajax/customer_autocomplete/', views.customer_autocomplete, name='customer_autocomplete'),
+    path('outbound/export/', outbound_export, name='outbound_export'),
 
     # 单独管理销售记录的URL
     path('sales_record/management/list/', views.sales_record_management_list, name='sales_record_management_list'),

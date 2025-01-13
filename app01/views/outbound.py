@@ -1,7 +1,8 @@
+import csv
 from pyexpat.errors import messages
 
 from django.db.models import Q, Count
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from app01.models import OutboundRecord, Market, Plant_batch, Vehicle, JobCategoryInfo
@@ -138,3 +139,60 @@ def get_batch_by_plot(request):
     qs = Plant_batch.objects.filter(地块=plot_val).values_list('批次ID', flat=True)
     data = list(qs)  # ["TXA-123xx","xxxx"]
     return JsonResponse(data, safe=False)
+
+
+def outbound_export(request):
+    """
+    导出出库记录为 CSV 文件
+    """
+    search_data = request.GET.get('q', "")
+    queryset = OutboundRecord.objects.exclude(日期__isnull=True).annotate(
+        sales_count=Count('sales_records')
+    ).order_by('-日期')
+
+    # 如果有搜索条件，则按条件过滤
+    if search_data:
+        queryset = queryset.filter(
+            Q(批次__icontains=search_data) |
+            Q(车牌__icontains=search_data) |
+            Q(挑菜__icontains=search_data) |
+            Q(地块__icontains=search_data) |
+            Q(公司__icontains=search_data) |
+            Q(日期__icontains=search_data) |
+            Q(市场__icontains=search_data)
+        ).order_by('-日期')
+
+    # 创建 HttpResponse 对象，并设置相应的 CSV 格式的 Content-Type
+    response = HttpResponse(content_type='text/csv; charset=utf-8')
+    response['Content-Disposition'] = 'attachment; filename="outbound_records.csv"'
+
+    writer = csv.writer(response)
+    # 写入 CSV 表头
+    writer.writerow([
+        'ID', '日期', '车牌', '公司', '市场', '品类', '品种', '规格',
+        '单位', '数量/筐', '重量/kg', '地块', '批次', '盖布/块', '挑菜', '备注', '销售记录数'
+    ])
+
+    # 写入数据
+    for record in queryset:
+        writer.writerow([
+            record.id,
+            record.日期,
+            record.车牌,
+            record.公司,
+            record.市场,
+            record.品类,
+            record.品种,
+            record.规格,
+            record.单位,
+            record.数量_筐,
+            record.重量_kg,
+            record.地块,
+            record.批次,
+            record.盖布_块,
+            record.挑菜,
+            record.备注,
+            record.sales_count,
+        ])
+
+    return response

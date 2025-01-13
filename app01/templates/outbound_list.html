@@ -17,6 +17,12 @@
                 <span class="glyphicon glyphicon-upload" aria-hidden="true"></span>
                 上传销售记录
             </a>
+
+               <!-- 新增导出按钮 -->
+            <a class="btn btn-info" href="{% url 'outbound_export' %}?q={{ search_data }}">
+                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                导出出库记录
+            </a>
             <div style="float: right; width: 300px;">
                 <form method="get">
                     <div class="input-group">
