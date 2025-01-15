@@ -1,7 +1,7 @@
 import csv
 from pyexpat.errors import messages
 
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -14,7 +14,7 @@ def outbound_list(request):
     """出库记录列表"""
     search_data = request.GET.get('q', "")
     queryset = OutboundRecord.objects.exclude(日期__isnull=True).annotate(
-        sales_count=Count('sales_records')  # related_name='sales_records'
+        total_sales_quantity=Sum('sales_records__数量')  # 汇总销售数量  # related_name='sales_records'
     ).order_by('-日期')
 
     if search_data:

@@ -18,7 +18,7 @@
                 上传销售记录
             </a>
 
-               <!-- 新增导出按钮 -->
+            <!-- 新增导出按钮 -->
             <a class="btn btn-info" href="{% url 'outbound_export' %}?q={{ search_data }}">
                 <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
                 导出出库记录
@@ -45,112 +45,117 @@
             <div class="table-responsive">
                 <table class="table table-bordered">
                     <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>日期</th>
-                            <th>车牌</th>
-                            <th>公司</th>
-                            <th>市场</th>
-                            <th>一级分类</th>
-                            <th>二级分类</th>
-                            <th>规格</th>
-                            <th>单位</th>
-                            <th>数量/筐</th>
-                            <th>重量/kg</th>
-                            <th>地块</th>
-                            <th>批次</th>
-                            <th>盖布/块</th>
-                            <th>挑菜</th>
-                            <th>备注</th>
-                            <th>销售记录数</th> <!-- 新增列 -->
-                            <th>操作</th>
-                        </tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>日期</th>
+                        <th>车牌</th>
+                        <th>公司</th>
+                        <th>市场</th>
+                        <th>一级分类</th>
+                        <th>二级分类</th>
+                        <th>规格</th>
+                        <th>单位</th>
+                        <th>数量/筐</th>
+                        <th>重量/kg</th>
+                        <th>地块</th>
+                        <th>批次</th>
+                        <th>盖布/块</th>
+                        <th>挑菜</th>
+                        <th>备注</th>
+                        <th>销售数量</th> <!-- 新增列 -->
+                        <th>操作</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        {% for obj in queryset %}
-                            <tr>
-                                <td>{{ obj.id }}</td>
-                                <td>{{ obj.日期 }}</td>
-                                <td>{{ obj.车牌 }}</td>
-                                <td>{{ obj.公司 }}</td>
-                                <td>{{ obj.市场 }}</td>
-                                <td>{{ obj.品类 }}</td>
-                                <td>{{ obj.品种 }}</td>
-                                <td>{{ obj.规格 }}</td>
-                                <td>{{ obj.单位 }}</td>
-                                <td>{{ obj.数量_筐 }}</td>
-                                <td>{{ obj.重量_kg }}</td>
-                                <td>{{ obj.地块 }}</td>
-                                <td>{{ obj.批次 }}</td>
-                                <td>{{ obj.盖布_块 }}</td>
-                                <td>{{ obj.挑菜 }}</td>
-                                <td>{{ obj.备注 }}</td>
-                                <td class="{% if obj.sales_count > 0 %}text-success{% else %}text-danger{% endif %}">
-                                    {{ obj.sales_count }}
-                                </td>
-                                <td>
-                                    <a class="btn btn-primary btn-xs" href="{% url 'outbound_edit' obj.id %}">编辑</a>
-                                    <a class="btn btn-danger btn-xs" href="{% url 'outbound_delete' obj.id %}">删除</a>
-                                    <button class="btn btn-info btn-xs" onclick="toggleSalesRecords({{ obj.id }})" id="toggle-sales-records-{{ obj.id }}">查看销售记录</button>
-                                </td>
-                            </tr>
-                            <tr id="sales-records-{{ obj.id }}" style="display: none;">
-                                <td colspan="17"> <!-- 确保 colspan 等于总列数 -->
-                                    <div class="table-responsive">
-                                        <table class="table table-bordered">
-                                            <thead>
-                                                <tr>
-                                                    <th>销售日期</th>
-                                                    <th>批次</th>
-                                                    <th>客户</th>
-                                                    <th>数量</th>
-                                                    <th>单位</th>
-                                                    <th>规格</th>
-                                                    <th>单价</th>
-                                                    <th>金额</th>
-                                                    <th>应收金额</th>
-                                                    <th>实收金额</th>
-                                                    <th>收款日期</th>
-                                                    <th>销售人员</th>
-                                                    <th>收款方式</th>
-                                                    <th>备注</th>
-                                                    <th>操作</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for record in obj.sales_records.all %}
-                                                    <tr>
-                                                        <td>{{ record.销售日期 }}</td>
-                                                        <td>{{ record.批次 }}</td>
-                                                        <td>{{ record.客户 }}</td>
-                                                        <td>{{ record.数量 }}</td>
-                                                        <td>{{ record.单位 }}</td>
-                                                        <td>{{ record.规格 }}</td>
-                                                        <td>{{ record.单价 }}</td>
-                                                        <td>{{ record.金额 }}</td>
-                                                        <td>{{ record.应收金额 }}</td>
-                                                        <td>{{ record.实收金额 }}</td>
-                                                        <td>{{ record.收款日期 }}</td>
-                                                        <td>{{ record.销售人员 }}</td>
-                                                        <td>{{ record.收款方式 }}</td>
-                                                        <td>{{ record.备注 }}</td>
-                                                        <td>
-                                                            <a class="btn btn-primary btn-xs" href="{% url 'sales_record_edit' record.id %}">编辑</a>
-                                                            <a class="btn btn-danger btn-xs" href="{% url 'sales_record_delete' record.id %}">删除</a>
-                                                        </td>
-                                                    </tr>
-                                                {% empty %}
-                                                    <tr>
-                                                        <td colspan="15" class="text-center">暂无销售记录</td>
-                                                    </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <a class="btn btn-success btn-xs" href="{% url 'sales_record_add' obj.id %}">添加销售记录</a>
-                                </td>
-                            </tr>
-                        {% endfor %}
+                    {% for obj in queryset %}
+                        <tr>
+                            <td>{{ obj.id }}</td>
+                            <td>{{ obj.日期 }}</td>
+                            <td>{{ obj.车牌 }}</td>
+                            <td>{{ obj.公司 }}</td>
+                            <td>{{ obj.市场 }}</td>
+                            <td>{{ obj.品类 }}</td>
+                            <td>{{ obj.品种 }}</td>
+                            <td>{{ obj.规格 }}</td>
+                            <td>{{ obj.单位 }}</td>
+                            <td>{{ obj.数量_筐 }}</td>
+                            <td>{{ obj.重量_kg }}</td>
+                            <td>{{ obj.地块 }}</td>
+                            <td>{{ obj.批次 }}</td>
+                            <td>{{ obj.盖布_块 }}</td>
+                            <td>{{ obj.挑菜 }}</td>
+                            <td>{{ obj.备注 }}</td>
+                            <td class="{% if obj.total_sales_quantity > 0 %}text-success{% else %}text-danger{% endif %}">
+                                {{ obj.total_sales_quantity|default:0 }}
+                            </td>
+                            <td>
+                                <a class="btn btn-primary btn-xs" href="{% url 'outbound_edit' obj.id %}">编辑</a>
+                                <a class="btn btn-danger btn-xs" href="{% url 'outbound_delete' obj.id %}">删除</a>
+                                <button class="btn btn-info btn-xs" onclick="toggleSalesRecords({{ obj.id }})"
+                                        id="toggle-sales-records-{{ obj.id }}">查看销售记录
+                                </button>
+                            </td>
+                        </tr>
+                        <tr id="sales-records-{{ obj.id }}" style="display: none;">
+                            <td colspan="17"> <!-- 确保 colspan 等于总列数 -->
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                        <tr>
+                                            <th>销售日期</th>
+                                            <th>批次</th>
+                                            <th>客户</th>
+                                            <th>数量</th>
+                                            <th>单位</th>
+                                            <th>规格</th>
+                                            <th>单价</th>
+                                            <th>金额</th>
+                                            <th>应收金额</th>
+                                            <th>实收金额</th>
+                                            <th>收款日期</th>
+                                            <th>销售人员</th>
+                                            <th>收款方式</th>
+                                            <th>备注</th>
+                                            <th>操作</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {% for record in obj.sales_records.all %}
+                                            <tr>
+                                                <td>{{ record.销售日期 }}</td>
+                                                <td>{{ record.批次 }}</td>
+                                                <td>{{ record.客户 }}</td>
+                                                <td>{{ record.数量 }}</td>
+                                                <td>{{ record.单位 }}</td>
+                                                <td>{{ record.规格 }}</td>
+                                                <td>{{ record.单价 }}</td>
+                                                <td>{{ record.金额 }}</td>
+                                                <td>{{ record.应收金额 }}</td>
+                                                <td>{{ record.实收金额 }}</td>
+                                                <td>{{ record.收款日期 }}</td>
+                                                <td>{{ record.销售人员 }}</td>
+                                                <td>{{ record.收款方式 }}</td>
+                                                <td>{{ record.备注 }}</td>
+                                                <td>
+                                                    <a class="btn btn-primary btn-xs"
+                                                       href="{% url 'sales_record_edit' record.id %}">编辑</a>
+                                                    <a class="btn btn-danger btn-xs"
+                                                       href="{% url 'sales_record_delete' record.id %}">删除</a>
+                                                </td>
+                                            </tr>
+                                        {% empty %}
+                                            <tr>
+                                                <td colspan="15" class="text-center">暂无销售记录</td>
+                                            </tr>
+                                        {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <a class="btn btn-success btn-xs"
+                                   href="{% url 'sales_record_add' obj.id %}">添加销售记录</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             </div>
@@ -167,16 +172,19 @@
             width: 100%;
             overflow-x: auto;
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: center;
             white-space: nowrap;
         }
+
         th {
             background-color: #f2f2f2;
             line-height: 1.2;
@@ -196,11 +204,11 @@
             }
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('[id^="sales-records-"]').forEach(function(element) {
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('[id^="sales-records-"]').forEach(function (element) {
                 element.style.display = 'none';
             });
-            document.querySelectorAll('[id^="toggle-sales-records-"]').forEach(function(button) {
+            document.querySelectorAll('[id^="toggle-sales-records-"]').forEach(function (button) {
                 button.innerText = '查看销售记录';
             });
         });
