@@ -278,10 +278,10 @@ def upload_agriculturecost_modal_form(request):
     return render(request, 'upload_form.html',
                   {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
 
-
 def upload_Plant_batch_modal_form(request):
-    """ 上传文件和数据（modelForm）"""
+    """ 上传批次表 Excel 文件，并存入数据库 """
     title = "批次表文件上传"
+
     if request.method == "GET":
         form = UpModelForm()
         return render(request, 'upload_form.html',
@@ -293,25 +293,37 @@ def upload_Plant_batch_modal_form(request):
             # 读取 Excel 文件
             df = pd.read_excel(form.cleaned_data['excel_file'])
 
-            # 检查必要的列是否存在
-            required_columns = ['批次ID', '移栽日期', '点籽日期', '面积', '移栽板量', '移栽数量']
+            # 必须包含的字段
+            required_columns = ['批次ID', '一级分类', '二级分类', '地块', '面积', '移栽日期', '点籽日期', '移栽板量', '移栽数量', '用籽量', '基地', '基地经理']
             for column in required_columns:
                 if column not in df.columns:
                     raise ValueError(f"缺少必要的列：{column}")
 
-            # 转换日期列为字符串格式
-            date_columns = ['移栽日期', '点籽日期', '采收初期', '采收末期', '下批前一天时间']
+            # 处理日期格式，避免 NaT 产生 strftime 错误
+            date_columns = ['移栽日期', '点籽日期', '采收初期', '采收末期']
             for column in date_columns:
-                df[column] = df[column].apply(lambda x: x.strftime('%Y-%m-%d') if pd.notna(x) else None)
+                if column in df.columns:
+                    df[column] = pd.to_datetime(df[column], errors='coerce')
 
-            # 处理 NaN 值的列，比如面积
-            df['面积'] = df['面积'].fillna(0)
+            # 处理 NaN 值
+            df.fillna({'面积': 0, '移栽板量': 0, '移栽数量': 0, '用籽量': 0}, inplace=True)
 
-            # 将 DataFrame 转换为字典列表
+            # 转换为字典列表
             records = df.to_dict(orient='records')
 
             for record in records:
                 try:
+                    # 处理 `移栽日期` 和 `点籽日期`
+                    transplant_date = record.get('移栽日期')
+                    seeding_date = record.get('点籽日期')
+
+                    # 避免 NaT 影响
+                    transplant_date = transplant_date.strftime('%Y-%m-%d') if pd.notna(transplant_date) else None
+                    seeding_date = seeding_date.strftime('%Y-%m-%d') if pd.notna(seeding_date) else None
+
+                    # 计算 `种植日期`
+                    planting_date = transplant_date if transplant_date else seeding_date
+
                     data = {
                         '一级分类': record.get('一级分类'),
                         '二级分类': record.get('二级分类'),
@@ -319,54 +331,38 @@ def upload_Plant_batch_modal_form(request):
                         '面积': record.get('面积', 0),
                         '基地': record.get('基地'),
                         '基地经理': record.get('基地经理'),
-                        '移栽日期': record.get('移栽日期'),
+                        '移栽日期': transplant_date,
+                        '点籽日期': seeding_date,
+                        '种植日期': planting_date,
                         '移栽板量': record.get('移栽板量', 0),
                         '移栽数量': record.get('移栽数量', 0),
-                        '点籽日期': record.get('点籽日期'),
                         '用籽量': record.get('用籽量', 0),
-                        '备注': record.get('备注'),
-                        '生长周期': record.get('生长周期'),
-                        '采收初期': record.get('采收初期'),
-                        '采收末期': record.get('采收末期'),
-                        '采收期': record.get('采收期'),
-                        '周期批次': record.get('周期批次'),
-                        '总周期天数': record.get('总周期天数'),
-                        '销毁面积': record.get('销毁面积', 0),
-                        '销毁备注': record.get('销毁备注'),
-                        '总产量': record.get('总产量', 0),
-                        '总亩产': record.get('总亩产', 0),
-                        '正常产量': record.get('正常产量', 0),
-                        '正常亩产': record.get('正常亩产', 0),
-                        '栽种方式': record.get('栽种方式'),
-                        '下批前一天时间': record.get('下批前一天时间'),
-                        '周期': record.get('周期'),
+                        '备注': record.get('备注') if pd.notna(record.get('备注')) else "",
+                        '生长周期': record.get('生长周期') if pd.notna(record.get('生长周期')) else None,
+                        '采收初期': record.get('采收初期').strftime('%Y-%m-%d') if pd.notna(record.get('采收初期')) else None,
+                        '采收末期': record.get('采收末期').strftime('%Y-%m-%d') if pd.notna(record.get('采收末期')) else None,
+                        '采收期': record.get('采收期') if pd.notna(record.get('采收期')) else "",
                         'uploader': request.session["info"]['name'],
                     }
 
-                    # 单独尝试每一个字段，捕捉并记录出错的字段
-                    for key, value in data.items():
-                        try:
-                            if key in ['移栽日期', '点籽日期', '采收初期', '采收末期', '下批前一天时间'] and value:
-                                # 尝试将日期字符串转换为日期对象以确保格式正确
-                                value = pd.to_datetime(value).strftime('%Y-%m-%d')
-                            obj, created = Plant_batch.objects.update_or_create(
-                                批次ID=record['批次ID'],
-                                defaults={key: value}
-                            )
-                        except Exception as field_error:
-                            print(f"处理字段 '{key}' 的值 '{value}' 时出错: {field_error}")
-                            raise  # 重新抛出异常以便在外层捕获
+                    # **基于 `批次ID + 地块` 确保唯一性**
+                    obj, created = Plant_batch.objects.update_or_create(
+                        批次ID=record['批次ID'],
+                        地块=record['地块'],  # 关键字段
+                        defaults=data
+                    )
 
-                except Exception as e:
-                    print(f"在处理记录时发生错误，字段 {record} 报错: {e}")
+                except Exception as record_error:
+                    print(f"处理记录 {record} 时发生错误: {record_error}")
+
             return redirect('/Plant_batch/list/')
+
         except Exception as e:
             print(f"处理过程中出现错误：{e}")
             form.add_error(None, "上传过程中出现问题，请检查数据格式并重试。")
+
     return render(request, 'Plant_batch.html',
                   {"form": form, 'title': title, 'uploader_name': request.session["info"]['name']})
-
-
 def upload_expense_allocation(request):
     """ 上传费用摊销数据 """
     if request.method == "GET":

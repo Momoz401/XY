@@ -218,7 +218,7 @@ class BaseInfoWorkHour(models.Model):
 class PlanPlantBatch(models.Model):
     ID = models.AutoField(primary_key=True)
     批次ID = models.CharField(max_length=10, null=True)
-    移栽日期 = models.DateField(null=True)
+    移栽日期 = models.DateField(null=True,blank=True)
     品种 = models.CharField(max_length=255, null=True)
     品类 = models.CharField(max_length=255, null=True)
     面积 = models.DecimalField(max_digits=10, decimal_places=3, null=True)
@@ -477,7 +477,7 @@ from django.utils import timezone
 
 class Plant_batch(models.Model):
     ID = models.AutoField(primary_key=True)
-    批次ID = models.CharField(max_length=50, unique=True, null=True, blank=True)  # 生成的批次ID
+    批次ID = models.CharField(max_length=50, null=True, blank=True)  # 生成的批次ID
     二级分类 = models.CharField(max_length=255, null=True, blank=True)
     一级分类 = models.CharField(max_length=255, null=True, blank=True)
     基地 = models.CharField(max_length=255, null=True, blank=True)  # 新增的基地字段
@@ -485,6 +485,7 @@ class Plant_batch(models.Model):
     面积 = models.DecimalField(max_digits=10, decimal_places=3, null=True, blank=True)
     基地经理 = models.CharField(max_length=255, null=True, blank=True)
     种植日期 = models.DateField(default=timezone.now, null=True, blank=True)  # 默认值为当天日期
+    移栽日期 = models.DateField(null=True, blank=True)  # 记录移栽日期
     移栽板量 = models.FloatField(null=True, blank=True)
     移栽数量 = models.FloatField(null=True, blank=True)
     点籽日期 = models.DateField(null=True, blank=True)
@@ -558,6 +559,9 @@ class Plant_batch(models.Model):
     收苗结束时间 = models.DateField(null=True, blank=True)
     收苗数量 = models.FloatField(null=True, blank=True)
     收苗单位 = models.CharField(max_length=50, null=True, blank=True,default="板")
+
+    class Meta:
+        unique_together = ('批次ID', '地块')  # 添加联合唯一约束
     def save(self, *args, **kwargs):
         # 保持原逻辑：生成批次ID
         if not self.批次ID:
