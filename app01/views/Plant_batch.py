@@ -16,7 +16,7 @@ def Plant_batch_list(request):
     if search_data:
         data_dict["批次ID__contains"] = search_data
 
-    queryset = Plant_batch.objects.filter(**data_dict).order_by('-种植日期')
+    queryset = Plant_batch.objects.filter(**data_dict).order_by('-ID')
 
     context = {
         "queryset": queryset,      # 传递所有过滤后的数据
