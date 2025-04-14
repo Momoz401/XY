@@ -24,6 +24,53 @@ def Plant_batch_list(request):
     }
     return render(request, 'Plant_batch.html', context)
 
+
+def Plant_batch_server_list(request):
+    """ DataTables 服务器端分页接口：返回 JSON 数据 """
+    draw = int(request.GET.get('draw', '1'))
+    start = int(request.GET.get('start', '0'))
+    length = int(request.GET.get('length', '10'))
+
+    # 获取搜索内容
+    search_value = request.GET.get('search[value]', '')
+
+    # 过滤数据（可选：根据搜索条件过滤）
+    if search_value:
+        queryset = Plant_batch.objects.filter(批次ID__icontains=search_value)
+    else:
+        queryset = Plant_batch.objects.all()
+
+    total_records = queryset.count()
+
+    # 分页数据
+    page_data = queryset.order_by('-ID')[start:start+length]
+
+    # 序列化数据
+    data = []
+    for idx, obj in enumerate(page_data, start=1 + start):
+        data.append({
+            "序号": idx,
+            "批次ID": obj.批次ID,
+            "一级分类": obj.一级分类,
+            "二级分类": obj.二级分类,
+            "基地": obj.基地,
+            "地块": obj.地块,
+            "面积": obj.面积,
+            "基地经理": obj.基地经理,
+            "种植日期": obj.种植日期.strftime('%Y-%m-%d') if obj.种植日期 else '',
+            "操作": f'''
+                <a href="/Plant_batch/edit/{obj.ID}/" class="btn btn-sm btn-primary">编辑</a>
+                <a href="/Plant_batch/delete/{obj.ID}/" class="btn btn-sm btn-danger">删除</a>
+            '''
+        })
+
+    return JsonResponse({
+        "draw": draw,
+        "recordsTotal": total_records,
+        "recordsFiltered": total_records,
+        "data": data,
+    })
+
 # 新增视图
 
 def export_plant_batches(request):
@@ -57,7 +104,20 @@ def Plant_batch_add(request):
 
     form = PlantBatchCreateForm(data=request.POST)
     if form.is_valid():
+        print(form.cleaned_data)
         instance = form.save(commit=False)
+
+        # 避免日期字段为空字符串导致保存时报错
+        for field in ['移栽日期', '点籽日期']:
+            value = request.POST.get(field)
+            if value == "":
+                setattr(instance, field, None)
+
+        # 处理空字符串数字字段为 None，防止 float('') 报错
+        for field in ['移栽板量', '移栽数量', '用籽量']:
+            value = request.POST.get(field)
+            if value == "":
+                setattr(instance, field, None)
 
         # 获取前端传来的批次ID
         batch_id = instance.批次ID
@@ -73,11 +133,9 @@ def Plant_batch_add(request):
 
         # 处理栽种方式，计算采收日期
         if instance.栽种方式 == '移栽':
-            instance.移栽日期 = request.POST.get('移栽日期')
             instance.移栽板量 = request.POST.get('移栽板量')
             instance.移栽数量 = request.POST.get('移栽数量')
         elif instance.栽种方式 == '点籽':
-            instance.点籽日期 = request.POST.get('点籽日期')
             instance.用籽量 = request.POST.get('用籽量')
 
         # 计算采收初期和采收末期
@@ -182,8 +240,6 @@ def Plant_batch_delete(request, nid):
     return redirect('/Plant_batch/list/')
 
 
-
-
 def Plant_batch_query(request):
     """ 批次信息查询 """
     data_dict = {}
@@ -235,53 +291,119 @@ def Plant_batch_query(request):
 
     return render(request, 'plant_batch_query.html', context)
 
-
-
 def Plant_batch_server_list(request):
-    draw = int(request.GET.get("draw", 1))
-    start = int(request.GET.get("start", 0))
-    length = int(request.GET.get("length", 10))
-    search_value = request.GET.get("search[value]", "")
+    draw = int(request.GET.get('draw', '1'))
+    start = int(request.GET.get('start', '0'))
+    length = int(request.GET.get('length', '10'))
+    search_value = request.GET.get('search[value]', '')
 
-    # 构建查询条件
-    query = Plant_batch.objects.all()
+    # 字段索引对应映射（与前端列顺序对应）
+    column_map = {
+        "0": "ID",
+        "1": "批次ID",
+        "2": "一级分类",
+        "3": "二级分类",
+        "4": "基地",
+        "5": "地块",
+        "6": "面积",
+        "7": "基地经理",
+        "8": "种植日期",
+        "9": "移栽板量",
+        "10": "移栽数量",
+        "11": "点籽日期",
+        "12": "用籽量",
+        "13": "备注",
+        "14": "生长周期",
+        "15": "采收初期",
+        "16": "采收末期",
+        "17": "采收期",
+        "18": "周期批次",
+        "19": "总周期天数",
+        "20": "销毁面积",
+        "21": "销毁备注",
+        "22": "正常产量",
+        "23": "正常亩产",
+        "24": "总产量",
+        "25": "总亩产",
+        "26": "栽种方式",
+        "27": "下批前一天时间",
+        "28": "周期",
+        "29": "打地开始时间",
+        "30": "打地结束时间",
+        "31": "打地周期",
+        "32": "打地数量",
+        "33": "移栽开始时间",
+        "34": "移栽结束时间",
+        "35": "移栽周期",
+        "36": "移栽数量",
+        "37": "除草开始时间",
+        "38": "除草结束时间",
+        "39": "除草周期",
+        "40": "除草数量",
+        "41": "采收开始时间",
+        "42": "采收结束时间",
+        "43": "采收周期",
+        "44": "采收数量",
+        "45": "清棚开始时间",
+        "46": "清棚结束时间",
+        "47": "清棚周期",
+        "48": "清棚数量",
+        "49": "点籽开始时间",
+        "50": "点籽结束时间",
+        "51": "点籽周期",
+        "52": "点籽数量",
+        "53": "间菜开始时间",
+        "54": "间菜结束时间",
+        "55": "间菜周期",
+        "56": "间菜数量",
+        "57": "吹生菜开始时间",
+        "58": "吹生菜结束时间",
+        "59": "吹生菜周期",
+        "60": "吹生菜数量",
+        "61": "施肥开始时间",
+        "62": "施肥结束时间",
+        "63": "施肥周期",
+        "64": "施肥数量",
+        "65": "收苗开始时间",
+        "66": "收苗结束时间",
+        "67": "收苗数量",
+        "68": "收苗单位",
+    }
+
+    # 搜索
+    queryset = Plant_batch.objects.all()
     if search_value:
-        query = query.filter(批次ID__icontains=search_value)
+        queryset = queryset.filter(批次ID__icontains=search_value)
 
-    total = query.count()
+    # 排序处理
+    column_index = request.GET.get('order[0][column]', '0')
+    order_dir = request.GET.get('order[0][dir]', 'asc')
+    order_column = column_map.get(column_index, 'ID')
+    if order_dir == 'desc':
+        order_column = f'-{order_column}'
+    queryset = queryset.order_by(order_column)
 
-    # 排序处理（根据 DataTables 参数排序）
-    order_column_index = request.GET.get("order[0][column]")
-    order_column = request.GET.get(f"columns[{order_column_index}][data]", "ID")
-    order_dir = request.GET.get("order[0][dir]", "desc")
-    if order_dir == "desc":
-        order_column = f"-{order_column}"
-    query = query.order_by(order_column)
+    total = queryset.count()
+    page_data = queryset[start:start + length]
 
-    # 分页
-    query = query[start:start+length]
-
-    # 转换数据
+    # 序列化数据
     data = []
-    for index, obj in enumerate(query, start=1):
-        data.append({
-            "序号": index + start,
-            "批次ID": obj.批次ID or "",
-            "一级分类": obj.一级分类 or "",
-            "二级分类": obj.二级分类 or "",
-            "基地": obj.基地 or "",
-            "地块": obj.地块 or "",
-            "面积": obj.面积 or "",
-            "基地经理": obj.基地经理 or "",
-            "种植日期": obj.种植日期 or "",
-            "操作": f'<a class="btn btn-primary btn-xs" href="/Plant_batch/{obj.ID}/edit/">编辑</a> '
-                    f'<a class="btn btn-danger btn-xs" href="/Plant_batch/{obj.ID}/delete/">删除</a>',
-            # 其他字段按需添加...
-        })
+    for i, obj in enumerate(page_data, start=1 + start):
+        row = {"0": i}
+        for index, field in column_map.items():
+            val = getattr(obj, field, '')
+            if hasattr(val, 'strftime'):
+                val = val.strftime('%Y-%m-%d')
+            row[index] = val
+        row[str(len(column_map))] = f'''
+            <a href="/Plant_batch/{obj.ID}/edit" class="btn btn-sm btn-primary">编辑</a>
+            <a href="/Plant_batch/{obj.ID}/delete" class="btn btn-sm btn-danger">删除</a>
+        '''
+        data.append(row)
 
     return JsonResponse({
         "draw": draw,
         "recordsTotal": total,
         "recordsFiltered": total,
-        "data": data
+        "data": data,
     })

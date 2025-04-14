@@ -22,7 +22,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-hkrj5qe6)4-oe)g&+s-_)90r8$$fk_*a1w33=2wikt4!^4_h6c'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -38,9 +38,17 @@ INSTALLED_APPS = [
     'app01.apps.App01Config'
 ]
 
+# 判断是否开发环境（通过环境变量控制）
+IS_DEV = os.environ.get("DJANGO_DEV", "").lower() == "true"
+
 MIDDLEWARE = [
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+]
+
+if not IS_DEV:
+    MIDDLEWARE.append('whitenoise.middleware.WhiteNoiseMiddleware')
+
+MIDDLEWARE += [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -48,7 +56,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'app01.middleware.auth.AuthMiddleware',
-
 ]
 
 ROOT_URLCONF = 'day16.urls'

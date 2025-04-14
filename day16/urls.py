@@ -428,6 +428,7 @@ urlpatterns = [
     path('ajax/plot-autocomplete/', plot_autocomplete, name='plot_autocomplete'),
     path('ajax/batch-by-plot/', get_batch_by_plot, name='get_batch_by_plot'),
 
+    path('Plant_batch/server/list/', Plant_batch.Plant_batch_server_list, name='Plant_batch_server_list'),
 
 ]
 from django.conf.urls.static import static
