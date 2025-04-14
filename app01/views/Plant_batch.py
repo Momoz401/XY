@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 
 import pandas as pd
 from django.db import IntegrityError
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from app01.models import Plant_batch, BaseInfoBase, JobCategoryInfo
 from app01.utils.form import PlantBatchEditForm, PlantBatchCreateForm
@@ -234,3 +234,54 @@ def Plant_batch_query(request):
     }
 
     return render(request, 'plant_batch_query.html', context)
+
+
+
+def Plant_batch_server_list(request):
+    draw = int(request.GET.get("draw", 1))
+    start = int(request.GET.get("start", 0))
+    length = int(request.GET.get("length", 10))
+    search_value = request.GET.get("search[value]", "")
+
+    # 构建查询条件
+    query = Plant_batch.objects.all()
+    if search_value:
+        query = query.filter(批次ID__icontains=search_value)
+
+    total = query.count()
+
+    # 排序处理（根据 DataTables 参数排序）
+    order_column_index = request.GET.get("order[0][column]")
+    order_column = request.GET.get(f"columns[{order_column_index}][data]", "ID")
+    order_dir = request.GET.get("order[0][dir]", "desc")
+    if order_dir == "desc":
+        order_column = f"-{order_column}"
+    query = query.order_by(order_column)
+
+    # 分页
+    query = query[start:start+length]
+
+    # 转换数据
+    data = []
+    for index, obj in enumerate(query, start=1):
+        data.append({
+            "序号": index + start,
+            "批次ID": obj.批次ID or "",
+            "一级分类": obj.一级分类 or "",
+            "二级分类": obj.二级分类 or "",
+            "基地": obj.基地 or "",
+            "地块": obj.地块 or "",
+            "面积": obj.面积 or "",
+            "基地经理": obj.基地经理 or "",
+            "种植日期": obj.种植日期 or "",
+            "操作": f'<a class="btn btn-primary btn-xs" href="/Plant_batch/{obj.ID}/edit/">编辑</a> '
+                    f'<a class="btn btn-danger btn-xs" href="/Plant_batch/{obj.ID}/delete/">删除</a>',
+            # 其他字段按需添加...
+        })
+
+    return JsonResponse({
+        "draw": draw,
+        "recordsTotal": total,
+        "recordsFiltered": total,
+        "data": data
+    })

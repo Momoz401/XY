@@ -63,7 +63,7 @@ from app01.views.customer import *
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-
+    path('', lambda request: redirect('/login/')),
     re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}, name='media'),
 
     path('tt/', chart.tt),
@@ -174,6 +174,9 @@ urlpatterns = [
     # 批次管理相关路径配置
     # 显示批次表列表页面
     path('Plant_batch/list/', Plant_batch.Plant_batch_list),
+
+    path('Plant_batch/server_data/', Plant_batch.Plant_batch_server_list),
+
     path('Plant_batch/export/', export_plant_batches, name='export_plant_batches'),
     # 创建新的批次记录的页面
     path('Plant_batch/add/', Plant_batch.Plant_batch_add),
